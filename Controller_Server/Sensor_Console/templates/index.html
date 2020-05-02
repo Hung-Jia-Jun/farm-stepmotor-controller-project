@@ -1,0 +1,218 @@
+<!DOCTYPE html> 
+<html lang="en">   
+ <head>     
+	<meta charset="utf-8">     
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>  
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css" rel="stylesheet">
+
+<script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+	 
+	 <script type="text/javascript"
+				 src="{{ url_for('static', filename='Sensor.js') }}"></script>
+ 
+ </head>   
+ <body>   
+ <div class="container">  
+    <div class="row">  
+        <div class="col-md-4">
+            <h4>光照度儀</h4>    
+            <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">名稱</th>
+                    <th scope="col">數值</th>
+                </tr>
+            </thead>
+            <tbody id="LuxTable">
+            </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-4">
+            <h4>PH 儀</h4>    
+            <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">名稱</th>
+                    <th scope="col">數值</th>
+                </tr>
+            </thead>
+            <tbody id="PH_Table">
+            </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-4">
+            <h4>EC 儀</h4>    
+            <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">名稱</th>
+                    <th scope="col">數值</th>
+                </tr>
+            </thead>
+            <tbody id="EC_Table">
+            </tbody>
+            </table>
+        </div>
+        <div class="col-md-4">
+            <button onclick="ReadAllSensor();" type="button" class="btn btn-primary">更新</button>  
+        </div>
+    </div>
+<div class="row">
+    <div class="col-md-8">
+        <h4>定時重複運行指令</h4>    
+        
+        <button onclick="showCommandList();" type="button" class="btn btn-primary">更新列表</button>  
+        
+        <button onclick="showCommandList();" type="button" class="btn btn-primary">新增指令</button>  
+        
+
+        <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">指令</th>
+                <th scope="col">方向</th>
+                <th scope="col">座標位置</th>
+                <th scope="col">到達目標所需時間</th>
+            </tr>
+        </thead>
+        <tbody id="Command_table">
+        </tbody>
+        </table>
+    </div>
+
+    <div class="col-md-4">
+        <h4>定時運行排程</h4>    
+        
+        <button type="button" class="btn btn-primary">更新排程列表</button>  
+        
+        <button type="button" class="btn btn-primary">新增排程運行</button>  
+        <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">時間</th>
+            </tr>
+        </thead>
+        <tbody id="Schedule_table">
+        </tbody>
+        </table>
+    </div>
+</div>
+
+<div style="height: 50px;" class="row"></div>
+<h4>校正馬達運行時間與移動距離</h4>
+<div class="row">
+        <div class = "col-md-1">
+            <h6>步進馬達</h6>
+        </div>
+        <div class="col-md-2">
+            <div class="dropdown">
+            <div>
+            </div>
+                <button class="btn btn-info dropdown-toggle" type="button" id="dropdownStepMotor" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    步進馬達旋轉方向
+                </button>
+                <div class="dropdown-menu" aria-labelledby="motor">
+                        <a class="dropdown-item" onclick="updateSelectionItem('dropdownStepMotor','正轉');" href="#">正轉</a>
+                    <a class="dropdown-item" onclick="updateSelectionItem('dropdownStepMotor','反轉');" href="#">反轉</a>
+                </div>
+            </div>
+            
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="runSecond" placeholder="秒">
+        </div>
+        <div class="col-md-2">
+            <button onclick="TestRunStep();" type="button" class="btn btn-warning">測試</button>
+        </div>
+
+        <div class = "col-md-0">
+            <h8>步進馬達時間距離比例</h8>
+        </div>
+
+        <div class="col-md-1">
+            <input type="text" class="form-control" id="runSecond" placeholder="公分">
+        </div>
+        <div class = "col-md-0">
+            <h6>:</h6>
+        </div>
+        <div class="col-md-1">
+            <input type="text" class="form-control" id="runSecond" placeholder="秒">
+        </div>
+        <div class="col-md-1">
+            <button onclick="TestRunStep();" type="button" class="btn btn-success">儲存</button>
+        </div>
+</div>
+<div style="height: 10px;" class="row"></div>
+  <div class="row">
+        <div class = "col-md-1">
+            <h6>直流馬達</h6>
+        </div>
+        <div class="col-md-2">
+            <div class="dropdown">
+            <div>
+            </div>
+                <button class="btn btn-info dropdown-toggle" type="button" id="dropdownBrushlessMotor" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    直流馬達旋轉方向
+                </button>
+                <div class="dropdown-menu" aria-labelledby="motor">
+                        <a class="dropdown-item" onclick="updateSelectionItem('dropdownBrushlessMotor','正轉');" href="#">正轉</a>
+                    <a class="dropdown-item" onclick="updateSelectionItem('dropdownBrushlessMotor','反轉');" href="#">反轉</a>
+                </div>
+            </div>
+            
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="runSecond" placeholder="秒">
+        </div>
+        <div class="col-md-2">
+            <button onclick="TestRunStep();" type="button" class="btn btn-warning">測試</button>
+        </div>
+
+        <div class = "col-md-0">
+            <h8>直流馬達時間距離比例</h8>
+        </div>
+
+        <div class="col-md-1">
+            <input type="text" class="form-control" id="runSecond" placeholder="公分">
+        </div>
+        <div class = "col-md-0">
+            <h6>:</h6>
+        </div>
+        <div class="col-md-1">
+            <input type="text" class="form-control" id="runSecond" placeholder="秒">
+        </div>
+        <div class="col-md-1">
+            <button onclick="TestRunStep();" type="button" class="btn btn-success">儲存</button>
+        </div>
+</div>
+    <div style="height: 50px;" class="row"></div>
+    <h4>拍照測試</h4>
+    <h8>Jetson Nano 拍照的圖將會顯示在這裡</h8>
+    
+    <div class="row">
+
+            <div class="col-md-4">
+                <img src="https://3.blog.xuite.net/3/a/2/7/238328267/blog_3441985/txt/200984010/0.jpg" width = "100%" height="auto" class="img-responsive" alt="Cinque Terre">
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <button onclick="TestTakePic();" type="button" class="btn btn-warning">Jetson Nano 拍照測試</button>
+                </div>
+                <div class="col-md-8">
+                    <h8 id="PicFilePath">拍照檔名 : </h8>
+                </div>
+            </div>
+    </div>
+</div>
+ </body> 
+</html>
