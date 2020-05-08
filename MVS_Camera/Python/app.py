@@ -11,6 +11,7 @@ import pdb
 import os
 import logging
 import GrabImageToJpg
+
 app = Flask(__name__)
 
 class Camera:
