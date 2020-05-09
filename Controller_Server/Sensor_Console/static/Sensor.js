@@ -116,12 +116,6 @@ function showCommandList()
 			align:'center'
 		}, 
 		{
-			field: 'Duration',
-			title: '到達目標所需時間',
-			align:'center'
-		}
-		, 
-		{
 			field: 'DateTime',
 			title: '創建時間',
 			align:'center'
@@ -213,6 +207,7 @@ function TestRunStep()
 	//脈衝次數
 	_Pulse_Count = document.getElementById("Pulse_Count").value;
 
+	_StepMotorNumber = document.getElementById("StepMotorNumber").innerText;
 	//步進馬達旋轉方向 = 順時針轉為1,逆時鐘轉為0
 	if (document.getElementById("dropdownStepMotor").innerText == "正轉")
 	{
@@ -225,7 +220,12 @@ function TestRunStep()
 
 	document.getElementById("StepRunResult").innerText = "運行結果 : 運行中 ...";
 	$.get(Controller_ServerURL + "/Stepping_Motor",
-		{Pulse_Width  : _PulseWidth,  PulseFrequency : _PulseFrequency , Pulse_Count  : _Pulse_Count , direction :_direction},
+		{   Pulse_Width  : _PulseWidth,  
+			PulseFrequency : _PulseFrequency , 
+			Pulse_Count  : _Pulse_Count , 
+			direction :_direction,
+			StepMotorNumber : _StepMotorNumber
+		},
 		function(data) {
 			document.getElementById("StepRunResult").innerText = "運行結果 :" + data;
 		}
@@ -233,37 +233,30 @@ function TestRunStep()
 }
 
 //儲存距離與馬達運行時間比例的修改結果
-function UpdateDistanceOfTimeProportion(_Setting_type)
+function UpdateDistanceOfTimeProportion(_SettingMotorNumber)
 {
 	_value = ""
-	if (_Setting_type == "BrushlessMotor")
-	{
-		_cm = document.getElementById("BrushlessMotorRunMile").value;
-		_duration = document.getElementById("BrushlessMotorRunSecond").value;
-		_value = _cm +"cm:" + _duration + "s"
-	}
-	else
-	{
-		//脈衝寬度
-		StepMotorPulseWidth = document.getElementById("StepMotorPulseWidth").value
-			
-		//脈衝頻率
-		StepMotorPulseFrequency = document.getElementById("StepMotorPulseFrequency").value
+	
+	//脈衝寬度
+	StepMotorPulseWidth = document.getElementById("StepMotorPulseWidth_" + _SettingMotorNumber).value
 		
-		//脈衝次數
-		StepMotorPulseTimes = document.getElementById("StepMotorPulseTimes").value
-		
-		//脈衝距離
-		StepMotorRunMile = document.getElementById("StepMotorRunMile").value
+	//脈衝頻率
+	StepMotorPulseFrequency = document.getElementById("StepMotorPulseFrequency_" + _SettingMotorNumber).value
+	
+	//脈衝次數
+	StepMotorPulseTimes = document.getElementById("StepMotorPulseTimes_" + _SettingMotorNumber).value
+	
+	//脈衝距離
+	StepMotorRunMile = document.getElementById("StepMotorRunMile_" + _SettingMotorNumber).value
 
-		//width=10:Frequency=10:Count=28:cm=10
-		_value ="width=" +StepMotorPulseWidth+ ":" +
-				"Frequency=" + StepMotorPulseFrequency + ":" +
-				"Count=" + StepMotorPulseTimes+ ":" +
-				"cm=" + StepMotorRunMile
-			}
+	//width=10:Frequency=10:Count=28:cm=10
+	_value ="width=" +StepMotorPulseWidth+ ":" +
+			"Frequency=" + StepMotorPulseFrequency + ":" +
+			"Count=" + StepMotorPulseTimes+ ":" +
+			"cm=" + StepMotorRunMile
+		
 	$.get("/UpdateDistanceOfTimeProportion",
-		{Setting_type : _Setting_type, value : _value},
+		{ Setting_type: _SettingMotorNumber, value : _value},
 		function(data) {
 			console.log(data);
 		}

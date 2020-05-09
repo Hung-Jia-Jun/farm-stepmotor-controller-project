@@ -18,8 +18,12 @@ db = SQLAlchemy(app)
 socketio = SocketIO(app)
 
 class config(db.Model):
-    config_key = db.Column(db.String(255), primary_key=True)
-    config_value = db.Column(db.String(255))
+    id = db.Column(db.Integer, primary_key=True)
+    config_key = db.Column(db.String(255))
+    width = db.Column(db.Integer)
+    frequency = db.Column(db.Integer)
+    count = db.Column(db.Integer)
+    distance = db.Column(db.Integer)
 
     def __init__(self, content):
         self.content = content
@@ -154,11 +158,26 @@ def saveMotorCommand():
 #取得現在的馬達距離比例
 @app.route("/queryDistanceOfTimeProportion")
 def queryDistanceOfTimeProportion():
-    StepMotor_config = config.query.filter_by(config_key ='StepMotor_DistanceOfTimeProportion').first()
-    BrushlessMotor_config = config.query.filter_by(config_key ='BrushlessMotor_DistanceOfTimeProportion').first()
+    StepMotor_config_A = config.query.filter_by(
+        config_key='StepMotor_DistanceOfTimeProportion_A').first()
+    StepMotor_config_B = config.query.filter_by(
+        config_key='StepMotor_DistanceOfTimeProportion_B').first()
+
     #距離與馬達運轉時間比例
-    proportionValue = {"StepMotor_DistanceOfTimeProportion": StepMotor_config.config_value,
-                        "BrushlessMotor_DistanceOfTimeProportion": BrushlessMotor_config.config_value}
+    proportionValue = {
+        "StepMotor_DistanceOfTimeProport_A": {
+            "width": StepMotor_config_A.width,
+            "frequency": StepMotor_config_A.frequency,
+            "count": StepMotor_config_A.count,
+            "distance": StepMotor_config_A.distance
+        },
+        "StepMotor_DistanceOfTimeProport_B": {
+            "width": StepMotor_config_B.width,
+            "frequency": StepMotor_config_B.frequency,
+            "count": StepMotor_config_B.count,
+            "distance": StepMotor_config_B.distance
+        }
+    }
     return proportionValue
 
 #讀取所有Sensor數值
@@ -185,19 +204,20 @@ def ReadEC():
 @app.route("/UpdateDistanceOfTimeProportion")
 def UpdateDistanceOfTimeProportion():
     #設定的類別
-    Setting_type = request.args.get('Setting_type')
+    _SettingMotorNumber = request.args.get('_SettingMotorNumber')
 
     value = request.args.get('value')
     
-    BrushlessMotor_config = config.query.filter_by(config_key ='BrushlessMotor_DistanceOfTimeProportion').first()
-    StepMotor_config = config.query.filter_by(config_key ='StepMotor_DistanceOfTimeProportion').first()
+    StepMotor_configA = config.query.filter_by(
+        config_key='StepMotorA_DistanceOfTimeProportion').first()
+    StepMotor_configB = config.query.filter_by(
+        config_key ='StepMotorB_DistanceOfTimeProportion').first()
 
-    #如果是設定無刷直流馬達的距離時間關係
-    if Setting_type == "BrushlessMotor":
-        BrushlessMotor_config.config_value = value
-    elif Setting_type == "StepMotor":
-        StepMotor_config.config_value = value
-
+    #因為現在是雙步進馬達，所以要依照馬達類別寫入
+    if _SettingMotorNumber == "StepMotorA":
+        StepMotor_configA.config_value = value
+    elif _SettingMotorNumber == "StepMotorB":
+        StepMotor_configB.config_value = value
     db.session.commit()
     return "OK"
 

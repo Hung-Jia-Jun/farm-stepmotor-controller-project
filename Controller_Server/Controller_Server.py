@@ -94,8 +94,31 @@ def Stepping_Motor():
 	#脈衝次數
 	Pulse_Count = request.args.get('Pulse_Count')
 	
+	#步進馬達代號
+	StepMotorNumber = request.args.get('StepMotorNumber')
+
+	if StepMotorNumber == "A" :
+		#定義要控制哪個步進馬達
+		#Set Enable
+		ENA = 5
+
+		#方向
+		DIR = 6
+
+		#脈衝
+		PUL = 13
+	#要控制代號B的步進馬達
+	else if StepMotorNumber =="B":
+		#Set Enable
+		ENA = 17
+
+		#方向
+		DIR = 27
+
+		#脈衝
+		PUL = 22
 	if sys.platform == "linux":
-		status = Controll_2MD4850.RunStepping_MotorByInputSetNumber(Pulse_Width,Pulse_Count,PulseFrequency,direction)
+		status = Controll_2MD4850.RunStepping_MotorByInputSetNumber(ENA,DIR,PUL,Pulse_Width,Pulse_Count,PulseFrequency,direction)
 		return str(status)
 	elif sys.platform == "win32":
 		return "在windows環境無法顯示此數值"

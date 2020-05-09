@@ -3,16 +3,7 @@ import time
 import pdb
 
 #啟動步進馬達，在使用者輸入一個指定毫秒時
-def RunStepping_MotorByInputSetNumber(Pulse_Width,Pulse_Count,PulseFrequency,DR_Type):
-    #Set Enable
-    ENA = 5
-
-    #方向
-    DIR = 6
-
-    #脈衝
-    PUL = 13
-
+def RunStepping_MotorByInputSetNumber(ENA,DIR,PUL,Pulse_Width,Pulse_Count,PulseFrequency,DR_Type):
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
 
