@@ -108,7 +108,7 @@ def Stepping_Motor():
 		#脈衝
 		PUL = 13
 	#要控制代號B的步進馬達
-	else if StepMotorNumber =="B":
+	elif StepMotorNumber =="B":
 		#Set Enable
 		ENA = 17
 

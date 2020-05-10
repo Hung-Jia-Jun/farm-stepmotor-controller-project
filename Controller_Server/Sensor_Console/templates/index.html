@@ -22,18 +22,28 @@
 	}
  </style>
 	<meta charset="utf-8">     
-	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>  
+ 	<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>  
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<link href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
-<script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
-	 
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+	<script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.3/moment.min.js"></script>
+						
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+ 
+    <script src="https://cdn.bootcss.com/moment.js/2.18.1/moment-with-locales.min.js"></script>
+    <link href="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css"  rel="stylesheet">
+    <script src="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+
+
 	 <script type="text/javascript" src="/static/Sensor.js"></script>
  
  </head>   
- <body onload="showDistanceOfTimeProportion();">   
+ <body>   
  <div class="container">  
 	<div class="row">  
 		<div class="col-md-4">
@@ -93,33 +103,17 @@
 		
 		<div style="height: 10px;" class="row"></div>
 		<div class="row">
-			<div class="dropdown col-md-2">
-				<div>
-					</div>
-						<button class="btn btn-info dropdown-toggle" type="button" id="MotorType" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">馬達類型</button>
-					<div class="dropdown-menu" aria-labelledby="motor" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
-					<a class="dropdown-item" onclick="updateSelectionItem('MotorType','步進馬達A');">步進馬達A</a>
-					<a class="dropdown-item" onclick="updateSelectionItem('MotorType','步進馬達B');">步進馬達B</a>
-				</div>
-			</div>
 
-			<div class="dropdown col-md-2">
-				<div>
-					</div>
-						<button class="btn btn-info dropdown-toggle" type="button" id="MotorDirection" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">反轉</button>
-					<div class="dropdown-menu" aria-labelledby="motor" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
-					<a class="dropdown-item" onclick="updateSelectionItem('MotorDirection','正轉');">正轉</a>
-					<a class="dropdown-item" onclick="updateSelectionItem('MotorDirection','反轉');">反轉</a>
-				</div>
+			<div class="col-md-2">
+				<input type="text" class="form-control" id="MotorPositionX" placeholder="X座標">
+			</div>
+			<div class="col-md-0.5">
+				<label>:</label>
 			</div>
 			<div class="col-md-2">
-				<input type="text" class="form-control" id="MotorPosition" placeholder="座標位置">
+				<input type="text" class="form-control" id="MotorPositionY" placeholder="Y座標">
 			</div>
-			<div class="custom-control custom-checkbox col-md-3">
-				<input type="checkbox" class="custom-control-input" id="ifGettingLightCutter" checked>
-				<label class="custom-control-label" for="ifGettingLightCutter">遇光遮斷器停止</label>
-			</div>
-			<div class="col-md-2">
+			<div class="col-md-1">
 				<button onclick="saveMotorCommand();" type="button" class="btn btn-primary">新增指令</button>  
 			</div>
 			
@@ -129,12 +123,6 @@
 		<table class="table" id="commandTable">
 			<thead>
 				<tr>
-					<th data-field="#"></th>
-					<th data-field="指令"></th>
-					<th data-field="方向"></th>
-					<th data-field="座標位置"></th>
-					<th data-field="遇光遮斷器停止"></th>
-					<th data-field="創建時間"></th>
 					<th data-checkbox="true"></th>
 				</tr>
 			</thead>
@@ -155,104 +143,165 @@
 	</div>
 
 	<div class="col-md-4">
-		<h4>定時運行排程</h4>    
+		<div class="row">
+			<h4>定時運行排程</h4>    
+		</div>
+		<div style="height: 5px;" class="row"></div>
 		
-		<button type="button" class="btn btn-primary">更新排程列表</button>  
-		
-		<button type="button" class="btn btn-primary">新增排程運行</button>  
-		<table class="table">
-		<thead>
-			<tr>
-			
-			</tr>
-		</thead>
-		<tbody id="Schedule_table">
-		</tbody>
-		</table>
+		<div class="row">
+			<div class="col-md-0">
+				<button type="button" class="btn btn-primary">新增排程運行</button>  
+			</div>
+			<div class="col-sm-6">
+				<div class="form-group">
+					<div class="input-group date" id='datetimepicker'>
+						<input type="text" class="form-control">
+						<span class="input-group-addon">
+							<i class="glyphicon glyphicon-calendar"></i>
+						</span>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<div class="row">
+			<table class="table" id="Schedule_table">
+				<thead>
+					<tr>
+						<th data-checkbox="true"></th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		<div style="height: 30px;" class="row">
+			<div class="col-md-0">
+				<h6 id="saveCommandRunResult">運行結果 :</h6>
+			</div>
+		</div>
+		<div style="height: 5px;" class="row"></div>
+		<div class="row">
+			<div class="col-md-0">
+				<button type="button" class="btn btn-primary">更新排程列表</button>  
+			</div>
+			<div class="col-md-1">
+				<button type="button" class="btn btn-danger">刪除已選排程</button>  
+			</div>
+		</div>
+
 	</div>
 </div>
 
 <div style="height: 50px;" class="row"></div>
-<h4>校正馬達運行時間與移動距離</h4>
-<div class="row">
-	<div class="col-md-3">
-		<h6>馬達代號</h6>
-	</div>
-	<div class="col-md-0">
-		<div class="dropdown">
-			<div>
-				</div>
-					<button class="btn btn-info dropdown-toggle" type="button" id="StepMotorNumber" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">代號</button>
-				<div class="dropdown-menu" aria-labelledby="motor" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
-				<a class="dropdown-item" onclick="updateSelectionItem('StepMotorNumber','A');">A</a>
-				<a class="dropdown-item" onclick="updateSelectionItem('StepMotorNumber','B');">B</a>
-			</div>
-		</div>
-	</div>
-	<div class="col-md-0">
-	</div>
-</div>
-<div style="height: 5px;" class="row"></div>
-<div class="row">
-	<div class="col-md-3">
-		<h6>步進馬達A</h6>
-	</div>
-	<div class="col-md-0">
-		<div class="dropdown">
-			<div>
-				</div>
-					<button class="btn btn-info dropdown-toggle" type="button" id="dropdownStepMotor" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">反轉</button>
-				<div class="dropdown-menu" aria-labelledby="motor" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
-				<a class="dropdown-item" onclick="updateSelectionItem('dropdownStepMotor','正轉');">正轉</a>
-				<a class="dropdown-item" onclick="updateSelectionItem('dropdownStepMotor','反轉');">反轉</a>
-			</div>
-		</div>
-	</div>
-	<div class="col-md-0">
-	</div>
-	
-</div>
-
-<div style="height: 5px;" class="row"></div><div class="row">
-	<div class="col-md-3">
-		<h9>脈衝寬度  0%~100%</h9>
-	</div>
-	<div class="col-md-0">
-		<input type="text" class="form-control" id="PulseWidth" placeholder="脈衝寬度">
-	</div>
-</div><div style="height: 5px;" class="row"></div><div class="row">
-	<div class="col-md-3">
-		<h9>脈衝頻率 Hz</h9>
-	</div>
-	<div class="col-md-0">
-		<input type="text" class="form-control" id="PulseFrequency" placeholder="脈衝頻率 Hz">
-	</div>
-</div><div style="height: 5px;" class="row"></div>
-<div class="row">
-	<div class="col-md-3">
-		<h9>脈衝次數</h9>
-	</div>
-	<div class="col-md-0">
-		<input type="text" class="form-control" id="Pulse_Count" placeholder="脈衝次數">
-	</div>
-</div>
-
-
-<div class="col-md-0">
-	<h6 id="StepRunResult">運行結果 :</h6>
-	<button onclick="TestRunStep();" type="button" class="btn btn-warning">測試</button>
-</div>
-<div style="height: 50px;" class="row"></div>
-
 <div class="row">
 	<div class="col-md-6">
 		<div class="row">
+			<div class="col-md-3">
+				<h4>馬達測試</h4>
+			</div>
+		</div>
+		<div style="height: 5px;" class="row"></div>
+		<div class="row">
+			<div class="col-md-4">
+				<h6>馬達代號</h6>
+			</div>
+			<div class="col-md-0">
+				<div class="dropdown">
+					<div>
+						</div>
+							<button class="btn btn-info dropdown-toggle" type="button" id="dropdownStepMotor" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">A</button>
+						<div class="dropdown-menu" aria-labelledby="motor" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
+						<a class="dropdown-item" onclick="updateSelectionItem('dropdownStepMotor','A');">A</a>
+						<a class="dropdown-item" onclick="updateSelectionItem('dropdownStepMotor','B');">B</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-0">
+			</div>
+		</div>
+		<div style="height: 5px;" class="row"></div>
+		<div class="row">
+			<div class="col-md-4">
+				<h6>旋轉方向</h6>
+			</div>
+			<div class="col-md-0">
+				<div class="dropdown">
+					<div>
+						</div>
+							<button class="btn btn-info dropdown-toggle" type="button" id="stepMotorDirection" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">反轉</button>
+						<div class="dropdown-menu" aria-labelledby="motor" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
+						<a class="dropdown-item" onclick="updateSelectionItem('stepMotorDirection','正轉');">正轉</a>
+						<a class="dropdown-item" onclick="updateSelectionItem('stepMotorDirection','反轉');">反轉</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-0">
+			</div>
+		</div>
+
+		<div style="height: 5px;" class="row"></div>
+		<div class="row">
+			<div class="col-md-4">
+				<h9>脈衝寬度  0%~100%</h9>
+			</div>
+			<div class="col-md-0">
+				<input type="text" class="form-control" id="PulseWidth" placeholder="脈衝寬度">
+			</div>
+		</div>
+
+		<div style="height: 5px;" class="row"></div>
+
+		<div class="row">
+			<div class="col-md-4">
+				<h9>脈衝頻率 Hz</h9>
+			</div>
+			<div class="col-md-0">
+				<input type="text" class="form-control" id="PulseFrequency" placeholder="脈衝頻率 Hz">
+			</div>
+		</div>
+		<div style="height: 5px;" class="row"></div>
+
+		<div class="row">
+			<div class="col-md-4">
+				<h9>脈衝次數</h9>
+			</div>
+			<div class="col-md-0">
+				<input type="text" class="form-control" id="Pulse_Count" placeholder="脈衝次數">
+			</div>
+		</div>
+		<div class="col-md-0">
+			<h6 id="StepRunResult">運行結果 :</h6>
+			<button onclick="TestRunStep();" type="button" class="btn btn-warning">測試</button>
+		</div>
+		<div style="height: 50px;" class="row"></div>
+		
+	</div>
+	<div class="col-md-6">
+		<div class="row">
 			<div class="col-md-12">
-				<h4>步進馬達 A 脈衝寬度、脈衝次數與距離比例</h4>
+				<h4>步進馬達 脈衝寬度、脈衝次數與距離比例</h4>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-3">
+			<div class="col-md-4">
+				<h6>馬達代號</h6>
+			</div>
+			<div class="col-md-0">
+				<div class="dropdown">
+					<div>
+						</div>
+							<button class="btn btn-info dropdown-toggle" type="button" id="StepMotorNumber" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">A</button>
+						<div class="dropdown-menu" aria-labelledby="motor" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
+						<a class="dropdown-item" onclick="updateSelectionItem('StepMotorNumber','A');">A</a>
+						<a class="dropdown-item" onclick="updateSelectionItem('StepMotorNumber','B');">B</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-0">
+			</div>
+		</div>
+		<div style="height: 5px;" class="row"></div>
+		<div class="row">
+			<div class="col-md-4">
 				<h9>脈衝寬度  0%~100%</h9>
 			</div>
 			<div class="col-md-0">
@@ -261,14 +310,14 @@
 		</div>
 		<div style="height: 5px;" class="row"></div>
 		<div class="row">
-			<div class="col-md-3">
+			<div class="col-md-4">
 				<h9>脈衝頻率 Hz</h9>
 			</div>
 			<div class="col-md-0">
 				<input type="text" class="form-control" id="StepMotorPulseFrequency_A" placeholder="脈衝頻率 Hz">
 			</div>
 		</div><div style="height: 5px;" class="row"></div><div class="row">
-			<div class="col-md-3">
+			<div class="col-md-4">
 				<h9>脈衝次數</h9>
 			</div>
 			<div class="col-md-0">
@@ -278,68 +327,21 @@
 
 		<div style="height: 5px;" class="row"></div>
 		<div class="row">
-			<div class="col-md-3">
+			<div class="col-md-4">
 				<h9>距離 cm</h9>
 			</div>
 			<div class="col-md-0">
 				<input type="text" class="form-control" id="StepMotorRunMile_A" placeholder="距離">
 			</div>
 		</div>
-		<div style="height: 5px;" class="row"></div>
+		<div style="height: 20px;" class="row"></div>
 		<div class="col-md-0">
 			<button onclick="UpdateDistanceOfTimeProportion('A');" type="button" class="btn btn-success">儲存</button>
 		</div>
 		<div style="height: 50px;" class="row"></div>
 			
 	</div>
-
-	<div class="col-md-6">
-		<div class="row">
-			<div class="col-md-12">
-				<h4>步進馬達 B 脈衝寬度、脈衝次數與距離比例</h4>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-3">
-				<h9>脈衝寬度  0%~100%</h9>
-			</div>
-			<div class="col-md-0">
-				<input type="text" class="form-control" id="StepMotorPulseWidth_B" placeholder="脈衝寬度">
-			</div>
-		</div>
-		<div style="height: 5px;" class="row"></div>
-		<div class="row">
-			<div class="col-md-3">
-				<h9>脈衝頻率 Hz</h9>
-			</div>
-			<div class="col-md-0">
-				<input type="text" class="form-control" id="StepMotorPulseFrequency_B" placeholder="脈衝頻率 Hz">
-			</div>
-		</div><div style="height: 5px;" class="row"></div><div class="row">
-			<div class="col-md-3">
-				<h9>脈衝次數</h9>
-			</div>
-			<div class="col-md-0">
-				<input type="text" class="form-control" id="StepMotorPulseTimes_B" placeholder="脈衝次數">
-			</div>
-		</div>
-
-		<div style="height: 5px;" class="row"></div>
-		<div class="row">
-			<div class="col-md-3">
-				<h9>距離 cm</h9>
-			</div>
-			<div class="col-md-0">
-				<input type="text" class="form-control" id="StepMotorRunMile_B" placeholder="距離">
-			</div>
-		</div>
-		<div style="height: 5px;" class="row"></div>
-		<div class="col-md-0">
-			<button onclick="UpdateDistanceOfTimeProportion('B');" type="button" class="btn btn-success">儲存</button>
-		</div>
-	</div>
 </div>
-
 
 	<div style="height: 50px;" class="row"></div>
 	<h4>拍照測試</h4>

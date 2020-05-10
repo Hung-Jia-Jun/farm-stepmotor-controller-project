@@ -51,33 +51,41 @@ function ReadAllSensor() {
 //儲存馬達控制指令
 function saveMotorCommand()
 {
-	//取得馬達類型
-	MotorType = document.getElementById("MotorType").innerText;
+	//馬達要到達的地點座標 X
+	MotorPositionX = document.getElementById("MotorPositionX").value;
 
-	//馬達旋轉方向
-	MotorDirection = document.getElementById("MotorDirection").innerText;
-
-	//馬達要到達的地點座標
-	MotorPosition = document.getElementById("MotorPosition").value;
-
-	//遇到光遮斷器要停止?
-	ifGettingLightCutter = document.getElementById("ifGettingLightCutter").checked
-
+	//馬達要到達的地點座標 X
+	MotorPositionY = document.getElementById("MotorPositionY").value;
 	
-	//要走多少距離需要幾秒
-	RunningTime =  parseInt(MotorPosition) /  parseInt(document.getElementById("StepMotorRunMile").value)
+	// StepMotorRunMile_A = document.getElementById("StepMotorRunMile_A").value;
+	// StepMotorRunMile_B = document.getElementById("StepMotorRunMile_B").value;
 
-	//持續時間 = (次數 / 頻率) * 要運行距離是參考距離的幾倍
-	Duration = parseFloat(parseInt(document.getElementById("StepMotorPulseTimes").value) / parseInt(document.getElementById("StepMotorPulseFrequency").value)) * RunningTime
+	// //步進馬達A要走多少距離需要幾秒
+	// RunningTime_A =  parseInt(MotorPositionX) /  parseInt(StepMotorRunMile_A)
+
+	// //步進馬達A要走多少距離需要幾秒
+	// RunningTime_B =  parseInt(MotorPositionY) /  parseInt(StepMotorRunMile_B)
+
+	// //A馬達的脈衝寬度
+	// StepMotorPulseTimes_A = document.getElementById("StepMotorPulseTimes_A").value;
+
+	// //B馬達的脈衝寬度
+	// StepMotorPulseTimes_B = document.getElementById("StepMotorPulseTimes_B").value;
+
+	// StepMotorPulseFrequency_A = document.getElementById("StepMotorPulseFrequency_A").value;
+	// StepMotorPulseFrequency_B = document.getElementById("StepMotorPulseFrequency_B").value;
+	// //持續時間 = (次數 / 頻率) * 要運行距離是參考距離的幾倍
+	// Duration_X = parseFloat(parseInt(StepMotorPulseTimes_A) / parseInt(StepMotorPulseFrequency_A)) * RunningTime_A;
+	
+	// //持續時間 = (次數 / 頻率) * 要運行距離是參考距離的幾倍
+	// Duration_Y =  parseFloat(parseInt(StepMotorPulseTimes_B) / parseInt(StepMotorPulseFrequency_B)) * RunningTime_B;
 	
 	document.getElementById("saveCommandRunResult").innerText = "運行結果 : 上傳中..."
+	//XY兩顆馬達有各自的運行時間，所以在編排前也要先設定好
 	$.get("/saveMotorCommand",
 		{
-			Direction:MotorDirection,
-			Duration:Duration,
-			Position:MotorPosition,
-			Setting_type:MotorType,
-			LightCutter:ifGettingLightCutter,
+			PositionX:MotorPositionX,
+			PositionY:MotorPositionY,
 		},
 		function(data)
 		{
@@ -95,31 +103,16 @@ function showCommandList()
 			title: '#',
 			align:'center'
 	 	}, 
-	 	{
-			field: 'Action',
-			title: '指令',
+		{
+			field: 'PositionX',
+			title: 'X座標',
 			align:'center'
 		}, 
 		{
-			field: 'Direction',
-			title: '方向',
+			field: 'PositionY',
+			title: 'Y座標',
 			align:'center'
 	   	}, 
-		{
-			field: 'Position',
-			title: '座標位置',
-			align:'center'
-	   	}, 
-		{
-			field: 'LightCutter',
-			title: '遇光遮斷器停止',
-			align:'center'
-		}, 
-		{
-			field: 'DateTime',
-			title: '創建時間',
-			align:'center'
-		}
 	];
 
 	$('#commandTable').bootstrapTable('destroy')
@@ -135,32 +128,10 @@ function showCommandList()
 
 	$.get("/queryCommandList",
 		function(data) {
-	
 			var indexnum = 1
 			var commandList = JSON.parse(data);
 			commandList.forEach(element => {
 				command = JSON.parse(element);
-				
-				Direction = command["Direction"];
-				if (Direction==0)
-				{
-					command["Direction"] = "反轉";
-				}
-				else
-				{
-					command["Direction"] = "正轉";
-				}
-
-				LightCutter = command["LightCutter"];
-				if (LightCutter==0)
-				{
-					command["LightCutter"] = "否";
-				}
-				else
-				{
-					command["LightCutter"] = "是";
-				}
-				command['Id'] = indexnum.toString()
 				$('#commandTable').bootstrapTable('append', command);
 				indexnum += 1;
 			});
@@ -168,6 +139,42 @@ function showCommandList()
 	);
 }
 
+//顯示運行指令
+function showPlanList()
+{	
+	var columns = [
+		{ 
+			field:"Id",  
+			title: '#',
+			align:'center'
+	 	}, 
+		{
+			field: 'Time',
+			title: '時間',
+			align:'center'
+		}, 
+	];
+	$('#Schedule_table').bootstrapTable('destroy')
+	$('#Schedule_table').bootstrapTable({  
+			toolbar:"#toolbar",  
+			columns: columns, 
+			uniqueId:'Id',
+			checkbox:"true",
+			pagination:false
+	});
+
+	// $.get("/queryCommandList",
+	// 	function(data) {
+	// 		var indexnum = 1
+	// 		var commandList = JSON.parse(data);
+	// 		commandList.forEach(element => {
+	// 			command = JSON.parse(element);
+	// 			$('#commandTable').bootstrapTable('append', command);
+	// 			indexnum += 1;
+	// 		});
+	// 	}
+	// );
+}
 
 
 //顯示距離與馬達運行時間比例
@@ -177,20 +184,20 @@ function showDistanceOfTimeProportion()
 		function(data) {
 			var StepMotor_config = data["StepMotor_DistanceOfTimeProportion"];
 			var BrushlessMotor_config = data["BrushlessMotor_DistanceOfTimeProportion"];
-			//脈衝寬度
-			document.getElementById("StepMotorPulseWidth").value = (StepMotor_config.split(":")[0].replace("width=",""));
+			// //脈衝寬度
+			// document.getElementById("StepMotorPulseWidth").value = (StepMotor_config.split(":")[0].replace("width=",""));
 			
-			//脈衝頻率
-			document.getElementById("StepMotorPulseFrequency").value = (StepMotor_config.split(":")[1].replace("Frequency=",""));
+			// //脈衝頻率
+			// document.getElementById("StepMotorPulseFrequency").value = (StepMotor_config.split(":")[1].replace("Frequency=",""));
 			
-			//脈衝次數
-			document.getElementById("StepMotorPulseTimes").value = (StepMotor_config.split(":")[2].replace("Count=",""));
+			// //脈衝次數
+			// document.getElementById("StepMotorPulseTimes").value = (StepMotor_config.split(":")[2].replace("Count=",""));
 			
-			//脈衝距離
-			document.getElementById("StepMotorRunMile").value = (StepMotor_config.split(":")[3].replace("cm=",""));
+			// //脈衝距離
+			// document.getElementById("StepMotorRunMile").value = (StepMotor_config.split(":")[3].replace("cm=",""));
 			
-			document.getElementById("BrushlessMotorRunMile").value = (BrushlessMotor_config.split(":")[0].replace("cm",""));
-			document.getElementById("BrushlessMotorRunSecond").value = (BrushlessMotor_config.split(":")[1].replace("s",""));
+			// document.getElementById("BrushlessMotorRunMile").value = (BrushlessMotor_config.split(":")[0].replace("cm",""));
+			// document.getElementById("BrushlessMotorRunSecond").value = (BrushlessMotor_config.split(":")[1].replace("s",""));
 		}
 	);
 }
@@ -311,6 +318,22 @@ $(document).ready(function(){
 		socket.emit('TakePic_event', {data: 'connected!'});
 	});
 
+	$('#datetimepicker').datetimepicker({
+		format: 'HH:mm',
+		locale: moment.locale('zh-tw')
+	});
+
+	//顯示命令列表
 	showCommandList();
+
+	//顯示步進馬達移動比例
+	showDistanceOfTimeProportion(); 
+
+	//讀取所有Sensor
+	ReadAllSensor(); 
+
+	//顯示所有排程列表
+	showPlanList();
+
 
 });

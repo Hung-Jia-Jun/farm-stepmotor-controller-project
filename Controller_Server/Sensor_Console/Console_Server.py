@@ -25,55 +25,23 @@ class config(db.Model):
     count = db.Column(db.Integer)
     distance = db.Column(db.Integer)
 
-    def __init__(self, content):
-        self.content = content
-
-    def __repr__(self):
-        return '<config %r>' % self.content
 class sensor_lux(db.Model):
 	DateTime = db.Column(db.String(255), primary_key=True)
 	Data = db.Column(db.String(255))
-	
-	def __init__(self, DateTime, Data):
-		self.DateTime = DateTime
-		self.Data = Data
-
-	def __repr__(self):
-		return '<sensor_lux %r>' % self.content
 
 class sensor_ec(db.Model):
 	DateTime = db.Column(db.String(255), primary_key=True)
 	Data = db.Column(db.String(255))
 
-	def __init__(self, DateTime, Data):
-		self.DateTime = DateTime
-		self.Data = Data
-
-	def __repr__(self):
-		return '<sensor_ec %r>' % self.content
-
 class sensor_ph(db.Model):
 	DateTime = db.Column(db.String(255), primary_key=True)
 	Data = db.Column(db.String(255))
-  
-	def __init__(self, DateTime, Data):
-		self.DateTime = DateTime
-		self.Data = Data
-
-	def __repr__(self):
-		return '<sensor_ph %r>' % self.content
-
 
 class schedule(db.Model):
-    DateTime = db.Column(db.String(255), primary_key=True)
-    Action = db.Column(db.String(255))
+    id = db.Column(db.Integer, primary_key=True)
+    PositionX = db.Column(db.Integer)
+    PositionY = db.Column(db.Integer)
 
-    def __init__(self, DateTime, Action):
-      self.DateTime = DateTime
-      self.Action = Action
-
-    def __repr__(self):
-        return '<schedule %r>' % self.content
 
 db.init_app(app)
 db.create_all()
@@ -90,9 +58,12 @@ def queryCommandList():
     Command_li = []
     for ele in scheduleLi:
         if ele != None:
-            Action = json.loads(ele.Action)
-            Action["DateTime"] = ele.DateTime
-            Command_li.append(json.dumps(Action))
+            scheduleCommand = {
+                'id' : ele.id,
+                'PositionX' : ele.PositionX,
+                'PositionY' : ele.PositionY,
+            }
+            Command_li.append(json.dumps(scheduleCommand))
     return json.dumps(Command_li)
 
 
@@ -129,27 +100,16 @@ def deleteMotorCommand():
 #新增工作指令
 @app.route("/saveMotorCommand")
 def saveMotorCommand():
-    #方向 順時針轉為1,逆時鐘轉為0
-    Direction = request.args.get('Direction')
-    
-    #座標位置
-    Position = request.args.get('Position')
+    #座標位置 X
+    _PositionX = request.args.get('PositionX')
 
-    #方向 順時針轉為1,逆時鐘轉為0
-    Setting_type = request.args.get('Setting_type')
-   
-    #持續時間
-    Duration = request.args.get('Duration')
+    #座標位置 Y
+    _PositionY = request.args.get('PositionY')
 
-    #光遮斷器
-    LightCutter = request.args.get('LightCutter')
-
-    #如果是設定無刷直流馬達的距離時間關係
-    if Setting_type == "無刷馬達":
-        scheduleCommand = schedule(DateTime = str(datetime.now()) , Action='{\"Action\": \"無刷馬達\", \"Position\": \"'+str(Position)+'\",\"Direction\": \"'+str(Direction)+'\",\"Duration\": \"'+str(Duration)+'\" ,\"LightCutter\":\"'+ str(LightCutter) +'\"}')
-    elif Setting_type == "步進馬達":
-        scheduleCommand = schedule(DateTime = str(datetime.now()) , Action='{\"Action\": \"步進馬達\", \"Position\": \"'+str(Position)+'\",\"Direction\": \"'+str(Direction)+'\",\"Duration\": \"' + str(Duration)+'\" ,\"LightCutter\":\"'+ str(LightCutter) +'\"}')
-        
+    scheduleCommand = schedule(PositionX = int(_PositionX),
+                                PositionY = int(_PositionY),
+                                )
+     
     db.session.add(scheduleCommand)
     db.session.commit()
     return "OK"
@@ -256,7 +216,7 @@ def TakePic_event(msg):
         socketio.emit('ImageStream', {'data': str(encoded_string, encoding = "utf-8")})
 if __name__ == "__main__":
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:HrK8Iww7hU0izq1H@192.168.11.4:3306/sensordb'
-    #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:HrK8Iww7hU0izq1H@localhost:3306/sensordb'
+    # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:HrK8Iww7hU0izq1H@localhost:3306/sensordb'
 
 
     app.run(host='0.0.0.0',port=8000)
