@@ -53,7 +53,8 @@ def index():
 #取得當前指令的列表
 @app.route("/queryCommandList")
 def queryCommandList():
-    scheduleLi = schedule.query.all()
+    #依照ID排序
+    scheduleLi = schedule.query.order_by(schedule.id.asc()).all()
     Command_li = []
     for ele in scheduleLi:
         if ele != None:
@@ -70,28 +71,13 @@ def queryCommandList():
 #刪除工作指令
 @app.route("/deleteMotorCommand")
 def deleteMotorCommand():
-    #方向 順時針轉為1,逆時鐘轉為0
-    Direction = request.args.get('Direction')
+    #使用ID來刪除物件
+    _id = request.args.get('id')
     
-    #座標位置
-    Position = request.args.get('Position')
-
-    #方向 順時針轉為1,逆時鐘轉為0
-    Setting_type = request.args.get('Setting_type')
-   
-    #持續時間
-    Duration = request.args.get('Duration')
-
-    #光遮斷器
-    LightCutter = request.args.get('LightCutter')
-
-    #如果是設定無刷直流馬達的距離時間關係
-    if Setting_type == "無刷馬達":
-        scheduleCommand = schedule(DateTime = str(datetime.now()) , Action='{\"Action\": \"無刷馬達\", \"Position\": \"'+str(Position)+'\",\"Direction\": \"'+str(Direction)+'\",\"Duration\": \"'+str(Duration)+'\" ,\"LightCutter\":\"'+ str(LightCutter) +'\"}')
-    elif Setting_type == "步進馬達":
-        scheduleCommand = schedule(DateTime = str(datetime.now()) , Action='{\"Action\": \"步進馬達\", \"Position\": \"'+str(Position)+'\",\"Direction\": \"'+str(Direction)+'\",\"Duration\": \"' + str(Duration)+'\" ,\"LightCutter\":\"'+ str(LightCutter) +'\"}')
-        
-    db.session.add(scheduleCommand)
+    scheduleCommand = schedule.query.filter_by(id=_id).first()
+    
+    #刪除指定的DB指令
+    db.session.delete(scheduleCommand)
     db.session.commit()
     return "OK"
 

@@ -92,9 +92,32 @@ function saveMotorCommand()
 		{
 			document.getElementById("saveCommandRunResult").innerText = "運行結果 : " + data;
 			showCommandList();
+			//定時重複運行指令的table如果沒資料會過大，只好非同步去修改高度
+			document.getElementsByClassName('fixed-table-body')[0].style.height = "33%";
 		}
 	);
 }
+
+//刪除已選擇的指令
+function deleteCommandList()
+{
+	var Selections = $('#commandTable').bootstrapTable('getSelections');
+	document.getElementById("saveCommandRunResult").innerText = "運行結果 : 刪除指令中..."
+	Selections.forEach(element => {
+		console.log(element.id);
+		$.get("/deleteMotorCommand",
+			{id : element.id},
+			function(data) {
+				document.getElementById("saveCommandRunResult").innerText = "運行結果 : OK !"
+				showCommandList();
+				//定時重複運行指令的table如果沒資料會過大，只好非同步去修改高度
+				document.getElementsByClassName('fixed-table-body')[0].style.height = "33%";
+			}
+		);
+
+	});
+}
+
 //顯示運行指令
 function showCommandList()
 {	
@@ -346,5 +369,6 @@ $(document).ready(function(){
 	//顯示所有排程列表
 	showPlanList();
 
-
+	//定時重複運行指令的table如果沒資料會過大，只好非同步去修改高度
+	document.getElementsByClassName('fixed-table-body')[0].style.height = "33%";
 });

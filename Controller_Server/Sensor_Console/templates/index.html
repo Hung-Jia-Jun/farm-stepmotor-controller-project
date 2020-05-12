@@ -20,6 +20,15 @@
 	0% { transform: rotate(0deg); }
 	100% { transform: rotate(360deg); }
 	}
+
+	table {
+    width: 100%;
+	}
+	
+	.fixed-table-body{
+		height: 33%;
+	}
+	
  </style>
 	<meta charset="utf-8">     
  	<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
@@ -120,7 +129,7 @@
 		</div>
 		<div style="height: 10px;" class="row"></div>
 
-		<table class="table" id="commandTable">
+		<table class="tableFixHead" id="commandTable">
 			<thead>
 				<tr>
 					<th data-checkbox="true"></th>
@@ -137,7 +146,7 @@
 				<button onclick="showCommandList();" type="button" class="btn btn-primary">更新列表</button>  
 			</div>
 			<div class="col-md-2">
-				<button onclick="showCommandList();" type="button" class="btn btn-danger">刪除已選指令</button>  
+				<button onclick="deleteCommandList();" type="button" class="btn btn-danger">刪除已選指令</button>  
 			</div>
 		</div>
 	</div>
