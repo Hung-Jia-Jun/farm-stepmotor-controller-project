@@ -291,8 +291,8 @@
 						</div>
 							<button class="btn btn-info dropdown-toggle" type="button" id="SetConfigStepMotorNumber" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">A</button>
 						<div class="dropdown-menu" aria-labelledby="motor" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
-						<a class="dropdown-item" onclick="updateSelectionItem('SetConfigStepMotorNumber','A');">A</a>
-						<a class="dropdown-item" onclick="updateSelectionItem('SetConfigStepMotorNumber','B');">B</a>
+						<a class="dropdown-item" onclick="updateSelectionItem('SetConfigStepMotorNumber','A'); showDistanceOfTimeProportion(); ">A</a>
+						<a class="dropdown-item" onclick="updateSelectionItem('SetConfigStepMotorNumber','B'); showDistanceOfTimeProportion(); ">B</a>
 					</div>
 				</div>
 			</div>
@@ -334,7 +334,11 @@
 				<input type="text" class="form-control" id="StepMotorRunMile" placeholder="距離">
 			</div>
 		</div>
-		<div style="height: 20px;" class="row"></div>
+		<div style="height: 30px;" class="row">
+			<div class="col-md-3">
+				<h6 id="saveDistanceOfTimeProportionResult">運行結果 :</h6>
+			</div>
+		</div>
 		<div class="col-md-0">
 			<script>
 				function readStepMotorNumber()

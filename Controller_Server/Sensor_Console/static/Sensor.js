@@ -183,22 +183,30 @@ function showDistanceOfTimeProportion()
 {
 	$.get("/queryDistanceOfTimeProportion",
 		function(data) {
-			var StepMotor_config = data["StepMotor_DistanceOfTimeProportion"];
-			var BrushlessMotor_config = data["BrushlessMotor_DistanceOfTimeProportion"];
-			// //脈衝寬度
-			// document.getElementById("StepMotorPulseWidth").value = (StepMotor_config.split(":")[0].replace("width=",""));
+			var StepMotor_config_A = data["StepMotor_DistanceOfTimeProport_A"];
+			var StepMotor_config_B = data["StepMotor_DistanceOfTimeProport_B"];
 			
-			// //脈衝頻率
-			// document.getElementById("StepMotorPulseFrequency").value = (StepMotor_config.split(":")[1].replace("Frequency=",""));
+			//準備show資料的寄存器
+			var ShowValue;
+			if (document.getElementById("SetConfigStepMotorNumber").innerText == "A")
+			{
+				ShowValue = StepMotor_config_A;
+			}
+			else
+			{
+				ShowValue = StepMotor_config_B;
+			}
+			//脈衝寬度
+			document.getElementById("StepMotorPulseWidth").value = ShowValue.width;
+
+			//脈衝頻率
+			document.getElementById("StepMotorPulseFrequency").value = ShowValue.frequency;
 			
-			// //脈衝次數
-			// document.getElementById("StepMotorPulseTimes").value = (StepMotor_config.split(":")[2].replace("Count=",""));
+			//脈衝次數
+			document.getElementById("StepMotorPulseTimes").value = ShowValue.count;
 			
-			// //脈衝距離
-			// document.getElementById("StepMotorRunMile").value = (StepMotor_config.split(":")[3].replace("cm=",""));
-			
-			// document.getElementById("BrushlessMotorRunMile").value = (BrushlessMotor_config.split(":")[0].replace("cm",""));
-			// document.getElementById("BrushlessMotorRunSecond").value = (BrushlessMotor_config.split(":")[1].replace("s",""));
+			//脈衝距離
+			document.getElementById("StepMotorRunMile").value = ShowValue.distance
 		}
 	);
 }
@@ -262,11 +270,13 @@ function UpdateDistanceOfTimeProportion(_SettingMotorNumber)
 			"Count" : StepMotorPulseTimes,
 			"distance" : StepMotorRunMile,
 			}
-		
+
+	document.getElementById("saveDistanceOfTimeProportionResult").innerText = "運行結果 : 儲存中..."
 	$.get("/UpdateDistanceOfTimeProportion",
 		{ SettingMotorNumber: _SettingMotorNumber, value : StepMotroConfig},
 		function(data) {
 			console.log(data);
+			document.getElementById("saveDistanceOfTimeProportionResult").innerText = "運行結果 : OK !"
 		}
 	);
 }
