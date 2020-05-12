@@ -58,29 +58,6 @@ function saveMotorCommand()
 	//馬達要到達的地點座標 X
 	MotorPositionY = document.getElementById("MotorPositionY").value;
 	
-	// StepMotorRunMile_A = document.getElementById("StepMotorRunMile_A").value;
-	// StepMotorRunMile_B = document.getElementById("StepMotorRunMile_B").value;
-
-	// //步進馬達A要走多少距離需要幾秒
-	// RunningTime_A =  parseInt(MotorPositionX) /  parseInt(StepMotorRunMile_A)
-
-	// //步進馬達A要走多少距離需要幾秒
-	// RunningTime_B =  parseInt(MotorPositionY) /  parseInt(StepMotorRunMile_B)
-
-	// //A馬達的脈衝寬度
-	// StepMotorPulseTimes_A = document.getElementById("StepMotorPulseTimes_A").value;
-
-	// //B馬達的脈衝寬度
-	// StepMotorPulseTimes_B = document.getElementById("StepMotorPulseTimes_B").value;
-
-	// StepMotorPulseFrequency_A = document.getElementById("StepMotorPulseFrequency_A").value;
-	// StepMotorPulseFrequency_B = document.getElementById("StepMotorPulseFrequency_B").value;
-	// //持續時間 = (次數 / 頻率) * 要運行距離是參考距離的幾倍
-	// Duration_X = parseFloat(parseInt(StepMotorPulseTimes_A) / parseInt(StepMotorPulseFrequency_A)) * RunningTime_A;
-	
-	// //持續時間 = (次數 / 頻率) * 要運行距離是參考距離的幾倍
-	// Duration_Y =  parseFloat(parseInt(StepMotorPulseTimes_B) / parseInt(StepMotorPulseFrequency_B)) * RunningTime_B;
-	
 	document.getElementById("saveCommandRunResult").innerText = "運行結果 : 上傳中..."
 	//XY兩顆馬達有各自的運行時間，所以在編排前也要先設定好
 	$.get("/saveMotorCommand",
@@ -186,18 +163,6 @@ function showPlanList()
 			checkbox:"true",
 			pagination:false
 	});
-
-	// $.get("/queryCommandList",
-	// 	function(data) {
-	// 		var indexnum = 1
-	// 		var commandList = JSON.parse(data);
-	// 		commandList.forEach(element => {
-	// 			command = JSON.parse(element);
-	// 			$('#commandTable').bootstrapTable('append', command);
-	// 			indexnum += 1;
-	// 		});
-	// 	}
-	// );
 }
 
 

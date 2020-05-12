@@ -12,4 +12,7 @@ def ReturnSensorStatus(SensorNumber):
     GPIO.setup(SensorNumber, GPIO.IN)
     #感應片間有物體會輸出1
     status = GPIO.input(SensorNumber)
-    return status
+    if status:
+        return True
+    else:
+        return False

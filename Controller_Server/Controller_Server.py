@@ -65,7 +65,19 @@ class sensor_ph(db.Model):
 	def __repr__(self):
 		return '<sensor_ph %r>' % self.content
 
+#定時運行到指定位置的資料表定義
+class schedule(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    PositionX = db.Column(db.Integer)
+    PositionY = db.Column(db.Integer)
 
+class config(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    config_key = db.Column(db.String(255))
+    width = db.Column(db.Integer)
+    frequency = db.Column(db.Integer)
+    count = db.Column(db.Integer)
+    distance = db.Column(db.Integer)
 
 @app.route("/BrushlessDC_Motor")
 def BrushlessDC_Motor():
@@ -244,7 +256,106 @@ def LightControllerStatus():
 	elif sys.platform == "win32":
 		return "在windows環境無法顯示此數值"
 
+#將兩顆步進馬達設定到0的位置
+def SetZeroPoint():
+	#Z軸垂直制動器煞車開關
+	EnableBrake = False
 
+	StepMotor_config_A = config.query.filter_by(
+        config_key='StepMotor_DistanceOfTimeProportion_A').first()
+    StepMotor_config_B = config.query.filter_by(
+        config_key='StepMotor_DistanceOfTimeProportion_B').first()
+
+    #距離與馬達運轉時間比例
+    StepMotor_config_A.width
+	StepMotor_config_A.frequency
+	StepMotor_config_A.count
+	StepMotor_config_A.distance
+
+	StepMotor_config_B.width
+	StepMotor_config_B.frequency
+	StepMotor_config_B.count
+	StepMotor_config_B.distance
+
+	#步進馬達A歸零，往後走無限個單位直到碰到零點
+	RunningTime_A =  parseInt(1000) /  parseInt(StepMotor_config_A.distance)
+
+ 	#持續時間 = (次數 / 頻率) * 要運行距離是參考距離的幾倍
+	Duration_A = parseFloat(parseInt(StepMotor_config_A.count) / parseInt(StepMotor_config_A.frequency)) * RunningTime_A
+	
+	#控制X軸馬達，代號A
+	#Set Enable
+	ENA = 5
+
+	#方向
+	DIR = 6
+
+	#脈衝
+	PUL = 13
+	if sys.platform == "linux":
+		status = Controll_2MD4850.RunStepping_MotorByInputSetNumber(ENA,
+																	DIR,
+																	PUL,
+																	Pulse_Width,
+																	Pulse_Count,
+																	PulseFrequency,
+																	direction,
+																	EnableBrake)
+		return str(status)
+	elif sys.platform == "win32":
+		parameterEcho = {
+			"direction" : direction,
+			"Pulse_Width" : Pulse_Width,
+			"PulseFrequency" : PulseFrequency,
+			"Pulse_Count" : Pulse_Count,
+			"StepMotorNumber" : StepMotorNumber,
+		}
+		return parameterEcho
+
+	#控制Y軸馬達，代號B
+	#Set Enable
+	ENA = 17
+
+	#方向
+	DIR = 27
+
+	#脈衝
+	PUL = 22
+	
+	#Z
+	EnableBrake = True
+	if sys.platform == "linux":
+		status = Controll_2MD4850.RunStepping_MotorByInputSetNumber(ENA,
+																	DIR,
+																	PUL,
+																	Pulse_Width,
+																	Pulse_Count,
+																	PulseFrequency,
+																	direction,
+																	EnableBrake)
+		return str(status)
+	elif sys.platform == "win32":
+		parameterEcho = {
+			"direction" : direction,
+			"Pulse_Width" : Pulse_Width,
+			"PulseFrequency" : PulseFrequency,
+			"Pulse_Count" : Pulse_Count,
+			"StepMotorNumber" : StepMotorNumber,
+		}
+		return parameterEcho
+
+#啟用定時運行命令
+def StartSchedule_Job():  
+	#現在座標的計量暫存
+	NowPositionX = 0
+	NowPositionY = 0
+
+	
+	#依照ID排序，將所有命令取出來
+    scheduleLi = schedule.query.order_by(schedule.id.asc()).all()
+    for ele in scheduleLi:
+		ele.PositionX
+		ele.PositionY
 def ReadLUX_Job():  
 	print ("Start task ReadLUX_Job")
 	try:

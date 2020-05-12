@@ -1,11 +1,11 @@
 import RPi.GPIO as GPIO
 import time
 import pdb
-
+import Controll_input
 #啟動步進馬達，在使用者輸入一個指定毫秒時
 def RunStepping_MotorByInputSetNumber(ENA,DIR,PUL,Pulse_Width,Pulse_Count,PulseFrequency,DR_Type,EnableBrake):
     
-    
+
     #終端限位感測
     limitSensor1 = 23
     limitSensor2 = 24
@@ -59,6 +59,26 @@ def RunStepping_MotorByInputSetNumber(ENA,DIR,PUL,Pulse_Width,Pulse_Count,PulseF
         time.sleep(HighDutyTime)
         GPIO.output(PUL, GPIO.LOW)
         time.sleep(LowDutyTime)
+        
+        #限位開關偵測
+        if Controll_input.ReturnSensorStatus(limitSensor1):
+            return "X axis limit sensor trigger"
+
+        #限位開關偵測
+        if Controll_input.ReturnSensorStatus(limitSensor2):
+            return "Y axis limit sensor trigger"
+
+        #零點開關偵測
+        if Controll_input.ReturnSensorStatus(ZeroSensor1):
+            return "X axis zero point sensor trigger"
+
+        #零點開關偵測
+        if Controll_input.ReturnSensorStatus(ZeroSensor2):
+            return "Y axis zero point sensor trigger"
+        
+
+
+
 
     #Enable開關要關閉，不然長時間運行馬達會過熱
     #Enable = GPIO.LOW (低電壓為啟動)
