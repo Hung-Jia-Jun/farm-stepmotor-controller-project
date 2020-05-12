@@ -1,4 +1,5 @@
-Controller_ServerURL = "http://192.168.11.3:8001"
+// Controller_ServerURL = "http://192.168.11.3:8001"
+Controller_ServerURL = "http://127.0.0.1:8001"
 function ReadAllSensor() {
 	$.get("/ReadLux",
 		function(data) {
@@ -110,7 +111,7 @@ function showCommandList()
 		}, 
 		{
 			field: 'PositionY',
-			title: 'Y座標',
+			title: 'Z座標',
 			align:'center'
 	   	}, 
 	];
@@ -242,28 +243,28 @@ function TestRunStep()
 //儲存距離與馬達運行時間比例的修改結果
 function UpdateDistanceOfTimeProportion(_SettingMotorNumber)
 {
-	_value = ""
-	
 	//脈衝寬度
-	StepMotorPulseWidth = document.getElementById("StepMotorPulseWidth_" + _SettingMotorNumber).value
+	StepMotorPulseWidth = document.getElementById("StepMotorPulseWidth").value
 		
 	//脈衝頻率
-	StepMotorPulseFrequency = document.getElementById("StepMotorPulseFrequency_" + _SettingMotorNumber).value
+	StepMotorPulseFrequency = document.getElementById("StepMotorPulseFrequency").value
 	
 	//脈衝次數
-	StepMotorPulseTimes = document.getElementById("StepMotorPulseTimes_" + _SettingMotorNumber).value
+	StepMotorPulseTimes = document.getElementById("StepMotorPulseTimes").value
 	
-	//脈衝距離
-	StepMotorRunMile = document.getElementById("StepMotorRunMile_" + _SettingMotorNumber).value
+	//每個脈衝能推動馬達走多少距離
+	StepMotorRunMile = document.getElementById("StepMotorRunMile").value
 
-	//width=10:Frequency=10:Count=28:cm=10
-	_value ="width=" +StepMotorPulseWidth+ ":" +
-			"Frequency=" + StepMotorPulseFrequency + ":" +
-			"Count=" + StepMotorPulseTimes+ ":" +
-			"cm=" + StepMotorRunMile
+	//步進馬達設定檔
+	StepMotroConfig = {
+			"width" : StepMotorPulseWidth,
+			"Frequency" : StepMotorPulseFrequency,
+			"Count" : StepMotorPulseTimes,
+			"distance" : StepMotorRunMile,
+			}
 		
 	$.get("/UpdateDistanceOfTimeProportion",
-		{ Setting_type: _SettingMotorNumber, value : _value},
+		{ SettingMotorNumber: _SettingMotorNumber, value : StepMotroConfig},
 		function(data) {
 			console.log(data);
 		}

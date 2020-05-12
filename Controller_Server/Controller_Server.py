@@ -97,6 +97,8 @@ def Stepping_Motor():
 	#步進馬達代號
 	StepMotorNumber = request.args.get('StepMotorNumber')
 
+	#Z軸垂直制動器煞車開關
+	EnableBrake = False
 	if StepMotorNumber == "A" :
 		#定義要控制哪個步進馬達
 		#Set Enable
@@ -117,11 +119,28 @@ def Stepping_Motor():
 
 		#脈衝
 		PUL = 22
+		
+		#Z
+		EnableBrake = True
 	if sys.platform == "linux":
-		status = Controll_2MD4850.RunStepping_MotorByInputSetNumber(ENA,DIR,PUL,Pulse_Width,Pulse_Count,PulseFrequency,direction)
+		status = Controll_2MD4850.RunStepping_MotorByInputSetNumber(ENA,
+																	DIR,
+																	PUL,
+																	Pulse_Width,
+																	Pulse_Count,
+																	PulseFrequency,
+																	direction,
+																	EnableBrake)
 		return str(status)
 	elif sys.platform == "win32":
-		return "在windows環境無法顯示此數值"
+		parameterEcho = {
+			"direction" : direction,
+			"Pulse_Width" : Pulse_Width,
+			"PulseFrequency" : PulseFrequency,
+			"Pulse_Count" : Pulse_Count,
+			"StepMotorNumber" : StepMotorNumber,
+		}
+		return parameterEcho
 
 def ReadLUX():
 	if sys.platform == "linux":
@@ -220,7 +239,7 @@ def ReadPH():
 @app.route("/LightControllerStatus")
 def LightControllerStatus():
 	if sys.platform == "linux":
-		status = Controll_input.ReturnLightControllStatus()
+		status = Controll_input.ReturnZeroSensor()
 		return str(status)
 	elif sys.platform == "win32":
 		return "在windows環境無法顯示此數值"

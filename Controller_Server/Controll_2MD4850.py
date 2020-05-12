@@ -3,13 +3,38 @@ import time
 import pdb
 
 #啟動步進馬達，在使用者輸入一個指定毫秒時
-def RunStepping_MotorByInputSetNumber(ENA,DIR,PUL,Pulse_Width,Pulse_Count,PulseFrequency,DR_Type):
+def RunStepping_MotorByInputSetNumber(ENA,DIR,PUL,Pulse_Width,Pulse_Count,PulseFrequency,DR_Type,EnableBrake):
+    
+    
+    #終端限位感測
+    limitSensor1 = 23
+    limitSensor2 = 24
+
+    #零點感測器
+    ZeroSensor1 = 0
+    ZeroSensor2 = 26
+
+    #垂直煞車制動器 (1-unlock;0-lock)
+    Brake = 26
+
+
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
 
     GPIO.setup(ENA, GPIO.OUT)
     GPIO.setup(DIR, GPIO.OUT)
     GPIO.setup(PUL, GPIO.OUT)
+
+    #設定制動器的GPIO
+    GPIO.setup(Brake, GPIO.OUT)
+    
+    if EnableBrake == True:
+        #垂直煞車制動器 (1-unlock;0-lock)
+        GPIO.output(Brake, GPIO.HIGH)
+    else:
+        #鎖定
+        #垂直煞車制動器 (1-unlock;0-lock)
+        GPIO.output(Brake, GPIO.LOW)
 
     #Enable = GPIO.LOW (低電壓為啟動)
     GPIO.output(ENA, GPIO.LOW)
@@ -35,4 +60,11 @@ def RunStepping_MotorByInputSetNumber(ENA,DIR,PUL,Pulse_Width,Pulse_Count,PulseF
         GPIO.output(PUL, GPIO.LOW)
         time.sleep(LowDutyTime)
 
+    #Enable開關要關閉，不然長時間運行馬達會過熱
+    #Enable = GPIO.LOW (低電壓為啟動)
+    GPIO.output(ENA, GPIO.HIGH)
+
+    #鎖定
+    #垂直煞車制動器 (1-unlock;0-lock)
+    GPIO.output(Brake, GPIO.LOW)
     return 'OK !'

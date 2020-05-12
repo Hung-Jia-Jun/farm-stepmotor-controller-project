@@ -1,14 +1,15 @@
+# -*- coding: utf-8 -*-
+ 
 import RPi.GPIO as GPIO
 import time
 import pdb
-#光敏電阻input pin
-photocell = 26
+from enum import Enum
 
-
-def ReturnLightControllStatus():
+#偵測限位感測器的狀態
+def ReturnSensorStatus(SensorNumber):
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(photocell, GPIO.IN)
+    GPIO.setup(SensorNumber, GPIO.IN)
     #感應片間有物體會輸出1
-    input = GPIO.input(photocell)
-    return input
+    status = GPIO.input(SensorNumber)
+    return status

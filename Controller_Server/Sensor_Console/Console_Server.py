@@ -4,7 +4,6 @@ import time
 import sys
 import schedule
 import os
-import MySQLdb
 import requests
 import json
 import ftplib
@@ -163,21 +162,30 @@ def ReadEC():
 #距離與持續時間的比例尺
 @app.route("/UpdateDistanceOfTimeProportion")
 def UpdateDistanceOfTimeProportion():
-    #設定的類別
-    _SettingMotorNumber = request.args.get('_SettingMotorNumber')
+    #設定的類別，目前設定的是哪台步進馬達
+    _SettingMotorNumber = request.args.get('SettingMotorNumber')
 
-    value = request.args.get('value')
+    width = request.args.get('value[width]')
+    Frequency = request.args.get('value[Frequency]')
+    Count = request.args.get('value[Count]')
+    distance = request.args.get('value[distance]')
     
     StepMotor_configA = config.query.filter_by(
-        config_key='StepMotorA_DistanceOfTimeProportion').first()
+        config_key='StepMotor_DistanceOfTimeProportion_A').first()
     StepMotor_configB = config.query.filter_by(
-        config_key ='StepMotorB_DistanceOfTimeProportion').first()
+        config_key ='StepMotor_DistanceOfTimeProportion_B').first()
 
     #因為現在是雙步進馬達，所以要依照馬達類別寫入
-    if _SettingMotorNumber == "StepMotorA":
-        StepMotor_configA.config_value = value
-    elif _SettingMotorNumber == "StepMotorB":
-        StepMotor_configB.config_value = value
+    if _SettingMotorNumber == "A":
+        StepMotor_configA.width = int(width)
+        StepMotor_configA.frequency = int(Frequency)
+        StepMotor_configA.count = int(Count)
+        StepMotor_configA.distance = int(distance)
+    elif _SettingMotorNumber == "B":
+        StepMotor_configB.width = int(width)
+        StepMotor_configB.frequency = int(Frequency)
+        StepMotor_configB.count = int(Count)
+        StepMotor_configB.distance = int(distance)
     db.session.commit()
     return "OK"
 

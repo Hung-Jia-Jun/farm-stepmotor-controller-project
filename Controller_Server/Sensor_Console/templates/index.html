@@ -111,7 +111,7 @@
 				<label>:</label>
 			</div>
 			<div class="col-md-2">
-				<input type="text" class="form-control" id="MotorPositionY" placeholder="Y座標">
+				<input type="text" class="form-control" id="MotorPositionY" placeholder="Z座標">
 			</div>
 			<div class="col-md-1">
 				<button onclick="saveMotorCommand();" type="button" class="btn btn-primary">新增指令</button>  
@@ -208,10 +208,10 @@
 				<div class="dropdown">
 					<div>
 						</div>
-							<button class="btn btn-info dropdown-toggle" type="button" id="dropdownStepMotor" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">A</button>
+							<button class="btn btn-info dropdown-toggle" type="button" id="StepMotorNumber" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">A</button>
 						<div class="dropdown-menu" aria-labelledby="motor" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
-						<a class="dropdown-item" onclick="updateSelectionItem('dropdownStepMotor','A');">A</a>
-						<a class="dropdown-item" onclick="updateSelectionItem('dropdownStepMotor','B');">B</a>
+						<a class="dropdown-item" onclick="updateSelectionItem('StepMotorNumber','A');">A</a>
+						<a class="dropdown-item" onclick="updateSelectionItem('StepMotorNumber','B');">B</a>
 					</div>
 				</div>
 			</div>
@@ -227,10 +227,10 @@
 				<div class="dropdown">
 					<div>
 						</div>
-							<button class="btn btn-info dropdown-toggle" type="button" id="stepMotorDirection" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">反轉</button>
+							<button class="btn btn-info dropdown-toggle" type="button" id="dropdownStepMotor" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">反轉</button>
 						<div class="dropdown-menu" aria-labelledby="motor" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
-						<a class="dropdown-item" onclick="updateSelectionItem('stepMotorDirection','正轉');">正轉</a>
-						<a class="dropdown-item" onclick="updateSelectionItem('stepMotorDirection','反轉');">反轉</a>
+						<a class="dropdown-item" onclick="updateSelectionItem('dropdownStepMotor','正轉');">正轉</a>
+						<a class="dropdown-item" onclick="updateSelectionItem('dropdownStepMotor','反轉');">反轉</a>
 					</div>
 				</div>
 			</div>
@@ -289,10 +289,10 @@
 				<div class="dropdown">
 					<div>
 						</div>
-							<button class="btn btn-info dropdown-toggle" type="button" id="StepMotorNumber" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">A</button>
+							<button class="btn btn-info dropdown-toggle" type="button" id="SetConfigStepMotorNumber" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">A</button>
 						<div class="dropdown-menu" aria-labelledby="motor" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
-						<a class="dropdown-item" onclick="updateSelectionItem('StepMotorNumber','A');">A</a>
-						<a class="dropdown-item" onclick="updateSelectionItem('StepMotorNumber','B');">B</a>
+						<a class="dropdown-item" onclick="updateSelectionItem('SetConfigStepMotorNumber','A');">A</a>
+						<a class="dropdown-item" onclick="updateSelectionItem('SetConfigStepMotorNumber','B');">B</a>
 					</div>
 				</div>
 			</div>
@@ -305,7 +305,7 @@
 				<h9>脈衝寬度  0%~100%</h9>
 			</div>
 			<div class="col-md-0">
-				<input type="text" class="form-control" id="StepMotorPulseWidth_A" placeholder="脈衝寬度">
+				<input type="text" class="form-control" id="StepMotorPulseWidth" placeholder="脈衝寬度">
 			</div>
 		</div>
 		<div style="height: 5px;" class="row"></div>
@@ -314,14 +314,14 @@
 				<h9>脈衝頻率 Hz</h9>
 			</div>
 			<div class="col-md-0">
-				<input type="text" class="form-control" id="StepMotorPulseFrequency_A" placeholder="脈衝頻率 Hz">
+				<input type="text" class="form-control" id="StepMotorPulseFrequency" placeholder="脈衝頻率 Hz">
 			</div>
 		</div><div style="height: 5px;" class="row"></div><div class="row">
 			<div class="col-md-4">
 				<h9>脈衝次數</h9>
 			</div>
 			<div class="col-md-0">
-				<input type="text" class="form-control" id="StepMotorPulseTimes_A" placeholder="脈衝次數">
+				<input type="text" class="form-control" id="StepMotorPulseTimes" placeholder="脈衝次數">
 			</div>
 		</div>
 
@@ -331,12 +331,18 @@
 				<h9>距離 cm</h9>
 			</div>
 			<div class="col-md-0">
-				<input type="text" class="form-control" id="StepMotorRunMile_A" placeholder="距離">
+				<input type="text" class="form-control" id="StepMotorRunMile" placeholder="距離">
 			</div>
 		</div>
 		<div style="height: 20px;" class="row"></div>
 		<div class="col-md-0">
-			<button onclick="UpdateDistanceOfTimeProportion('A');" type="button" class="btn btn-success">儲存</button>
+			<script>
+				function readStepMotorNumber()
+				{
+					StepNumber = document.getElementById("SetConfigStepMotorNumber").innerText;
+				}
+			</script>
+			<button onclick="readStepMotorNumber(); UpdateDistanceOfTimeProportion(StepNumber);" type="button" class="btn btn-success">儲存</button>
 		</div>
 		<div style="height: 50px;" class="row"></div>
 			
