@@ -151,6 +151,9 @@ def Stepping_Motor():
 			"PulseFrequency" : PulseFrequency,
 			"Pulse_Count" : Pulse_Count,
 			"StepMotorNumber" : StepMotorNumber,
+			"ENA" : str(ENA),
+			"DIR" : str(DIR),
+			"PUL" : str(PUL),
 		}
 		return parameterEcho
 
@@ -261,28 +264,12 @@ def SetZeroPoint():
 	#Z軸垂直制動器煞車開關
 	EnableBrake = False
 
+	#讀取資料庫設定檔
 	StepMotor_config_A = config.query.filter_by(
 		config_key='StepMotor_DistanceOfTimeProportion_A').first()
 	StepMotor_config_B = config.query.filter_by(
 		config_key='StepMotor_DistanceOfTimeProportion_B').first()
 
-	#距離與馬達運轉時間比例
-	StepMotor_config_A.width
-	StepMotor_config_A.frequency
-	StepMotor_config_A.count
-	StepMotor_config_A.distance
-
-	StepMotor_config_B.width
-	StepMotor_config_B.frequency
-	StepMotor_config_B.count
-	StepMotor_config_B.distance
-
-	#步進馬達A歸零，往後走無限個單位直到碰到零點
-	RunningTime_A =  parseInt(1000) /  parseInt(StepMotor_config_A.distance)
-
- 	#持續時間 = (次數 / 頻率) * 要運行距離是參考距離的幾倍
-	Duration_A = parseFloat(parseInt(StepMotor_config_A.count) / parseInt(StepMotor_config_A.frequency)) * RunningTime_A
-	
 	#控制X軸馬達，代號A
 	#Set Enable
 	ENA = 5
@@ -296,11 +283,11 @@ def SetZeroPoint():
 		status = Controll_2MD4850.RunStepping_MotorByInputSetNumber(ENA,
 																	DIR,
 																	PUL,
-																	Pulse_Width,
-																	Pulse_Count,
-																	PulseFrequency,
-																	direction,
-																	EnableBrake)
+																	StepMotor_config_A.width,
+																	Pulse_Count = 999999,
+																	StepMotor_config_A.frequency,
+																	direction = 0,
+																	EnableBrake = False)
 		return str(status)
 	elif sys.platform == "win32":
 		parameterEcho = {
@@ -325,13 +312,13 @@ def SetZeroPoint():
 	#Z
 	EnableBrake = True
 	if sys.platform == "linux":
-		status = Controll_2MD4850.RunStepping_MotorByInputSetNumber(ENA,
+				status = Controll_2MD4850.RunStepping_MotorByInputSetNumber(ENA,
 																	DIR,
 																	PUL,
-																	Pulse_Width,
-																	Pulse_Count,
-																	PulseFrequency,
-																	direction,
+																	StepMotor_config_B.width,
+																	Pulse_Count = 999999,
+																	StepMotor_config_B.frequency,
+																	direction = 0,
 																	EnableBrake)
 		return str(status)
 	elif sys.platform == "win32":

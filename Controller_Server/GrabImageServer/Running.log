@@ -1,1 +1,14 @@
-10-25-2020 20:25:21 werkzeug:INFO:192.168.2.50 - - [10/May/2020 20:25:21] "[33mGET / HTTP/1.1[0m" 404 -
+13-15-2020 20:15:15 root:INFO:Grab Sussful 2020_05_13_20-15-11.jpg
+13-15-2020 20:15:15 root:INFO:Grab Status: 2020_05_13_20-15-11.jpg
+13-15-2020 20:15:15 werkzeug:INFO:192.168.11.3 - - [13/May/2020 20:15:15] "[37mGET /Pic HTTP/1.1[0m" 200 -
+13-15-2020 20:15:15 root:WARNING:['2020_05_13_20-15-11.jpg']
+13-15-2020 20:15:15 root:DEBUG:Try Upload ftp
+13-15-2020 20:15:15 root:DEBUG:Finsh
+13-15-2020 20:15:15 root:INFO:ftp close
+13-15-2020 20:15:15 root:INFO:file removed
+13-15-2020 20:15:15 root:INFO:2020_05_13_20-15-11.jpg uploaded
+13-15-2020 20:15:15 root:INFO:Upload to FTP status: 2020_05_13_20-15-11.jpg uploaded
+13-15-2020 20:15:15 werkzeug:INFO:192.168.11.3 - - [13/May/2020 20:15:15] "[37mGET /upload?filename=2020_05_13_20-15-11.jpg HTTP/1.1[0m" 200 -
+13-15-2020 20:15:15 root:WARNING:2020_05_13_20-15-11.jpg Missing
+13-15-2020 20:15:15 root:INFO:Upload to FTP status: 2020_05_13_20-15-11.jpg Missing
+13-15-2020 20:15:15 werkzeug:INFO:192.168.11.3 - - [13/May/2020 20:15:15] "[37mGET /upload?filename=2020_05_13_20-15-11.jpg HTTP/1.1[0m" 200 -

@@ -4,8 +4,6 @@ import pdb
 import Controll_input
 #啟動步進馬達，在使用者輸入一個指定毫秒時
 def RunStepping_MotorByInputSetNumber(ENA,DIR,PUL,Pulse_Width,Pulse_Count,PulseFrequency,DR_Type,EnableBrake):
-    
-
     #終端限位感測
     limitSensor1 = 23
     limitSensor2 = 24
