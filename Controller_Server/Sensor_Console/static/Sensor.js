@@ -1,5 +1,5 @@
-// Controller_ServerURL = "http://192.168.11.3:8001"
-Controller_ServerURL = "http://127.0.0.1:8001"
+Controller_ServerURL = "http://192.168.11.3:8001"
+// Controller_ServerURL = "http://127.0.0.1:8001"
 function ReadAllSensor() {
 	$.get("/ReadLux",
 		function(data) {

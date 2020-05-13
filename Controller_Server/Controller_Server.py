@@ -3,7 +3,6 @@ from flask import render_template
 import time
 import sys
 import threading
-import schedule
 import MySQLdb
 import requests
 import json
@@ -12,6 +11,7 @@ import ftplib
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_socketio import SocketIO, emit
+
 
 import base64
 if sys.platform == "linux":
@@ -67,17 +67,17 @@ class sensor_ph(db.Model):
 
 #定時運行到指定位置的資料表定義
 class schedule(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    PositionX = db.Column(db.Integer)
-    PositionY = db.Column(db.Integer)
+	id = db.Column(db.Integer, primary_key=True)
+	PositionX = db.Column(db.Integer)
+	PositionY = db.Column(db.Integer)
 
 class config(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    config_key = db.Column(db.String(255))
-    width = db.Column(db.Integer)
-    frequency = db.Column(db.Integer)
-    count = db.Column(db.Integer)
-    distance = db.Column(db.Integer)
+	id = db.Column(db.Integer, primary_key=True)
+	config_key = db.Column(db.String(255))
+	width = db.Column(db.Integer)
+	frequency = db.Column(db.Integer)
+	count = db.Column(db.Integer)
+	distance = db.Column(db.Integer)
 
 @app.route("/BrushlessDC_Motor")
 def BrushlessDC_Motor():
@@ -262,12 +262,12 @@ def SetZeroPoint():
 	EnableBrake = False
 
 	StepMotor_config_A = config.query.filter_by(
-        config_key='StepMotor_DistanceOfTimeProportion_A').first()
-    StepMotor_config_B = config.query.filter_by(
-        config_key='StepMotor_DistanceOfTimeProportion_B').first()
+		config_key='StepMotor_DistanceOfTimeProportion_A').first()
+	StepMotor_config_B = config.query.filter_by(
+		config_key='StepMotor_DistanceOfTimeProportion_B').first()
 
-    #距離與馬達運轉時間比例
-    StepMotor_config_A.width
+	#距離與馬達運轉時間比例
+	StepMotor_config_A.width
 	StepMotor_config_A.frequency
 	StepMotor_config_A.count
 	StepMotor_config_A.distance
@@ -352,8 +352,8 @@ def StartSchedule_Job():
 
 	
 	#依照ID排序，將所有命令取出來
-    scheduleLi = schedule.query.order_by(schedule.id.asc()).all()
-    for ele in scheduleLi:
+	scheduleLi = schedule.query.order_by(schedule.id.asc()).all()
+	for ele in scheduleLi:
 		ele.PositionX
 		ele.PositionY
 def ReadLUX_Job():  
@@ -389,6 +389,7 @@ def pendingJob():
 		time.sleep(1)
 
 if __name__ == "__main__":
+	import schedule
 	if sys.platform == "linux":
 		RS485 = Read_RS485_Sensor_Lib.RS485()
 	elif sys.platform == "win32":

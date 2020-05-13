@@ -1,0 +1,12 @@
+[Unit]
+Description=StartGrab
+
+[Service]
+Type=simple
+WorkingDirectory=/home/jetson/MVS/Samples/aarch64/Python/
+ExecStart=/bin/bash StartGrab.sh
+
+
+[Install]
+WantedBy=multi-user.target
+

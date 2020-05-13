@@ -15,7 +15,7 @@ def RunStepping_MotorByInputSetNumber(ENA,DIR,PUL,Pulse_Width,Pulse_Count,PulseF
     ZeroSensor2 = 26
 
     #垂直煞車制動器 (1-unlock;0-lock)
-    Brake = 26
+    Brake = 25
 
 
     GPIO.setwarnings(False)
@@ -87,4 +87,6 @@ def RunStepping_MotorByInputSetNumber(ENA,DIR,PUL,Pulse_Width,Pulse_Count,PulseF
     #鎖定
     #垂直煞車制動器 (1-unlock;0-lock)
     GPIO.output(Brake, GPIO.LOW)
+
+    GPIO.cleanup()
     return 'OK !'
