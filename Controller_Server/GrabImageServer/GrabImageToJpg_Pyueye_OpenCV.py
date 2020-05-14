@@ -107,6 +107,9 @@ class Pyueye:
 
 		# Allocates an image memory for an image having its dimensions defined by width and height and its color depth defined by nBitsPerPixel
 		nRet = ueye.is_AllocImageMem(hCam, width, height, nBitsPerPixel, pcImageMemory, MemID)
+		count = ueye.UINT()
+		count.value = 4
+		nRet = ueye.is_ImageFormat(hCam, ueye.IMGFRMT_CMD_GET_NUM_ENTRIES, count, ueye.sizeof(count))
 		if nRet != ueye.IS_SUCCESS:
 			print("is_AllocImageMem ERROR")
 		else:
