@@ -33,11 +33,11 @@ class Camera:
 		config.read('/home/jetson/MVS/Samples/aarch64/Python/Config.ini')
 		localPictureFolderPath = config.get('Setting','localPictureFolderPath')
 
-		self.FileName=time.strftime('%Y_%m_%d_%H-%M-%S',time.localtime(time.time()))+'.jpg'
 
 		#拍照結果
 		result = ""
 
+		self.FileName=time.strftime('%Y_%m_%d_%H-%M-%S',time.localtime(time.time()))+'.jpg'
 		#依照USB現在的名稱，去自動選擇拍照的機器
 		if "IDS" in str(self.subprocess):
 			#IDS相機拍照

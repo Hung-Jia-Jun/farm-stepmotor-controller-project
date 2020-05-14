@@ -134,6 +134,7 @@ class Pyueye:
 
 		#---------------------------------------------------------------------------------------------------------------------------------------
 
+		counter = 0
 		# Continuous image display
 		while(nRet == ueye.IS_SUCCESS):
 
@@ -147,7 +148,7 @@ class Pyueye:
 			frame = np.reshape(array,(height.value, width.value, bytes_per_pixel))
 
 			# ...resize the image by a half
-			frame = cv2.resize(frame,(0,0),fx=0.5, fy=0.5)
+			# frame = cv2.resize(frame,(0,0),fx=0.5, fy=0.5)
 			
 		#---------------------------------------------------------------------------------------------------------------------------------------
 			#Include image data processing here
@@ -157,11 +158,13 @@ class Pyueye:
 			#...and finally display it
 			# cv2.imshow("SimpleLive_Python_uEye_OpenCV", frame)
 
-			#Write File
-			cv2.imwrite(filename,frame,[cv2.IMWRITE_PNG_COMPRESSION, 0])
-			print (filename + "  OK")
-			break
-			
+			if counter > 100:
+				#Write File
+				cv2.imwrite(filename, frame)
+
+				print (filename + "  OK")
+				break
+			counter += 1
 			# Press q if you want to end the loop
 			if cv2.waitKey(1) & 0xFF == ord('q'):
 				break
