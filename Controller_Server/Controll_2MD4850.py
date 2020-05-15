@@ -45,6 +45,25 @@ class StepMotorControll:
                 "PUL" : 22
             }
         }
+
+    #使用座標來移動單顆步進馬達
+    def SetPointToMove(self,nowPosition,TargetPosition,Pulse_Count,Distance):
+        #算出目前座標點與目標點差距多少
+        diffPosition = Position - nowPosition
+
+        MoveClockwise = 0
+        if diffPosition > 0:
+            #正轉
+            MoveDirection = DR_TypeStruct().Clockwise
+        else:
+            #反轉
+            MoveDirection = DR_TypeStruct().AntiClockwise
+
+        #目標與基準距離的差距有多少
+        MoveTime = diffPosition / Distance 
+
+        #正反轉 and 返回到目標需要多少個脈波
+        return MoveDirection , MoveTime * Pulse_Count
     #啟動步進馬達，在使用者輸入一個指定毫秒時
     def Run(self,Pulse_Width,Pulse_Count,PulseFrequency,DR_Type,EnableBrake):
         ENA = self.GPIONumber[self.MotorNumber]["ENA"]

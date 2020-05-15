@@ -47,7 +47,7 @@ class Pyueye:
 
 
 		formatInfo=ueye.IMAGE_FORMAT_INFO()
-		formatInfo.nFormatID=4
+		formatInfo.nFormatID=6
 		nRet = ueye.is_ImageFormat(hCam, ueye.IMGFRMT_CMD_SET_FORMAT, formatInfo.nFormatID, ueye.sizeof(formatInfo.nFormatID))
 
 		# Set display mode to DIB

@@ -80,6 +80,11 @@ class config(db.Model):
 	count = db.Column(db.Integer)
 	distance = db.Column(db.Integer)
 
+class motor_position(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	number = db.Column(db.String(255))
+	value = db.Column(db.Integer)
+	
 @app.route("/BrushlessDC_Motor")
 def BrushlessDC_Motor():
 	#方向 順時針轉為1,逆時鐘轉為0
@@ -241,7 +246,11 @@ def LightControllerStatus():
 		return "在windows環境無法顯示此數值"
 
 #將兩顆步進馬達設定到指定的位置
+@app.route("/SetPoint")
 def SetPoint():
+	TargetX = request.args.get('TargetX')
+	TargetY = request.args.get('TargetY')
+
 	#讀取資料庫設定檔
 	StepMotor_config_A = config.query.filter_by(
 		config_key='StepMotor_DistanceOfTimeProportion_A').first()
@@ -250,26 +259,43 @@ def SetPoint():
 
 	Step_A = Controll_2MD4850.StepMotorControll("A")
 	Step_B = Controll_2MD4850.StepMotorControll("B")
+	
+	#取得現在步進馬達的座標多少
+	MotroCurrentPostion_A = motor_position.query.filter_by(number='A').first()
+	MotroCurrentPostion_B = motor_position.query.filter_by(number='B').first()
+	
+	#算出與目標點差距有幾個脈波
+	Direction_X , Pulse_X_Count = Step_A.SetPointToMove(nowPosition = MotroCurrentPostion_A.value,
+														TargetPosition = TargetX,
+														Pulse_Count = StepMotor_config_A.count,
+														Distance = StepMotor_config_A.distance,
+														)
 
-	#現在是進行歸零的動作，如果碰到0點歸零開關就會停止
+	Direction_Y , Pulse_Y_Count = Step_B.SetPointToMove(nowPosition = MotroCurrentPostion_B.value,
+														TargetPosition = TargetY,
+														Pulse_Count = StepMotor_config_B.count,
+														Distance = StepMotor_config_B.distance,
+														)
+	
+	#如果碰到0點歸零開關就會停止
 	if sys.platform == "linux":
 		#Z軸垂直制動器煞車開關
 		_EnableBrake = False
 		status_A = Step_A.Run(  Pulse_Width = StepMotor_config_A.width,
-								Pulse_Count = 999999,
+								Pulse_Count = Pulse_X_Count,
 								PulseFrequency = StepMotor_config_A.frequency,
-								DR_Type = 0,
+								DR_Type = Direction_X,
 								EnableBrake = _EnableBrake,)
 		
-
 		#Z軸要放開煞車
 		_EnableBrake = True
 		status_B = Step_B.Run(  Pulse_Width = StepMotor_config_B.width,
-								Pulse_Count = 999999,
+								Pulse_Count = Pulse_Y_Count,
 								PulseFrequency = StepMotor_config_B.frequency,
-								DR_Type = 0,
+								DR_Type = Direction_Y,
 								EnableBrake = _EnableBrake,)
 		return str(status_A + status_B)
+
 	elif sys.platform == "win32":
 		parameterEcho = {
 			"direction" : direction,
