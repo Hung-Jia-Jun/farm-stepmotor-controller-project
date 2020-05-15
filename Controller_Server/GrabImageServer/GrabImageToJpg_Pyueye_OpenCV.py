@@ -45,6 +45,11 @@ class Pyueye:
 		if nRet != ueye.IS_SUCCESS:
 			print("is_ResetToDefault ERROR")
 
+
+		formatInfo=ueye.IMAGE_FORMAT_INFO()
+		formatInfo.nFormatID=4
+		nRet = ueye.is_ImageFormat(hCam, ueye.IMGFRMT_CMD_SET_FORMAT, formatInfo.nFormatID, ueye.sizeof(formatInfo.nFormatID))
+
 		# Set display mode to DIB
 		nRet = ueye.is_SetDisplayMode(hCam, ueye.IS_SET_DM_DIB)
 
@@ -107,9 +112,8 @@ class Pyueye:
 
 		# Allocates an image memory for an image having its dimensions defined by width and height and its color depth defined by nBitsPerPixel
 		nRet = ueye.is_AllocImageMem(hCam, width, height, nBitsPerPixel, pcImageMemory, MemID)
-		count = ueye.UINT()
-		count.value = 4
-		nRet = ueye.is_ImageFormat(hCam, ueye.IMGFRMT_CMD_GET_NUM_ENTRIES, count, ueye.sizeof(count))
+		
+	
 		if nRet != ueye.IS_SUCCESS:
 			print("is_AllocImageMem ERROR")
 		else:

@@ -111,38 +111,18 @@ def Stepping_Motor():
 
 	#Z軸垂直制動器煞車開關
 	EnableBrake = False
-	if StepMotorNumber == "A" :
-		#定義要控制哪個步進馬達
-		#Set Enable
-		ENA = 5
 
-		#方向
-		DIR = 6
-
-		#脈衝
-		PUL = 13
-	#要控制代號B的步進馬達
-	elif StepMotorNumber =="B":
-		#Set Enable
-		ENA = 17
-
-		#方向
-		DIR = 27
-
-		#脈衝
-		PUL = 22
-		
+	if StepMotorNumber =="B":
 		#Z
 		EnableBrake = True
+		
 	if sys.platform == "linux":
-		status = Controll_2MD4850.RunStepping_MotorByInputSetNumber(ENA,
-																	DIR,
-																	PUL,
-																	Pulse_Width,
-																	Pulse_Count,
-																	PulseFrequency,
-																	direction,
-																	EnableBrake)
+		Step = Controll_2MD4850.StepMotorControll(StepMotorNumber)
+		status = Step.Run(Pulse_Width,
+							Pulse_Count,
+							PulseFrequency,
+							direction,
+							EnableBrake)
 		return str(status)
 	elif sys.platform == "win32":
 		parameterEcho = {
@@ -260,7 +240,7 @@ def LightControllerStatus():
 		return "在windows環境無法顯示此數值"
 
 #將兩顆步進馬達設定到0的位置
-def SetZeroPoint():
+def SetPoint():
 	#Z軸垂直制動器煞車開關
 	EnableBrake = False
 
@@ -270,57 +250,26 @@ def SetZeroPoint():
 	StepMotor_config_B = config.query.filter_by(
 		config_key='StepMotor_DistanceOfTimeProportion_B').first()
 
-	#控制X軸馬達，代號A
-	#Set Enable
-	ENA = 5
+	Step_A = Controll_2MD4850.StepMotorControll("A")
+	Step_B = Controll_2MD4850.StepMotorControll("B")
 
-	#方向
-	DIR = 6
-
-	#脈衝
-	PUL = 13
+	#現在是進行歸零的動作，如果碰到0點歸零開關就會停止
 	if sys.platform == "linux":
-		status = Controll_2MD4850.RunStepping_MotorByInputSetNumber(ENA,
-																	DIR,
-																	PUL,
-																	StepMotor_config_A.width,
-																	Pulse_Count = 999999,
-																	StepMotor_config_A.frequency,
-																	direction = 0,
-																	EnableBrake = False)
-		return str(status)
-	elif sys.platform == "win32":
-		parameterEcho = {
-			"direction" : direction,
-			"Pulse_Width" : Pulse_Width,
-			"PulseFrequency" : PulseFrequency,
-			"Pulse_Count" : Pulse_Count,
-			"StepMotorNumber" : StepMotorNumber,
-		}
-		return parameterEcho
-
-	#控制Y軸馬達，代號B
-	#Set Enable
-	ENA = 17
-
-	#方向
-	DIR = 27
-
-	#脈衝
-	PUL = 22
-	
-	#Z
-	EnableBrake = True
-	if sys.platform == "linux":
-				status = Controll_2MD4850.RunStepping_MotorByInputSetNumber(ENA,
-																	DIR,
-																	PUL,
-																	StepMotor_config_B.width,
-																	Pulse_Count = 999999,
-																	StepMotor_config_B.frequency,
-																	direction = 0,
-																	EnableBrake)
-		return str(status)
+		EnableBrake = False
+		status_A = Step_A.Run(StepMotor_config_A.width,
+							Pulse_Count = 999999,
+							StepMotor_config_A.frequency,
+							direction = 0,
+							EnableBrake)
+		
+		#Z軸要放開煞車
+		EnableBrake = True
+		status_B = Step_B.Run(StepMotor_config_B.width,
+							Pulse_Count = 999999,
+							StepMotor_config_B.frequency,
+							direction = 0,
+							EnableBrake)
+		return str(status_A + status_B)
 	elif sys.platform == "win32":
 		parameterEcho = {
 			"direction" : direction,
