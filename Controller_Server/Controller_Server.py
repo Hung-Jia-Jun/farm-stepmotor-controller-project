@@ -21,6 +21,7 @@ if sys.platform == "linux":
 	#無刷直流馬達
 	import Controll_ZM6405E
 
+	
 	import Read_RS485_Sensor_Lib
 
 	#步進馬達
@@ -115,7 +116,7 @@ def Stepping_Motor():
 	if StepMotorNumber =="B":
 		#Z
 		EnableBrake = True
-		
+
 	if sys.platform == "linux":
 		Step = Controll_2MD4850.StepMotorControll(StepMotorNumber)
 		status = Step.Run(Pulse_Width,
@@ -239,11 +240,8 @@ def LightControllerStatus():
 	elif sys.platform == "win32":
 		return "在windows環境無法顯示此數值"
 
-#將兩顆步進馬達設定到0的位置
+#將兩顆步進馬達設定到指定的位置
 def SetPoint():
-	#Z軸垂直制動器煞車開關
-	EnableBrake = False
-
 	#讀取資料庫設定檔
 	StepMotor_config_A = config.query.filter_by(
 		config_key='StepMotor_DistanceOfTimeProportion_A').first()
@@ -255,20 +253,22 @@ def SetPoint():
 
 	#現在是進行歸零的動作，如果碰到0點歸零開關就會停止
 	if sys.platform == "linux":
-		EnableBrake = False
-		status_A = Step_A.Run(StepMotor_config_A.width,
-							Pulse_Count = 999999,
-							StepMotor_config_A.frequency,
-							direction = 0,
-							EnableBrake)
+		#Z軸垂直制動器煞車開關
+		_EnableBrake = False
+		status_A = Step_A.Run(  Pulse_Width = StepMotor_config_A.width,
+								Pulse_Count = 999999,
+								PulseFrequency = StepMotor_config_A.frequency,
+								DR_Type = 0,
+								EnableBrake = _EnableBrake,)
 		
+
 		#Z軸要放開煞車
-		EnableBrake = True
-		status_B = Step_B.Run(StepMotor_config_B.width,
-							Pulse_Count = 999999,
-							StepMotor_config_B.frequency,
-							direction = 0,
-							EnableBrake)
+		_EnableBrake = True
+		status_B = Step_B.Run(  Pulse_Width = StepMotor_config_B.width,
+								Pulse_Count = 999999,
+								PulseFrequency = StepMotor_config_B.frequency,
+								DR_Type = 0,
+								EnableBrake = _EnableBrake,)
 		return str(status_A + status_B)
 	elif sys.platform == "win32":
 		parameterEcho = {
@@ -327,14 +327,17 @@ def pendingJob():
 if __name__ == "__main__":
 	import schedule
 	if sys.platform == "linux":
-		RS485 = Read_RS485_Sensor_Lib.RS485()
+		try:
+			RS485 = Read_RS485_Sensor_Lib.RS485()
+		except:
+			pass
 	elif sys.platform == "win32":
 		pass
 	
 	app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:HrK8Iww7hU0izq1H@192.168.11.4:3306/sensordb'
 	db.init_app(app)
 	db.create_all()
-
+	app.debug = True
 	schedule.every(15).minutes.do(ReadLUX_Job)  
 	schedule.every(16).minutes.do(ReadEC_Job)  
 	schedule.every(17).minutes.do(ReadPH_Job)  
