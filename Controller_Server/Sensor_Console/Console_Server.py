@@ -41,6 +41,9 @@ class schedule(db.Model):
     PositionX = db.Column(db.Integer)
     PositionY = db.Column(db.Integer)
 
+class schedule_day_of_time(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    time = db.Column(db.String)
 
 db.init_app(app)
 db.create_all()

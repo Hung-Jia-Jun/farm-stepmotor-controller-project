@@ -165,7 +165,7 @@ class Pyueye:
 			#...and finally display it
 			# cv2.imshow("SimpleLive_Python_uEye_OpenCV", frame)
 
-			if counter > 100:
+			if counter > 150:
 				#Write File
 				cv2.imwrite(filename, frame)
 

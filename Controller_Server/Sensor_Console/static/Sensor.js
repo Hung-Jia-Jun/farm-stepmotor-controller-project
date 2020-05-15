@@ -165,7 +165,12 @@ function showPlanList()
 	});
 }
 
-
+//設定定時運行排程
+function SetMovePlan()
+{
+	var Time = document.getElementById("datetimepicker").childNodes[1].value;
+	
+}
 //顯示距離與馬達運行時間比例
 function showDistanceOfTimeProportion()
 {
