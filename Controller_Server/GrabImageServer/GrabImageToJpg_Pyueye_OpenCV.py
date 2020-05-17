@@ -7,6 +7,10 @@ import time
 
 class Pyueye:
 	def StartGrab(self,filename):
+		self.tackPic = 1
+		self.filename = filename
+	def __init__(self):
+		self.tackPic = 0
 		#---------------------------------------------------------------------------------------------------------------------------------------
 
 		#Variables
@@ -165,13 +169,13 @@ class Pyueye:
 			#...and finally display it
 			# cv2.imshow("SimpleLive_Python_uEye_OpenCV", frame)
 
-			if counter > 150:
+			if self.tackPic == 1:
 				#Write File
-				cv2.imwrite(filename, frame)
+				cv2.imwrite(self.filename, frame)
 
 				print (filename + "  OK")
-				break
-			counter += 1
+				self.tackPic = 0
+			
 			# Press q if you want to end the loop
 			if cv2.waitKey(1) & 0xFF == ord('q'):
 				break

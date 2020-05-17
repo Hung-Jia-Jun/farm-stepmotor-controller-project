@@ -1,0 +1,8 @@
+[Unit]
+Description=MVS Camera server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/jetson/MVS/Samples/aarch64/Python/app.py 
+[Install]
+WantedBy=multi-user.target

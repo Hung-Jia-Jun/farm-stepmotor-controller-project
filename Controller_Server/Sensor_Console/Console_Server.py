@@ -10,43 +10,16 @@ import ftplib
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_socketio import SocketIO, emit
-import base64
+from os.path import dirname, abspath
+d = dirname(dirname(abspath(__file__)))
+sys.path.append(d)
+import Models
+from Models import *
+
 app = Flask(__name__)
 
-db = SQLAlchemy(app)
 socketio = SocketIO(app)
 
-class config(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    config_key = db.Column(db.String(255))
-    width = db.Column(db.Integer)
-    frequency = db.Column(db.Integer)
-    count = db.Column(db.Integer)
-    distance = db.Column(db.Integer)
-
-class sensor_lux(db.Model):
-	DateTime = db.Column(db.String(255), primary_key=True)
-	Data = db.Column(db.String(255))
-
-class sensor_ec(db.Model):
-	DateTime = db.Column(db.String(255), primary_key=True)
-	Data = db.Column(db.String(255))
-
-class sensor_ph(db.Model):
-	DateTime = db.Column(db.String(255), primary_key=True)
-	Data = db.Column(db.String(255))
-
-class schedule(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    PositionX = db.Column(db.Integer)
-    PositionY = db.Column(db.Integer)
-
-class schedule_day_of_time(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    time = db.Column(db.String)
-
-db.init_app(app)
-db.create_all()
 
 
 @app.route("/index")
