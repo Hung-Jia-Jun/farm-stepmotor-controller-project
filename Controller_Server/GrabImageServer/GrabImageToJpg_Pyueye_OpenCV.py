@@ -7,8 +7,16 @@ import time
 
 class Pyueye:
 	def StartGrab(self,filename):
-		self.tackPic = 1
+		self.Uploadedfilename = ""
 		self.filename = filename
+
+		#啟動拍照
+		self.tackPic = 1
+
+		#輪詢去檢查拍照狀態
+		while self.Uploadedfilename == "":
+			time.sleep(0.2)
+		return self.filename
 	def __init__(self):
 		self.tackPic = 0
 		#---------------------------------------------------------------------------------------------------------------------------------------
@@ -174,6 +182,9 @@ class Pyueye:
 				cv2.imwrite(self.filename, frame)
 
 				print (filename + "  OK")
+
+				#已上傳的檔案名稱
+				self.Uploadedfilename = filename
 				self.tackPic = 0
 			
 			# Press q if you want to end the loop
