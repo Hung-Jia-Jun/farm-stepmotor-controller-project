@@ -50,7 +50,7 @@ class Camera:
 		if "IDS" in str(self.subprocess):
 			GrabImageFilePath = localPictureFolderPath + self.FileName
 			#存放拍照命令到消息隊列
-			queue.put(GrabImageFilePath)     
+			self.queue.put(GrabImageFilePath)     
 			result = GrabImageToJpg_Pyueye_OpenCV.GetTakePicResponse(self.ResponseQueue)
 		else:
 			#MVS相機拍照
@@ -63,7 +63,6 @@ class Camera:
 		else:
 			logging.error("GrabFail")
 			return "GrabFail"
-Camera = Camera()
 class FTP:
 	def __init__(self):
 		self.config = configparser.ConfigParser()
@@ -116,7 +115,7 @@ class FTP:
 		logging.info(file +" uploaded")
 		return file +" uploaded"
 
-
+Camera = Camera()
 @app.route("/Pic")
 def Pic():
 	global Camera

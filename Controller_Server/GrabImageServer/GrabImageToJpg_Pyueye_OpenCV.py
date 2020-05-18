@@ -181,6 +181,8 @@ class Pyueye:
 			# cv2.imshow("SimpleLive_Python_uEye_OpenCV", frame)
 
 			if  queue.qsize() > 0:
+				import pdb
+				pdb.set_trace()
 				filename = queue.get()
 				#Write File
 				cv2.imwrite(filename, frame)
