@@ -181,10 +181,10 @@ class Pyueye:
 				#Write File
 				cv2.imwrite(self.filename, frame)
 
-				print (filename + "  OK")
+				print (self.filename + "  OK")
 
 				#已上傳的檔案名稱
-				self.Uploadedfilename = filename
+				self.Uploadedfilename = self.filename
 				self.tackPic = 0
 			
 			# Press q if you want to end the loop
