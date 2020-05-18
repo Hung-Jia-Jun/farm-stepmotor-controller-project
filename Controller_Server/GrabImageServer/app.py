@@ -13,7 +13,7 @@ import logging
 import GrabImageToJpg
 import GrabImageToJpg_Pyueye_OpenCV
 import subprocess
-
+from multiprocessing import Process, Queue
 app = Flask(__name__)
 
 class Camera:
@@ -25,8 +25,16 @@ class Camera:
 		
 		#讀取USB現在插的是IDS相機還是MVS相機
 		self.subprocess = subprocess.Popen("lsusb", shell=True, stdout=subprocess.PIPE).stdout.read()
-
-		pass
+		#依照USB現在的名稱，去自動選擇拍照的機器
+		if "IDS" in str(self.subprocess):
+			#拍照行為的消息隊列
+			self.queue = Queue() 
+			#回傳拍照結果的隊列
+			self.ResponseQueue = Queue() 
+			Pyueye = GrabImageToJpg_Pyueye_OpenCV.Pyueye()
+			#啟動IDS相機拍照的背景程序，讓它自動對焦
+			Process_Pyueye = Process(target=Pyueye.OpenCamera, args=(self.queue,self.ResponseQueue,))
+			Process_Pyueye.start()
 	def SaveImage(self):
 		logging.basicConfig(filename="/home/jetson/MVS/Samples/aarch64/Python/Running.log", filemode="w", format="%(asctime)s %(name)s:%(levelname)s:%(message)s", datefmt="%d-%M-%Y %H:%M:%S", level=logging.DEBUG)
 		config = configparser.ConfigParser()
@@ -40,9 +48,10 @@ class Camera:
 
 		#依照USB現在的名稱，去自動選擇拍照的機器
 		if "IDS" in str(self.subprocess):
-			#IDS相機拍照
-			Pyueye = GrabImageToJpg_Pyueye_OpenCV.Pyueye()
-			result = Pyueye.StartGrab(localPictureFolderPath + self.FileName)
+			GrabImageFilePath = localPictureFolderPath + self.FileName
+			#存放拍照命令到消息隊列
+			queue.put(GrabImageFilePath)     
+			result = GrabImageToJpg_Pyueye_OpenCV.GetTakePicResponse(self.ResponseQueue)
 		else:
 			#MVS相機拍照
 			MVSControll = GrabImageToJpg.MVSControll()
@@ -110,6 +119,7 @@ class FTP:
 
 @app.route("/Pic")
 def Pic():
+	global Camera
 	result = Camera.SaveImage()
 	logging.info("Grab Status: " + result)
 	return result

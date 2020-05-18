@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 import sys
 import time
+from multiprocessing import Process, Queue
 
 class Pyueye:
 	def StartGrab(self,filename):
@@ -16,8 +17,9 @@ class Pyueye:
 		#輪詢去檢查拍照狀態
 		while self.Uploadedfilename == "":
 			time.sleep(0.2)
+		self.Uploadedfilename = ""
 		return self.filename
-	def __init__(self):
+	def OpenCamera(self,queue,ResponseQueue):
 		self.tackPic = 0
 		#---------------------------------------------------------------------------------------------------------------------------------------
 
@@ -61,6 +63,7 @@ class Pyueye:
 		formatInfo=ueye.IMAGE_FORMAT_INFO()
 		formatInfo.nFormatID=6
 		nRet = ueye.is_ImageFormat(hCam, ueye.IMGFRMT_CMD_SET_FORMAT, formatInfo.nFormatID, ueye.sizeof(formatInfo.nFormatID))
+		nRet = ueye.is_Focus (hCam, ueye.FOC_CMD_SET_ENABLE_AUTOFOCUS, None, 0)
 
 		# Set display mode to DIB
 		nRet = ueye.is_SetDisplayMode(hCam, ueye.IS_SET_DM_DIB)
@@ -177,19 +180,12 @@ class Pyueye:
 			#...and finally display it
 			# cv2.imshow("SimpleLive_Python_uEye_OpenCV", frame)
 
-			if self.tackPic == 1:
+			if  queue.qsize() > 0:
+				filename = queue.get()
 				#Write File
-				cv2.imwrite(self.filename, frame)
-
-				print (self.filename + "  OK")
-
-				#已上傳的檔案名稱
-				self.Uploadedfilename = self.filename
-				self.tackPic = 0
-			
-			# Press q if you want to end the loop
-			if cv2.waitKey(1) & 0xFF == ord('q'):
-				break
+				cv2.imwrite(filename, frame)
+				ResponseQueue.put(filename)
+				print (filename + "  OK")
 		#---------------------------------------------------------------------------------------------------------------------------------------
 
 		# Releases an image memory that was allocated using is_AllocImageMem() and removes it from the driver management
@@ -198,11 +194,25 @@ class Pyueye:
 		# Disables the hCam camera handle and releases the data structures and memory areas taken up by the uEye camera
 		ueye.is_ExitCamera(hCam)
 
+#取得拍照結果
+def GetTakePicResponse(ResponseQueue):
+	while True:
+		if ResponseQueue.qsize() > 0 :
+			return ResponseQueue.get()
 
-		#save and exit process
-		return filename
 
 if __name__ == "__main__":
-	FileName=time.strftime('%Y_%m_%d_%H-%M-%S',time.localtime(time.time()))+'.jpg'
+	#拍照行為的消息隊列
+	queue = Queue() 
+	#回傳拍照結果的隊列
+	ResponseQueue = Queue() 
 	Pyueye = Pyueye()
-	print(Pyueye.StartGrab(FileName))
+	Process_Pyueye = Process(target=Pyueye.OpenCamera, args=(queue,ResponseQueue,))
+	Process_Pyueye.start()
+	FileName=time.strftime('%Y_%m_%d_%H-%M-%S',time.localtime(time.time()))+'.jpg'
+
+	time.sleep(15)
+	#存放拍照命令到消息隊列
+	queue.put(FileName)     
+
+	print (GetTakePicResponse(ResponseQueue))
