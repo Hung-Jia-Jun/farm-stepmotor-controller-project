@@ -3,8 +3,8 @@ Description=StartGrab
 
 [Service]
 Type=simple
-WorkingDirectory=/home/jetson/MVS/Samples/aarch64/Python/
-ExecStart=/bin/bash StartGrab.sh
+WorkingDirectory=/home/pii/farm-stepmotor-controller-project/Controller_Server/Sensor_Console
+ExecStart=/bin/bash StartConsoleServer.sh
 
 
 [Install]
