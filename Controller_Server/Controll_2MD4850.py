@@ -17,7 +17,9 @@ my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=1024*1024,
 my_handler.setFormatter(log_formatter)
 my_handler.setLevel(logging.DEBUG)
 
+
 logger = logging.getLogger('root')
+
 logger.setLevel(logging.DEBUG)
 
 logger.addHandler(my_handler)
@@ -41,7 +43,7 @@ class StepMotorControll:
             },
             "B":{
                 "ENA" : 17,
-                "DIR" : 27,
+                "DIR" : 10,
                 "PUL" : 22
             }
         }
