@@ -10,7 +10,6 @@ import ftplib
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_socketio import SocketIO, emit
-from Models import *
 
 import base64
 if sys.platform == "linux":
@@ -37,10 +36,6 @@ socketio = SocketIO(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:HrK8Iww7hU0izq1H@192.168.11.4:3306/sensordb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
-manager = Manager(app)
-manager.add_command('server', Server)
-manager.add_command('db', MigrateCommand)
-migrate = Migrate(app, db)
 
 
 
@@ -108,8 +103,11 @@ def BrushlessDC_Motor():
 	elif sys.platform == "win32":
 		return "在windows環境無法顯示此數值"
 
+
+
 @app.route("/Stepping_Motor")
 def Stepping_Motor():
+
 	#方向 順時針轉為1,逆時鐘轉為0
 	direction = request.args.get('direction')
 	

@@ -32,21 +32,49 @@ class DR_TypeStruct:
 
         #逆時鐘
         self.AntiClockwise  = 0
+        
+GPIONumber = {
+    "A":{
+        "ENA" : 5,
+        "DIR" : 6,
+        "PUL" : 13
+    },
+    "B":{
+        "ENA" : 17,
+        "DIR" : 16,
+        "PUL" : 22
+    }
+}
+def InitMotor():
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BCM)
+
+    #垂直煞車制動器 (1-unlock;0-lock)
+    Brake = 25
+    #設定制動器的GPIO
+    GPIO.setup(Brake, GPIO.OUT)
+
+    #先鎖定煞車，後放鬆馬達出力
+    for motor in list(GPIONumber.keys()):
+        logger.info("Start Init step motor " + str(motor) + "-----------------------")
+        #垂直煞車制動器 (1-unlock;0-lock)
+        GPIO.output(Brake, GPIO.LOW)
+        logger.info("lock Brake = "+str(Brake)+"  GPIO.LOW")
+
+        #初始化的時候，關閉馬達出力
+        ENA = GPIONumber[motor]["ENA"]
+        GPIO.setup(ENA, GPIO.OUT)
+        #Enable = GPIO.LOW (低電壓為啟動,高電位為disable)
+        GPIO.output(ENA, GPIO.HIGH)
+        logger.info("Disable StepMotor = "+ motor +"GPIO : "+str(ENA)+"  GPIO.HIGH")
+
+#啟動Server後，先鎖定煞車，後放鬆馬達出力
+InitMotor()
 class StepMotorControll:
     def __init__(self,MotorNumber):
         self.MotorNumber = MotorNumber
-        self.GPIONumber = {
-            "A":{
-                "ENA" : 5,
-                "DIR" : 6,
-                "PUL" : 13
-            },
-            "B":{
-                "ENA" : 17,
-                "DIR" : 10,
-                "PUL" : 22
-            }
-        }
+        self.GPIONumber = GPIONumber
+        
 
     #使用座標來移動單顆步進馬達
     def SetPointToMove(self,nowPosition,TargetPosition,Pulse_Count,Distance):
@@ -106,7 +134,7 @@ class StepMotorControll:
         GPIO.output(ENA, GPIO.LOW)
 
         #DR_Type = 順時針轉為1,逆時鐘轉為0
-        #正轉
+        logger.info("Enable DIR = "+str(DIR)+" " + str(DR_Type))
         GPIO.output(DIR, int(DR_Type))
 
         #一秒內有工作的時候(高電平)有幾毫秒
@@ -182,3 +210,7 @@ class StepMotorControll:
         GPIO.output(Brake, GPIO.LOW)
 
         return 'OK !'
+
+if __name__ == "__main__":
+    InitMotor()
+    pass

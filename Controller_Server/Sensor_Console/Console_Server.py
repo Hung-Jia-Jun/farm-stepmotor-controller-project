@@ -10,10 +10,10 @@ import ftplib
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_socketio import SocketIO, emit
+import base64
 from os.path import dirname, abspath
 d = dirname(dirname(abspath(__file__)))
 sys.path.append(d)
-from Models import *
 
 
 #------------------------------------------------------------------------------------------------------
@@ -22,10 +22,6 @@ socketio = SocketIO(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:HrK8Iww7hU0izq1H@192.168.11.4:3306/sensordb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
-manager = Manager(app)
-manager.add_command('server', Server)
-manager.add_command('db', MigrateCommand)
-migrate = Migrate(app, db)
 
 
 
@@ -130,6 +126,53 @@ def saveMotorCommand():
 	db.session.add(scheduleCommand)
 	db.session.commit()
 	return "OK"
+
+#--------------------定時運行排程----------------------------------------------------------------------
+#新增定時運行排程
+@app.route("/savePlanRunning")
+def savePlanRunning():
+	#座標位置 X
+	Time = request.args.get('Time')
+
+	#座標位置 Y
+	_PositionY = request.args.get('PositionY')
+
+	schedule_day_of_time_Command = schedule_day_of_time(time = Time)
+	 
+	db.session.add(schedule_day_of_time_Command)
+	db.session.commit()
+	return "OK"
+
+#取得當前定時運行排程列表
+@app.route("/queryPlanList")
+def queryPlanList():
+	#依照ID排序
+	day_schedule = schedule_day_of_time.query.order_by(schedule_day_of_time.id.asc()).all()
+	Plan_li = []
+	for ele in day_schedule:
+		if ele != None:
+			schedulePlan = {
+				'id' : ele.id,
+				'Time' : ele.time,
+			}
+			Plan_li.append(schedulePlan)
+	return json.dumps(Plan_li)
+
+
+#刪除定時運行指令
+@app.route("/deleteTimeCommand")
+def deleteTimeCommand():
+	#使用ID來刪除物件
+	_id = request.args.get('id')
+	
+	Command = schedule_day_of_time.query.filter_by(id=_id).first()
+	
+	#刪除指定的DB指令
+	db.session.delete(Command)
+	db.session.commit()
+	return "OK"
+
+#--------------------定時運行排程----------------------------------------------------------------------
 
 
 #取得現在的馬達距離比例

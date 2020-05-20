@@ -13,7 +13,9 @@ import logging
 import GrabImageToJpg
 import GrabImageToJpg_Pyueye_OpenCV
 import subprocess
-from multiprocessing import Process, Queue
+# from multiprocessing import Process, Queue
+from queue import Queue
+import threading
 app = Flask(__name__)
 
 class Camera:
@@ -33,8 +35,10 @@ class Camera:
 			self.ResponseQueue = Queue() 
 			Pyueye = GrabImageToJpg_Pyueye_OpenCV.Pyueye()
 			#啟動IDS相機拍照的背景程序，讓它自動對焦
-			Process_Pyueye = Process(target=Pyueye.OpenCamera, args=(self.queue,self.ResponseQueue,))
-			Process_Pyueye.start()
+			Thread_Pyueye = threading.Thread(target=Pyueye.OpenCamera,args=(self.queue,self.ResponseQueue,))
+			Thread_Pyueye.start()
+			# Process_Pyueye = Process(target=Pyueye.OpenCamera, args=(self.queue,self.ResponseQueue,))
+			# Process_Pyueye.start()
 	def SaveImage(self):
 		logging.basicConfig(filename="/home/jetson/MVS/Samples/aarch64/Python/Running.log", filemode="w", format="%(asctime)s %(name)s:%(levelname)s:%(message)s", datefmt="%d-%M-%Y %H:%M:%S", level=logging.DEBUG)
 		config = configparser.ConfigParser()
@@ -115,11 +119,11 @@ class FTP:
 		logging.info(file +" uploaded")
 		return file +" uploaded"
 
-Camera = Camera()
+
+_Camera = Camera()
 @app.route("/Pic")
 def Pic():
-	global Camera
-	result = Camera.SaveImage()
+	result = _Camera.SaveImage()
 	logging.info("Grab Status: " + result)
 	return result
 
@@ -136,5 +140,6 @@ def init():
 	import os
 	return os.popen("pwd").read()
 if __name__ == "__main__":
+	# 
 	app.debug = True
 	app.run(host='0.0.0.0', port=8000)
