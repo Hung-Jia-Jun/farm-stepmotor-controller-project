@@ -120,9 +120,10 @@ class FTP:
 		return file +" uploaded"
 
 
-_Camera = Camera()
+
 @app.route("/Pic")
 def Pic():
+	global _Camera
 	result = _Camera.SaveImage()
 	logging.info("Grab Status: " + result)
 	return result
@@ -135,11 +136,12 @@ def upload():
 	logging.info("Upload to FTP status: " + result)
 	return result
 
-@app.route("/init")
-def init():
-	import os
-	return os.popen("pwd").read()
+_Camera = None
+@app.before_first_request
+def StartCamera():
+	global _Camera
+	_Camera = Camera()
+
 if __name__ == "__main__":
-	# 
 	app.debug = True
 	app.run(host='0.0.0.0', port=8000)

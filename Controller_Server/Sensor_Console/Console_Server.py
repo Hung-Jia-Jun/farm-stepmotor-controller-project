@@ -155,9 +155,8 @@ def queryPlanList():
 				'id' : ele.id,
 				'Time' : ele.time,
 			}
-			Plan_li.append(schedulePlan)
+			Plan_li.append(json.dumps(schedulePlan))
 	return json.dumps(Plan_li)
-
 
 #刪除定時運行指令
 @app.route("/deleteTimeCommand")

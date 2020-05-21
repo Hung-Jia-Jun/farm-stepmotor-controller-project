@@ -114,7 +114,6 @@ function showCommandList()
 	];
 
 	$('#commandTable').bootstrapTable('destroy')
-	//bootstrap table初始化数据
 	$('#commandTable').bootstrapTable({  
 			toolbar:"#toolbar",  
 			columns: columns, 
@@ -166,12 +165,10 @@ function showPlanList()
 	});
 	$.get("/queryPlanList",
 		function(data) {
-			var indexnum = 1
 			var commandList = JSON.parse(data);
 			commandList.forEach(element => {
 				command = JSON.parse(element);
-				$('#commandTable').bootstrapTable('append', command);
-				indexnum += 1;
+				$('#Schedule_table').bootstrapTable('append', command);
 			});
 		}
 	);
@@ -195,6 +192,23 @@ function SetMovePlan()
 }
 
 
+//刪除已選擇的指令
+function deleteTimeCommand()
+{
+	var Selections = $('#Schedule_table').bootstrapTable('getSelections');
+	document.getElementById("savePlanRunResult").innerText = "運行結果 : 刪除指令中..."
+	Selections.forEach(element => {
+		console.log(element.id);
+		$.get("/deleteTimeCommand",
+			{id : element.id},
+			function(data) {
+				document.getElementById("saveCommandRunResult").innerText = "運行結果 : OK !"
+				showPlanList();
+			}
+		);
+
+	});
+}
 
 
 //顯示距離與馬達運行時間比例
