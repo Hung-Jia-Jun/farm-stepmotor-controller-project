@@ -24,11 +24,6 @@
 	table {
     width: 100%;
 	}
-	
-	.fixed-table-body{
-		height: 33%;
-	}
-	
  </style>
 	<meta charset="utf-8">     
  	<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
@@ -112,7 +107,6 @@
 		
 		<div style="height: 10px;" class="row"></div>
 		<div class="row">
-
 			<div class="col-md-2">
 				<input type="text" class="form-control" id="MotorPositionX" placeholder="X座標">
 			</div>
@@ -125,19 +119,21 @@
 			<div class="col-md-1">
 				<button onclick="saveMotorCommand();" type="button" class="btn btn-primary">新增指令</button>  
 			</div>
-			
 		</div>
 		<div style="height: 10px;" class="row"></div>
-
-		<table class="tableFixHead" id="commandTable">
-			<thead>
-				<tr>
-					<th data-checkbox="true"></th>
-				</tr>
-			</thead>
-		</table>
+		<div class="row">
+			<div class="col-md-10 table-responsive">
+				<table class="table table-responsive-md" id="commandTable">
+					<thead>
+						<tr>
+							<th data-checkbox="true"></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
 		<div style="height: 30px;" class="row">
-			<div class="col-md-3">
+			<div class="col-md-12">
 				<h6 id="saveCommandRunResult">運行結果 :</h6>
 			</div>
 		</div>
@@ -147,6 +143,9 @@
 			</div>
 			<div class="col-md-2">
 				<button onclick="deleteCommandList();" type="button" class="btn btn-danger">刪除已選指令</button>  
+			</div>
+			<div class="col-md-2">
+				<button onclick="runCommandList();" type="button" class="btn btn-warning">立即運行重複指令</button>  
 			</div>
 		</div>
 	</div>
@@ -174,13 +173,15 @@
 
 		</div>
 		<div class="row">
-			<table class="table" id="Schedule_table">
-				<thead>
-					<tr>
-						<th data-checkbox="true"></th>
-					</tr>
-				</thead>
-			</table>
+			<div class="col-md-8 table-responsive">
+				<table class="table" id="Schedule_table">
+					<thead>
+						<tr>
+							<th data-checkbox="true"></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
 		</div>
 		<div style="height: 30px;" class="row">
 			<div class="col-md-0">

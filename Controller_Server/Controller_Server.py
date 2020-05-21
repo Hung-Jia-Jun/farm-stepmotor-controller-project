@@ -10,7 +10,7 @@ import ftplib
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_socketio import SocketIO, emit
-
+import schedule as scheduler
 import base64
 if sys.platform == "linux":
 	#光遮斷器
@@ -254,20 +254,17 @@ def LightControllerStatus():
 		return "在windows環境無法顯示此數值"
 
 #將兩顆步進馬達設定到指定的位置
-@app.route("/SetPoint")
-def SetPoint():
-	TargetX = request.args.get('TargetX')
-	TargetY = request.args.get('TargetY')
-
+def SetPoint(TargetX,TargetY):
 	#讀取資料庫設定檔
 	StepMotor_config_A = config.query.filter_by(
 		config_key='StepMotor_DistanceOfTimeProportion_A').first()
 	StepMotor_config_B = config.query.filter_by(
 		config_key='StepMotor_DistanceOfTimeProportion_B').first()
 
+	
 	Step_A = Controll_2MD4850.StepMotorControll("A")
 	Step_B = Controll_2MD4850.StepMotorControll("B")
-	
+		
 	#取得現在步進馬達的座標多少
 	MotroCurrentPostion_A = motor_position.query.filter_by(number='A').first()
 	MotroCurrentPostion_B = motor_position.query.filter_by(number='B').first()
@@ -284,7 +281,18 @@ def SetPoint():
 														Pulse_Count = StepMotor_config_B.count,
 														Distance = StepMotor_config_B.distance,
 														)
-	
+	# Target position 剪掉 now position														
+	PosX = TargetX - MotroCurrentPostion_A.value
+	PosY = TargetY - MotroCurrentPostion_B.value
+
+	if PosX < 0:
+		PosX = 0
+	if PosY < 0:
+		PosY = 0
+	MotroCurrentPostion_A.value = PosX
+	MotroCurrentPostion_B.value = PosY
+	db.session.commit()
+
 	#如果碰到0點歸零開關就會停止
 	if sys.platform == "linux":
 		#Z軸垂直制動器煞車開關
@@ -294,7 +302,10 @@ def SetPoint():
 								PulseFrequency = StepMotor_config_A.frequency,
 								DR_Type = Direction_X,
 								EnableBrake = _EnableBrake,)
-		
+		#碰到零點感測器就表示已經回0了
+		if "axis zero point sensor trigger" in status_A:
+			MotroCurrentPostion_A.value = 0
+			
 		#Z軸要放開煞車
 		_EnableBrake = True
 		status_B = Step_B.Run(  Pulse_Width = StepMotor_config_B.width,
@@ -302,6 +313,11 @@ def SetPoint():
 								PulseFrequency = StepMotor_config_B.frequency,
 								DR_Type = Direction_Y,
 								EnableBrake = _EnableBrake,)
+		
+		#碰到零點感測器就表示已經回0了
+		if "axis zero point sensor trigger" in status_B:
+			MotroCurrentPostion_B.value = 0
+
 		return str(status_A + status_B)
 
 	elif sys.platform == "win32":
@@ -314,18 +330,6 @@ def SetPoint():
 		}
 		return parameterEcho
 
-#啟用定時運行命令
-def StartSchedule_Job():  
-	#現在座標的計量暫存
-	NowPositionX = 0
-	NowPositionY = 0
-
-	
-	#依照ID排序，將所有命令取出來
-	scheduleLi = schedule.query.order_by(schedule.id.asc()).all()
-	for ele in scheduleLi:
-		ele.PositionX
-		ele.PositionY
 def ReadLUX_Job():  
 	print ("Start task ReadLUX_Job")
 	try:
@@ -350,16 +354,46 @@ def ReadPH_Job():
 		pass
 	print ("End task ReadPH_Job")
 	
-	
+#啟用定時運行命令
+def StartSchedule_Job():  
+	#依照ID排序，將所有命令取出來
+	scheduleLi = schedule.query.order_by(schedule.id.asc()).all()
+	for ele in scheduleLi:
+		SetPoint(ele.PositionX,ele.PositionY)
+
+#立即運行剛剛設定的指令
+@app.route("/runCommandList")
+def runCommandList():
+	StartSchedule_Job()
+
+#一直去更新步進馬達的移動任務
+def updateMotorJob():
+	while True:
+		#依照ID排序
+		day_schedule = schedule_day_of_time.query.order_by(schedule_day_of_time.id.asc()).all()
+		
+		#清空所有任務
+		scheduler.clear()
+		
+		Plan_li = []
+		for ele in day_schedule:
+			if ele != None:
+				schedulePlan = {
+					'id' : ele.id,
+					'Time' : ele.time,
+				}
+				#到指定時間後，運行重複運行指令
+				scheduler.every().day.at(ele.time).do(StartSchedule_Job)  
+		print (scheduler.jobs)
+		time.sleep(30)
 
 #每秒鐘都去確認現在是否有任務可以運行
 def pendingJob():
 	while True:
-		schedule.run_pending()
+		scheduler.run_pending()
 		time.sleep(1)
 
 if __name__ == "__main__":
-	import schedule
 	if sys.platform == "linux":
 		try:
 			RS485 = Read_RS485_Sensor_Lib.RS485()
@@ -374,14 +408,21 @@ if __name__ == "__main__":
 	print (__name__ , "db.create_all")
 
 
-	schedule.every(15).minutes.do(ReadLUX_Job)  
-	schedule.every(16).minutes.do(ReadEC_Job)  
-	schedule.every(17).minutes.do(ReadPH_Job)  
+
+	scheduler.every(15).minutes.do(ReadLUX_Job)  
+	scheduler.every(16).minutes.do(ReadEC_Job)  
+	scheduler.every(17).minutes.do(ReadPH_Job)  
 	# 建立一個子執行緒，去監控任務運行狀態
 	t = threading.Thread(target = pendingJob)
 
 	# 執行該子執行緒
 	t.start()
+
+	# # 建立一個子執行緒，去定時更新運行排程
+	# t2 = threading.Thread(target = updateMotorJob)
+
+	# # 執行該子執行緒
+	# t2.start()
 	app.run(host='0.0.0.0',port=8001)
 	
 

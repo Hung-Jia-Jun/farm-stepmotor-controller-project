@@ -92,6 +92,21 @@ function deleteCommandList()
 	});
 }
 
+
+//刪除已選擇的指令
+function runCommandList()
+{
+	document.getElementById("saveCommandRunResult").innerText = "運行結果 : 正在運行動作列表..."
+	Selections.forEach(element => {
+		console.log(element.id);
+		$.get("/runCommandList",
+			function(data) {
+				document.getElementById("saveCommandRunResult").innerText = "運行結果 : OK !"
+			}
+		);
+	});
+}
+
 //顯示運行指令
 function showCommandList()
 {	
@@ -202,11 +217,10 @@ function deleteTimeCommand()
 		$.get("/deleteTimeCommand",
 			{id : element.id},
 			function(data) {
-				document.getElementById("saveCommandRunResult").innerText = "運行結果 : OK !"
+				document.getElementById("savePlanRunResult").innerText = "運行結果 : OK !"
 				showPlanList();
 			}
 		);
-
 	});
 }
 

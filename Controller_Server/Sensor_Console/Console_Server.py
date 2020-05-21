@@ -2,7 +2,7 @@ from flask import Flask,request
 from flask import render_template
 import time
 import sys
-import schedule
+import schedule as scheduler
 import os
 import requests
 import json
@@ -11,7 +11,8 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_socketio import SocketIO, emit
 import base64
-from os.path import dirname, abspath
+from os.path import dirname, abspath 
+import threading
 d = dirname(dirname(abspath(__file__)))
 sys.path.append(d)
 
