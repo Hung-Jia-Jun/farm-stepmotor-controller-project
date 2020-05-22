@@ -8,7 +8,7 @@
 7. Raspberry controll step motor
 
 # Architecture diagram
-![](https://lh5.googleusercontent.com/1jHhT_zgtkOXDzKxn0vepraMELzgzExIydARZbzomJ_693kpXoIDwJkx7j34lkErKlNSA8fLzwx0gAuxRvc_=w1600-h757-rw)
+![](https://i.imgur.com/z71rRYA.png)
 # Jetson Nano 
 ![](https://d11vq4vh3begny.cloudfront.net/img/tmp/1EP/BOo6z/Lo/5LvB5/Zg)
 
