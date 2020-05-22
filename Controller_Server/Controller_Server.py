@@ -12,6 +12,7 @@ from datetime import datetime
 from flask_socketio import SocketIO, emit
 import schedule as scheduler
 import base64
+import logging
 if sys.platform == "linux":
 	#光遮斷器
 	import Controll_input
@@ -19,7 +20,7 @@ if sys.platform == "linux":
 	#無刷直流馬達
 	import Controll_ZM6405E
 
-	
+
 	import Read_RS485_Sensor_Lib
 
 	#步進馬達
@@ -66,7 +67,7 @@ class schedule_day_of_time(db.Model):
 class sensor_lux(db.Model):
 	DateTime = db.Column(db.String(255), primary_key=True)
 	Data = db.Column(db.String(255))
-	
+
 	def __init__(self, DateTime, Data):
 		self.DateTime = DateTime
 		self.Data = Data
@@ -82,19 +83,19 @@ class sensor_ec(db.Model):
 class sensor_ph(db.Model):
 	DateTime = db.Column(db.String(255), primary_key=True)
 	Data = db.Column(db.String(255))
-  
+
 	def __init__(self, DateTime, Data):
 		self.DateTime = DateTime
 		self.Data = Data
 #------------------------------------------------------------------------------------------------------
 
 
-	
+
 @app.route("/BrushlessDC_Motor")
 def BrushlessDC_Motor():
 	#方向 順時針轉為1,逆時鐘轉為0
 	direction = request.args.get('direction')
-	
+
 	#毫秒為單位
 	TimeMinSec = request.args.get('TimeMinSec')
 	if sys.platform == "linux":
@@ -110,7 +111,7 @@ def Stepping_Motor():
 
 	#方向 順時針轉為1,逆時鐘轉為0
 	direction = request.args.get('direction')
-	
+
 	#脈衝寬度
 	Pulse_Width = request.args.get('Pulse_Width')
 
@@ -119,7 +120,7 @@ def Stepping_Motor():
 
 	#脈衝次數
 	Pulse_Count = request.args.get('Pulse_Count')
-	
+
 	#步進馬達代號
 	StepMotorNumber = request.args.get('StepMotorNumber')
 
@@ -164,7 +165,7 @@ def ReadLUX():
 				"二氧化碳" : str(C02),
 				"大氣壓力" : str(AtmosphericPressure),
 			}
-			
+
 			print (_Data)
 			LuxData = sensor_lux(
 				DateTime = str(datetime.now()) ,
@@ -197,7 +198,7 @@ def ReadEC():
 				"水溫" : str(temperature),
 				"電導率" : str(EC),
 			}
-		
+
 			print (_Data)
 			ECData = sensor_ec(
 				DateTime = str(datetime.now()) ,
@@ -243,12 +244,41 @@ def ReadPH():
 			"PH" : "在windows環境無法顯示此數值"
 		}
 		return data
-					
+
 #讀取光遮斷器數值
 @app.route("/LightControllerStatus")
 def LightControllerStatus():
 	if sys.platform == "linux":
-		status = Controll_input.ReturnZeroSensor()
+		#終端限位感測
+		limitSensor1 = 23
+		limitSensor2 = 24
+
+		#零點感測器
+		ZeroSensor1 = 0
+		ZeroSensor2 = 26
+		status = "None"
+		#如果是正轉，碰到限位開關就要停止，只能反轉回去
+		#限位開關偵測
+		if Controll_input.ReturnSensorStatus(limitSensor1):
+			logger.warning("X axis limit sensor trigger")
+			status = "X axis limit sensor trigger"
+
+		#限位開關偵測
+		if Controll_input.ReturnSensorStatus(limitSensor2):
+			logger.warning("Y axis limit sensor trigger")
+			status = "Y axis limit sensor trigger"
+
+		#如果是反轉，碰到零點開關就要停止，只能正轉出去
+		#零點開關偵測
+		if Controll_input.ReturnSensorStatus(ZeroSensor1):
+			logger.warning("X axis zero point sensor trigger")
+			status = "X axis zero point sensor trigger"
+
+		#零點開關偵測
+		if Controll_input.ReturnSensorStatus(ZeroSensor2):
+			logger.warning("Y axis zero point sensor trigger")
+			status = "Y axis zero point sensor trigger"
+
 		return str(status)
 	elif sys.platform == "win32":
 		return "在windows環境無法顯示此數值"
@@ -261,14 +291,14 @@ def SetPoint(TargetX,TargetY):
 	StepMotor_config_B = config.query.filter_by(
 		config_key='StepMotor_DistanceOfTimeProportion_B').first()
 
-	
+
 	Step_A = Controll_2MD4850.StepMotorControll("A")
 	Step_B = Controll_2MD4850.StepMotorControll("B")
-		
+
 	#取得現在步進馬達的座標多少
 	MotroCurrentPostion_A = motor_position.query.filter_by(number='A').first()
 	MotroCurrentPostion_B = motor_position.query.filter_by(number='B').first()
-	
+
 	#算出與目標點差距有幾個脈波
 	Direction_X , Pulse_X_Count = Step_A.SetPointToMove(nowPosition = MotroCurrentPostion_A.value,
 														TargetPosition = TargetX,
@@ -281,7 +311,7 @@ def SetPoint(TargetX,TargetY):
 														Pulse_Count = StepMotor_config_B.count,
 														Distance = StepMotor_config_B.distance,
 														)
-	# Target position 剪掉 now position														
+	# Target position 剪掉 now position
 	PosX = TargetX - MotroCurrentPostion_A.value
 	PosY = TargetY - MotroCurrentPostion_B.value
 
@@ -305,7 +335,7 @@ def SetPoint(TargetX,TargetY):
 		#碰到零點感測器就表示已經回0了
 		if "axis zero point sensor trigger" in status_A:
 			MotroCurrentPostion_A.value = 0
-			
+
 		#Z軸要放開煞車
 		_EnableBrake = True
 		status_B = Step_B.Run(  Pulse_Width = StepMotor_config_B.width,
@@ -313,7 +343,7 @@ def SetPoint(TargetX,TargetY):
 								PulseFrequency = StepMotor_config_B.frequency,
 								DR_Type = Direction_Y,
 								EnableBrake = _EnableBrake,)
-		
+
 		#碰到零點感測器就表示已經回0了
 		if "axis zero point sensor trigger" in status_B:
 			MotroCurrentPostion_B.value = 0
@@ -330,32 +360,32 @@ def SetPoint(TargetX,TargetY):
 		}
 		return parameterEcho
 
-def ReadLUX_Job():  
+def ReadLUX_Job():
 	print ("Start task ReadLUX_Job")
 	try:
 		ReadLUX()
 	except:
 		pass
 	print ("End task ReadLUX_Job")
-	
-def ReadEC_Job():  
+
+def ReadEC_Job():
 	print ("Start task ReadEC_Job")
 	try:
 		ReadEC()
 	except:
 		pass
 	print ("End task ReadEC_Job")
-	
-def ReadPH_Job():  
+
+def ReadPH_Job():
 	print ("Start task ReadPH_Job")
 	try:
 		ReadPH()
 	except:
 		pass
 	print ("End task ReadPH_Job")
-	
+
 #啟用定時運行命令
-def StartSchedule_Job():  
+def StartSchedule_Job():
 	#依照ID排序，將所有命令取出來
 	scheduleLi = schedule.query.order_by(schedule.id.asc()).all()
 	for ele in scheduleLi:
@@ -365,16 +395,16 @@ def StartSchedule_Job():
 @app.route("/runCommandList")
 def runCommandList():
 	StartSchedule_Job()
-
+	return "OK"
 #一直去更新步進馬達的移動任務
 def updateMotorJob():
 	while True:
 		#依照ID排序
 		day_schedule = schedule_day_of_time.query.order_by(schedule_day_of_time.id.asc()).all()
-		
+
 		#清空所有任務
 		scheduler.clear()
-		
+
 		Plan_li = []
 		for ele in day_schedule:
 			if ele != None:
@@ -383,7 +413,7 @@ def updateMotorJob():
 					'Time' : ele.time,
 				}
 				#到指定時間後，運行重複運行指令
-				scheduler.every().day.at(ele.time).do(StartSchedule_Job)  
+				scheduler.every().day.at(ele.time).do(StartSchedule_Job)
 		print (scheduler.jobs)
 		time.sleep(30)
 
@@ -401,17 +431,17 @@ if __name__ == "__main__":
 			pass
 	elif sys.platform == "win32":
 		pass
-	
-	
+
+
 	db.init_app(app)
 	db.create_all()
 	print (__name__ , "db.create_all")
 
 
 
-	scheduler.every(15).minutes.do(ReadLUX_Job)  
-	scheduler.every(16).minutes.do(ReadEC_Job)  
-	scheduler.every(17).minutes.do(ReadPH_Job)  
+	scheduler.every(15).minutes.do(ReadLUX_Job)
+	scheduler.every(16).minutes.do(ReadEC_Job)
+	scheduler.every(17).minutes.do(ReadPH_Job)
 	# 建立一個子執行緒，去監控任務運行狀態
 	t = threading.Thread(target = pendingJob)
 
@@ -424,5 +454,5 @@ if __name__ == "__main__":
 	# # 執行該子執行緒
 	# t2.start()
 	app.run(host='0.0.0.0',port=8001)
-	
+
 

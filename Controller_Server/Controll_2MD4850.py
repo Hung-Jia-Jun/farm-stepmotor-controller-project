@@ -79,7 +79,7 @@ class StepMotorControll:
     #使用座標來移動單顆步進馬達
     def SetPointToMove(self,nowPosition,TargetPosition,Pulse_Count,Distance):
         #算出目前座標點與目標點差距多少
-        diffPosition = Position - nowPosition
+        diffPosition = TargetPosition - nowPosition
 
         MoveClockwise = 0
         if diffPosition > 0:

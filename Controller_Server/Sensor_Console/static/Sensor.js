@@ -92,19 +92,14 @@ function deleteCommandList()
 	});
 }
 
-
-//刪除已選擇的指令
 function runCommandList()
 {
 	document.getElementById("saveCommandRunResult").innerText = "運行結果 : 正在運行動作列表..."
-	Selections.forEach(element => {
-		console.log(element.id);
-		$.get("/runCommandList",
+	$.get("http://192.168.11.3:8001/runCommandList",
 			function(data) {
 				document.getElementById("saveCommandRunResult").innerText = "運行結果 : OK !"
 			}
-		);
-	});
+	);
 }
 
 //顯示運行指令
