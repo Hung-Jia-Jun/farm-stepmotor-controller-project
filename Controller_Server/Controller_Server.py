@@ -13,6 +13,7 @@ from flask_socketio import SocketIO, emit
 import schedule as scheduler
 import base64
 import logging
+from logging.handlers import RotatingFileHandler
 if sys.platform == "linux":
 	#光遮斷器
 	import Controll_input
@@ -38,6 +39,22 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:HrK8Iww7hU0izq1H@192.168.1
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
+
+log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(lineno)d) %(message)s')
+
+logFile = "/home/pii/StepMotor.log"
+
+my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=1024*1024, 
+                                 backupCount=2, encoding=None, delay=0)
+my_handler.setFormatter(log_formatter)
+my_handler.setLevel(logging.DEBUG)
+
+
+logger = logging.getLogger('root')
+
+logger.setLevel(logging.DEBUG)
+
+logger.addHandler(my_handler)
 
 
 

@@ -171,30 +171,34 @@ class StepMotorControll:
             GPIO.output(PUL, GPIO.LOW)
             time.sleep(LowDutyTime)
             
-            #如果是正轉，碰到限位開關就要停止，只能反轉回去
-            if DR_Type == DR_TypeStruct().Clockwise:
-                #限位開關偵測
-                if Controll_input.ReturnSensorStatus(limitSensor1):
-                    logger.warning("X axis limit sensor trigger")
-                    return "X axis limit sensor trigger"
+            #每200個脈波檢查一次
+            if i % 200 == 0:
+                #如果是正轉，碰到限位開關就要停止，只能反轉回去
+                if DR_Type == DR_TypeStruct().Clockwise:
+                    if self.MotorNumber == "A":
+                        #限位開關偵測
+                        if Controll_input.ReturnSensorStatus(limitSensor1):
+                            logger.warning("X axis limit sensor trigger")
+                            return "X axis limit sensor trigger"
+                    if self.MotorNumber == "B":
+                        #限位開關偵測
+                        if Controll_input.ReturnSensorStatus(limitSensor2):
+                            logger.warning("Y axis limit sensor trigger")
+                            return "Y axis limit sensor trigger"
 
-                #限位開關偵測
-                if Controll_input.ReturnSensorStatus(limitSensor2):
-                    logger.warning("Y axis limit sensor trigger")
-                    return "Y axis limit sensor trigger"
-
-            #如果是反轉，碰到零點開關就要停止，只能正轉出去
-            if DR_Type == DR_TypeStruct().AntiClockwise:
-                #零點開關偵測
-                if Controll_input.ReturnSensorStatus(ZeroSensor1):
-                    logger.warning("X axis zero point sensor trigger")
-                    return "X axis zero point sensor trigger"
-
-                #零點開關偵測
-                if Controll_input.ReturnSensorStatus(ZeroSensor2):
-                    logger.warning("Y axis zero point sensor trigger")
-                    return "Y axis zero point sensor trigger"
-                
+                #如果是反轉，碰到零點開關就要停止，只能正轉出去
+                if DR_Type == DR_TypeStruct().AntiClockwise:
+                    if self.MotorNumber == "A":
+                        #零點開關偵測
+                        if Controll_input.ReturnSensorStatus(ZeroSensor1):
+                            logger.warning("X axis zero point sensor trigger")
+                            return "X axis zero point sensor trigger"
+                    if self.MotorNumber == "B":
+                        #零點開關偵測
+                        if Controll_input.ReturnSensorStatus(ZeroSensor2):
+                            logger.warning("Y axis zero point sensor trigger")
+                            return "Y axis zero point sensor trigger"
+                    
 
 
 
