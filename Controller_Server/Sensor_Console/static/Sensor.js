@@ -100,6 +100,12 @@ function runCommandList()
 				document.getElementById("saveCommandRunResult").innerText = "運行結果 : OK !"
 			}
 	);
+	$.get("http://192.168.11.3:8001/updateMotorJob",
+			function(data) {
+				console.log("updateMotorJob OK");
+			}
+	);
+	
 }
 
 //顯示運行指令
