@@ -28,10 +28,10 @@ logger.addHandler(my_handler)
 class DR_TypeStruct:
     def __init__(self):
         #順時鐘
-        self.Clockwise  = 1
+        self.Clockwise  = '1'
 
         #逆時鐘
-        self.AntiClockwise  = 0
+        self.AntiClockwise  = '0'
         
 GPIONumber = {
     "A":{
