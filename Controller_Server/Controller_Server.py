@@ -436,7 +436,8 @@ if __name__ == "__main__":
 	db.init_app(app)
 	db.create_all()
 	print (__name__ , "db.create_all")
-
+	#啟動Server後，先鎖定煞車，後放鬆馬達出力
+	Controll_2MD4850.InitMotor()
 
 
 	scheduler.every(15).minutes.do(ReadLUX_Job)

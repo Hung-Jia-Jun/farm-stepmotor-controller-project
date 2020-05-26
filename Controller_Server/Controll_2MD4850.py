@@ -28,10 +28,10 @@ logger.addHandler(my_handler)
 class DR_TypeStruct:
     def __init__(self):
         #順時鐘
-        self.Clockwise  = 1
+        self.Clockwise  = '1'
 
         #逆時鐘
-        self.AntiClockwise  = 0
+        self.AntiClockwise  = '0'
         
 GPIONumber = {
     "A":{
@@ -54,6 +54,7 @@ def InitMotor():
     #設定制動器的GPIO
     GPIO.setup(Brake, GPIO.OUT)
 
+    print ("start")
     #先鎖定煞車，後放鬆馬達出力
     for motor in list(GPIONumber.keys()):
         logger.info("Start Init step motor " + str(motor) + "-----------------------")
@@ -68,8 +69,7 @@ def InitMotor():
         GPIO.output(ENA, GPIO.HIGH)
         logger.info("Disable StepMotor = "+ motor +"GPIO : "+str(ENA)+"  GPIO.HIGH")
 
-#啟動Server後，先鎖定煞車，後放鬆馬達出力
-InitMotor()
+
 class StepMotorControll:
     def __init__(self,MotorNumber):
         self.MotorNumber = MotorNumber
@@ -128,7 +128,6 @@ class StepMotorControll:
             #鎖定
             #垂直煞車制動器 (1-unlock;0-lock)
             GPIO.output(Brake, GPIO.LOW)
-
         logger.info("Enable ENA = "+str(ENA)+"  GPIO.LOW")
         #Enable = GPIO.LOW (低電壓為啟動)
         GPIO.output(ENA, GPIO.LOW)
@@ -212,5 +211,4 @@ class StepMotorControll:
         return 'OK !'
 
 if __name__ == "__main__":
-    InitMotor()
     pass
