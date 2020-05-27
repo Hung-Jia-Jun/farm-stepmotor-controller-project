@@ -54,6 +54,7 @@ def InitMotor():
     #設定制動器的GPIO
     GPIO.setup(Brake, GPIO.OUT)
 
+    print ("start")
     #先鎖定煞車，後放鬆馬達出力
     for motor in list(GPIONumber.keys()):
         logger.info("Start Init step motor " + str(motor) + "-----------------------")
@@ -68,8 +69,7 @@ def InitMotor():
         GPIO.output(ENA, GPIO.HIGH)
         logger.info("Disable StepMotor = "+ motor +"GPIO : "+str(ENA)+"  GPIO.HIGH")
 
-#啟動Server後，先鎖定煞車，後放鬆馬達出力
-InitMotor()
+
 class StepMotorControll:
     def __init__(self,MotorNumber):
         self.MotorNumber = MotorNumber
@@ -90,7 +90,7 @@ class StepMotorControll:
             MoveDirection = DR_TypeStruct().AntiClockwise
 
         #目標與基準距離的差距有多少
-        MoveTime = diffPosition / Distance 
+        MoveTime = abs(diffPosition / Distance) 
 
         #正反轉 and 返回到目標需要多少個脈波
         return MoveDirection , MoveTime * Pulse_Count
@@ -128,7 +128,7 @@ class StepMotorControll:
             #鎖定
             #垂直煞車制動器 (1-unlock;0-lock)
             GPIO.output(Brake, GPIO.LOW)
-
+        
         logger.info("Enable ENA = "+str(ENA)+"  GPIO.LOW")
         #Enable = GPIO.LOW (低電壓為啟動)
         GPIO.output(ENA, GPIO.LOW)
@@ -159,10 +159,6 @@ class StepMotorControll:
         logger.debug("HighDutyTime : " + str(HighDutyTime))
         logger.debug("LowDutyTime : " + str(LowDutyTime))
        
-        
-        
-        
-        
         #依照次數與脈衝寬度與頻率控制步進馬達
         for i in range(int(Pulse_Count)):
             logger.debug(str(i) + ".   PUL = " + str(PUL) + str(" : GPIO.HIGH"))
@@ -212,9 +208,8 @@ class StepMotorControll:
         #鎖定
         #垂直煞車制動器 (1-unlock;0-lock)
         GPIO.output(Brake, GPIO.LOW)
-
+        
         return 'OK !'
 
 if __name__ == "__main__":
-    InitMotor()
     pass
