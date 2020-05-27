@@ -188,6 +188,11 @@ function showPlanList()
 			});
 		}
 	);
+	$.get("http://192.168.11.3:8001/updateMotorJob",
+			function(data) {
+				console.log("updateMotorJob OK");
+			}
+	);
 
 }
 

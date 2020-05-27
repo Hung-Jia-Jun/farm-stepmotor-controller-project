@@ -4,7 +4,7 @@ Description=StartGrab
 [Service]
 Type=simple
 WorkingDirectory=/home/pii/farm-stepmotor-controller-project/Controller_Server
-ExecStart=/bin/bash StartControllerServer.sh
+ExecStart=/bin/bash -c "python3 Controller_Server.py"
 
 
 [Install]
