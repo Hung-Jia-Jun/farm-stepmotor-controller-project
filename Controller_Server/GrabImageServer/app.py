@@ -59,6 +59,8 @@ class Camera:
 		else:
 			#MVS相機拍照
 			MVSControll = GrabImageToJpg.MVSControll()
+			if MVSControll == "device not find !":
+				return "device not find !"
 			result = MVSControll.StartGrab(localPictureFolderPath + self.FileName)
 			MVSControll.StopCamera()
 		if self.FileName in result:

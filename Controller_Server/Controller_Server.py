@@ -365,6 +365,8 @@ def SetPoint(TargetX,TargetY):
 		if "axis zero point sensor trigger" in status_B:
 			MotroCurrentPostion_B.value = 0
 
+		#到達定位後拍照
+		TakePic()
 		return str(status_A + status_B)
 
 	elif sys.platform == "win32":
@@ -376,6 +378,12 @@ def SetPoint(TargetX,TargetY):
 			"StepMotorNumber" : StepMotorNumber,
 		}
 		return parameterEcho
+
+#呼叫Jetson Nano拍照
+def TakePic():
+	response = requests.get("http://192.168.11.7:8000/Pic", timeout = 30)
+	logger.info("Response : " + response.text)
+	return response.text
 
 def ReadLUX_Job():
 	print ("Start task ReadLUX_Job")
@@ -465,11 +473,11 @@ if __name__ == "__main__":
 	# 執行該子執行緒
 	t.start()
 
-	# # 建立一個子執行緒，去定時更新運行排程
-	# t2 = threading.Thread(target = updateMotorJob)
+	# 建立一個子執行緒，去定時更新運行排程
+	t2 = threading.Thread(target = updateMotorJob)
 
-	# # 執行該子執行緒
-	# t2.start()
+	# 執行該子執行緒
+	t2.start()
 	app.run(host='0.0.0.0',port=8001)
 
 
