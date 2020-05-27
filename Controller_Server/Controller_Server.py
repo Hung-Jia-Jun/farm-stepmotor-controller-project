@@ -344,14 +344,27 @@ def SetPoint(TargetX,TargetY):
                                 EnableBrake = _EnableBrake)
         #正常操作下，不應該碰到限位開關，如果碰到了，就要回到原點
         if "limit sensor trigger" in status_A:
-            status_A = Step_A.Run(  Pulse_Width = StepMotor_config_A.width,
+            #X,Y軸都要回原點
+			status_A = Step_A.Run(  Pulse_Width = StepMotor_config_A.width,
                                     Pulse_Count = 99999,
                                     PulseFrequency = StepMotor_config_A.frequency,
                                     DR_Type = '0',
                                     EnableBrake = _EnableBrake)
-            #碰到零點感測器就表示已經回0了
-            if "axis zero point sensor trigger" in status_A:
-                MotroCurrentPostion_A.value = 0
+            status_B = Step_B.Run(  Pulse_Width = StepMotor_config_B.width,
+                                    Pulse_Count = 99999,
+                                    PulseFrequency = StepMotor_config_B.frequency,
+                                    DR_Type = '0',
+                                    EnableBrake = _EnableBrake)
+
+            #碰到零點感測器就表示已經回0了 (X軸)
+			if "axis zero point sensor trigger" in status_A:
+				MotroCurrentPostion_A.value = 0
+            #碰到零點感測器就表示已經回0了 (Y軸)
+            if "axis zero point sensor trigger" in status_B:
+                MotroCurrentPostion_B.value = 0
+				
+			#回到原點後，略過此次任務
+			return "Pass this mission"
 
         #碰到零點感測器就表示已經回0了
         if "axis zero point sensor trigger" in status_A:
@@ -370,21 +383,36 @@ def SetPoint(TargetX,TargetY):
 
         #正常操作下，不應該碰到限位開關，如果碰到了，就要回到原點
         if "limit sensor trigger" in status_B:
+			#X,Y軸都要回原點
+			status_A = Step_A.Run(  Pulse_Width = StepMotor_config_A.width,
+                                    Pulse_Count = 99999,
+                                    PulseFrequency = StepMotor_config_A.frequency,
+                                    DR_Type = '0',
+                                    EnableBrake = _EnableBrake)
             status_B = Step_B.Run(  Pulse_Width = StepMotor_config_B.width,
                                     Pulse_Count = 99999,
                                     PulseFrequency = StepMotor_config_B.frequency,
                                     DR_Type = '0',
                                     EnableBrake = _EnableBrake)
 
-            #碰到零點感測器就表示已經回0了
+			#碰到零點感測器就表示已經回0了 (X軸)
+			if "axis zero point sensor trigger" in status_A:
+				MotroCurrentPostion_A.value = 0
+            #碰到零點感測器就表示已經回0了 (Y軸)
             if "axis zero point sensor trigger" in status_B:
                 MotroCurrentPostion_B.value = 0
+
+			#回到原點後，略過此次任務
+			return "Pass this mission"
 
         #碰到零點感測器就表示已經回0了
         if "axis zero point sensor trigger" in status_B:
             MotroCurrentPostion_B.value = 0
         
         db.session.commit()
+
+        #到達定點後拍照
+        TakePic()
         return str(status_A + status_B)
 
     elif sys.platform == "win32":
@@ -432,6 +460,7 @@ def StartSchedule_Job():
     #依照ID排序，將所有命令取出來
     scheduleLi = schedule.query.order_by(schedule.id.asc()).all()
     for ele in scheduleLi:
+		logger.info("Start Schedule Job: (" +str(ele.PositionX) + "," +str(ele.PositionY) + ")")
         SetPoint(ele.PositionX,ele.PositionY)
 
 #立即運行剛剛設定的指令
@@ -442,7 +471,7 @@ def runCommandList():
 
 #立即運行剛剛設定的指令
 @app.route("/updateMotorJob")
-#一直去更新步進馬達的移動任務
+#更新步進馬達的移動任務
 def updateMotorJob():
     #依照ID排序
     day_schedule = schedule_day_of_time.query.order_by(schedule_day_of_time.id.asc()).all()

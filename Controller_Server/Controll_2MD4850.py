@@ -194,6 +194,14 @@ class StepMotorControll:
                         #零點開關偵測
                         if Controll_input.ReturnSensorStatus(ZeroSensor2):
                             logger.warning("Y axis zero point sensor trigger")
+                            logger.info("Disable ENA = "+str(ENA)+"  GPIO.HIGH")
+                            #鎖定垂直煞車制動器 (1-unlock;0-lock)
+                            GPIO.output(Brake, GPIO.LOW)
+
+                            #Enable開關要關閉，不然長時間運行馬達會過熱
+                            #Enable = GPIO.LOW (低電壓為啟動) 高電壓為ENA disable 
+                            GPIO.output(ENA, GPIO.HIGH)
+                            
                             return "Y axis zero point sensor trigger"
                     
 
