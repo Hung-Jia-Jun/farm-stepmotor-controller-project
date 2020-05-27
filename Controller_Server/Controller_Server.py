@@ -476,9 +476,6 @@ def updateMotorJob():
     #依照ID排序
     day_schedule = schedule_day_of_time.query.order_by(schedule_day_of_time.id.asc()).all()
 
-    #清空所有任務
-    scheduler.clear()
-
     Plan_li = []
     for ele in day_schedule:
         if ele != None:
@@ -486,17 +483,19 @@ def updateMotorJob():
                 'id' : ele.id,
                 'Time' : ele.time,
             }
+            import pdb
+            pdb.set_trace()
             #到指定時間後，運行重複運行指令
-            scheduler.every().day.at(ele.time).do(StartSchedule_Job)
-    print (scheduler.jobs)
+            if datetime.now().strftime("%H:%M") == ele.time:
+                StartSchedule_Job()
     return "OK"
 
 #每秒鐘都去確認現在是否有任務可以運行
 def pendingJob():
     while True:
         logger.info("run pending")
-        scheduler.run_pending()
-        time.sleep(1)
+        updateMotorJob()
+        time.sleep(60)
 
 if __name__ == "__main__":
     if sys.platform == "linux":
