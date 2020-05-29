@@ -483,8 +483,6 @@ def updateMotorJob():
                 'id' : ele.id,
                 'Time' : ele.time,
             }
-            import pdb
-            pdb.set_trace()
             #到指定時間後，運行重複運行指令
             if datetime.now().strftime("%H:%M") == ele.time:
                 StartSchedule_Job()
