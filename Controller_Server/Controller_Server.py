@@ -273,30 +273,33 @@ def LightControllerStatus():
         #零點感測器
         ZeroSensor1 = 0
         ZeroSensor2 = 26
-        status = "None"
+        status = {
+            "limitSensor1" : False,
+            "limitSensor2" : False,
+            "ZeroSensor1" : False,
+            "ZeroSensor2" : False,
+        }
         #如果是正轉，碰到限位開關就要停止，只能反轉回去
         #限位開關偵測
         if Controll_input.ReturnSensorStatus(limitSensor1):
             logger.warning("X axis limit sensor trigger")
-            status = "X axis limit sensor trigger"
-
+            status["limitSensor1"] = True
         #限位開關偵測
         if Controll_input.ReturnSensorStatus(limitSensor2):
             logger.warning("Y axis limit sensor trigger")
-            status = "Y axis limit sensor trigger"
-
+            status["limitSensor2"] = True
         #如果是反轉，碰到零點開關就要停止，只能正轉出去
         #零點開關偵測
         if Controll_input.ReturnSensorStatus(ZeroSensor1):
             logger.warning("X axis zero point sensor trigger")
-            status = "X axis zero point sensor trigger"
+            status["ZeroSensor1"] = True
 
         #零點開關偵測
         if Controll_input.ReturnSensorStatus(ZeroSensor2):
             logger.warning("Y axis zero point sensor trigger")
-            status = "Y axis zero point sensor trigger"
+            status["ZeroSensor2"] = True
 
-        return str(status)
+        return json.dumps(status)
     elif sys.platform == "win32":
         return "在windows環境無法顯示此數值"
 

@@ -5,7 +5,7 @@ import time
 import pdb
 from enum import Enum
 
- #終端限位感測
+#終端限位感測
 limitSensor1 = 23
 limitSensor2 = 24
 
