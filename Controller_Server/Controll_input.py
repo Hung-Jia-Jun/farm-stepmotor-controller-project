@@ -6,12 +6,12 @@ import pdb
 from enum import Enum
 
 #終端限位感測
-limitSensor1 = 23
-limitSensor2 = 24
+limitSensor1 = 8
+limitSensor2 = 9
 
 #零點感測器
-ZeroSensor1 = 0
-ZeroSensor2 = 26
+ZeroSensor1 = 10
+ZeroSensor2 = 11
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)

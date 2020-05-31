@@ -99,13 +99,14 @@ class StepMotorControll:
         ENA = self.GPIONumber[self.MotorNumber]["ENA"]
         DIR = self.GPIONumber[self.MotorNumber]["DIR"]
         PUL = self.GPIONumber[self.MotorNumber]["PUL"]
+      
         #終端限位感測
-        limitSensor1 = 23
-        limitSensor2 = 24
+        limitSensor1 = 8
+        limitSensor2 = 9
 
         #零點感測器
-        ZeroSensor1 = 0
-        ZeroSensor2 = 26
+        ZeroSensor1 = 10
+        ZeroSensor2 = 11
 
         #垂直煞車制動器 (1-unlock;0-lock)
         Brake = 25

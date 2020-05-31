@@ -93,7 +93,7 @@ def queryCommandList():
 				'PositionY' : ele.PositionY,
 			}
 			Command_li.append(json.dumps(scheduleCommand))
-	return json.dumps(Command_li)
+	return mps(Command_li)json.du
 
 
 

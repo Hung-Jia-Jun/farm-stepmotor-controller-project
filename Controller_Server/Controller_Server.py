@@ -267,12 +267,12 @@ def ReadPH():
 def LightControllerStatus():
     if sys.platform == "linux":
         #終端限位感測
-        limitSensor1 = 23
-        limitSensor2 = 24
+        limitSensor1 = 8
+        limitSensor2 = 9
 
         #零點感測器
-        ZeroSensor1 = 0
-        ZeroSensor2 = 26
+        ZeroSensor1 = 10
+        ZeroSensor2 = 11
         status = {
             "limitSensor1" : False,
             "limitSensor2" : False,
@@ -414,6 +414,7 @@ def SetPoint(TargetX,TargetY):
         
         db.session.commit()
 
+        time.sleep(6)
         #到達定點後拍照
         TakePic()
         return str(status_A + status_B)
