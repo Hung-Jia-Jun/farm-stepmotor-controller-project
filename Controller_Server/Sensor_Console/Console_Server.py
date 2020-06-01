@@ -93,7 +93,7 @@ def queryCommandList():
 				'PositionY' : ele.PositionY,
 			}
 			Command_li.append(json.dumps(scheduleCommand))
-	return mps(Command_li)json.du
+	return json.dumps(Command_li)
 
 
 
@@ -264,7 +264,7 @@ def TakePic_event(msg):
 		payload = {'filename': filename}
 
 		#叫Nano拍照
-		response = requests.get("http:// 7:8000/upload", timeout = 30 , params=payload)
+		response = requests.get("http://192.168.11.7:8000/upload", timeout = 30 , params=payload)
 		
 		#等確定上傳後，去下載剛剛上傳的檔案，並轉成base64
 		FTPURL = "192.168.11.4"
