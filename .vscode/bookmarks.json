@@ -1,10 +1,10 @@
 [
 	{
-		"path": "$ROOTPATH$/Controller_Server/GrabImageServer/GrabImageToJpg_Pyueye_OpenCV.py",
+		"path": "$ROOTPATH$/Controller_Server/Sensor_Console/templates/index.html",
 		"bookmarks": [
 			{
-				"line": 196,
-				"column": 36,
+				"line": 430,
+				"column": 26,
 				"label": ""
 			}
 		]
