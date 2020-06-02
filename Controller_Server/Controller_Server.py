@@ -432,8 +432,13 @@ def SetPoint(TargetX,TargetY):
 #呼叫Jetson Nano拍照
 def TakePic():
     response = requests.get("http://192.168.11.7:8000/Pic", timeout = 30)
-    logger.info("Response : " + response.text)
-    return response.text
+    
+    filename = response.text
+    payload = {'filename': filename}
+    #叫Nano上傳
+    uploadResponse = requests.get("http://192.168.11.7:8000/upload", timeout = 30 , params=payload)
+    logger.info("Schedule take picture result : " + uploadResponse.text)
+    return response.text,uploadResponse.text
 
 def ReadLUX_Job():
     print ("Start task ReadLUX_Job")

@@ -263,7 +263,7 @@ def TakePic_event(msg):
 		filename = msg["data"].replace("Upload :","")
 		payload = {'filename': filename}
 
-		#叫Nano拍照
+		#叫Nano上傳
 		response = requests.get("http://192.168.11.7:8000/upload", timeout = 30 , params=payload)
 		
 		#等確定上傳後，去下載剛剛上傳的檔案，並轉成base64

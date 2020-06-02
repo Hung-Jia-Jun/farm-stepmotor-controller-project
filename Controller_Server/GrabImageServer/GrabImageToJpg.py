@@ -2,6 +2,7 @@
 
 import sys
 from ctypes import *
+import logging
 if sys.platform == "linux":
 	import threading
 	import os
