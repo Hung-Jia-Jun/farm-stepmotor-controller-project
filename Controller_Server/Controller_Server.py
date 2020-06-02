@@ -414,9 +414,11 @@ def SetPoint(TargetX,TargetY):
         
         db.session.commit()
 
-        time.sleep(6)
-        #到達定點後拍照
-        TakePic()
+        #回原點歸零的那個任務不拍照
+        if int(TargetX) > 0 and int(TargetY) > 0:
+            time.sleep(6)
+            #到達定點後拍照
+            TakePic()
         return str(status_A + status_B)
 
     elif sys.platform == "win32":
