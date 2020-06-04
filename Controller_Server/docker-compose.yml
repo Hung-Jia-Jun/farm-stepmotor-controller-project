@@ -1,0 +1,18 @@
+mysql:
+    image: armbuilds/mariadb
+    restart: always
+    environment:
+        - MYSQL_DATABASES=sensordb
+        - MYSQL_HOST=localhost
+        - MYSQL_PORT=3306
+        - MYSQL_USER=root
+        - MYSQL_PASSWORD=snapfarming
+        - MYSQL_ROOT_PASSWORD=snapfarming
+    volumes:
+        - "./volumes/mysql:/var/lib/mysql"
+        - "./home/pii:/home/pii"
+        - mysql-data:/var/lib/mysql        
+    ports:
+        - "3306:3306"
+        - "80:80"
+        - "8880:8880"

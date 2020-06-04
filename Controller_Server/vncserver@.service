@@ -1,0 +1,14 @@
+[Unit]
+Description=Remote desktop service (VNC)
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=root
+PAMName=root
+PIDFile=/home/pii/.vnc/%H%i.pid
+ExecStart=/usr/bin/vncserver :%i
+ExecStop=/usr/bin/vncserver -kill %i
+
+[Install]
+WantedBy=multi-user.target
