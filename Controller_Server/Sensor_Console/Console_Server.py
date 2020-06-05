@@ -20,6 +20,7 @@ sys.path.append(d)
 
 #------------------------------------------------------------------------------------------------------
 app = Flask(__name__)
+CORS(app)
 socketio = SocketIO(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:snapfarming@192.168.11.3:3306/sensordb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
