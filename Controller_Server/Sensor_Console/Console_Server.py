@@ -8,6 +8,7 @@ import requests
 import json
 import ftplib
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 from datetime import datetime
 from flask_socketio import SocketIO, emit
 import base64
@@ -34,7 +35,7 @@ class config(db.Model):
 	frequency = db.Column(db.Integer)
 	count = db.Column(db.Integer)
 	distance = db.Column(db.Integer)
-
+	value = db.Column(db.String(255))
 class motor_position(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	number = db.Column(db.String(255))
@@ -250,12 +251,36 @@ def UpdateDistanceOfTimeProportion():
 	db.session.commit()
 	return "OK"
 
+#更新Jetson的IP位置
+@app.route("/UpdateJetsonIP")
+def UpdateJetsonIP():
+	IP = request.args.get('IP')
+	configIP = config.query.filter_by(
+		config_key='JetsonIP').first()
+
+	#如果沒有Jetson 的 IP 就新增一個	
+	if configIP == None:
+		configIP = config(config_key = "JetsonIP",
+							value = IP)
+		db.session.add(configIP)
+	else:
+		configIP.value = IP
+	db.session.commit()
+	return "OK"
+
+#更新Jetson的IP位置
+@app.route("/GetJetsonIP")
+def GetJetsonIP():
+	configIP = config.query.filter_by(
+		config_key='JetsonIP').first()
+	return configIP.value
 
 @socketio.on('TakePic_event')
 def TakePic_event(msg):
+	JetsonIP = GetJetsonIP()
 	if msg["data"] == "Take Pic!":
 		try:
-			response = requests.get("http://192.168.11.7:8000/Pic", timeout = 30)
+			response = requests.get("http://"+ JetsonIP +":8000/Pic", timeout = 30)
 			socketio.emit('server_response', {'data': "TakePic :" + response.text})
 		except:
 			pass
@@ -264,7 +289,7 @@ def TakePic_event(msg):
 		payload = {'filename': filename}
 
 		#叫Nano上傳
-		response = requests.get("http://192.168.11.7:8000/upload", timeout = 30 , params=payload)
+		response = requests.get("http://"+ JetsonIP +":8000/upload", timeout = 30 , params=payload)
 		
 		#等確定上傳後，去下載剛剛上傳的檔案，並轉成base64
 		FTPURL = "192.168.11.4"

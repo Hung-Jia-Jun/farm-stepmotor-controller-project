@@ -1,7 +1,20 @@
-Controller_ServerURL = "http://192.168.11.3:8001"
-// Controller_ServerURL = "http://127.0.0.1:8001"
+RaspberryIP = ""
+Controller_ServerURL =""
+Console_ServerURL =""
+
+function getRaspberryIP()
+{
+	//http://127.0.0.1:8000/index?pii=192.168.11.3
+	url = window.location.href;
+	url = url.split("pii=")[1];
+	RaspberryIP = url;
+	Controller_ServerURL = "http://" + RaspberryIP + ":8001"
+	Console_ServerURL = "http://" + RaspberryIP + ":8000"
+	console.log(url);
+}
+
 function ReadAllSensor() {
-	$.get("/ReadLux",
+	$.get(Console_ServerURL + "/ReadLux",
 		function(data) {
 		   var LuxTable = document.getElementById("LuxTable");
 		   var indexnum = 1
@@ -21,7 +34,7 @@ function ReadAllSensor() {
 		}
 	);
 
-	$.get("/ReadPH",
+	$.get(Console_ServerURL + "/ReadPH",
 		function(data) {
 		   var PH_Table = document.getElementById("PH_Table");
 		   var indexnum = 1
@@ -34,7 +47,7 @@ function ReadAllSensor() {
 		}
 	);
 
-	$.get("/ReadEC",
+	$.get(Console_ServerURL + "/ReadEC",
 		function(data) {
 		   var EC_Table = document.getElementById("EC_Table");
 		   var indexnum = 1
@@ -60,7 +73,7 @@ function saveMotorCommand()
 	
 	document.getElementById("saveCommandRunResult").innerText = "運行結果 : 上傳中..."
 	//XY兩顆馬達有各自的運行時間，所以在編排前也要先設定好
-	$.get("/saveMotorCommand",
+	$.get(Console_ServerURL + "/saveMotorCommand",
 		{
 			PositionX:MotorPositionX,
 			PositionY:MotorPositionY,
@@ -73,6 +86,38 @@ function saveMotorCommand()
 	);
 }
 
+ 
+//儲存Jetson nano 的IP
+function saveJetsonNanoIP()
+{
+	//馬達要到達的地點座標 X
+	JetsonNanoIP = document.getElementById("JetsonNanoIP").value;
+	$.get(Console_ServerURL + "/UpdateJetsonIP",
+	{IP : JetsonNanoIP},
+	function(data) {
+		if (data == "OK")
+		{
+			alert("儲存成功");
+		}
+		else
+		{
+			alert(data);
+		}
+	}
+	);
+
+}
+
+ 
+//取得JetsonNano 的IP
+function getJetsonNanoIP()
+{
+	$.get(Console_ServerURL + "/GetJetsonIP",
+	function(data) {
+		document.getElementById("JetsonNanoIP").value = data;
+	}
+	);
+}
 //刪除已選擇的指令
 function deleteCommandList()
 {
@@ -80,7 +125,7 @@ function deleteCommandList()
 	document.getElementById("saveCommandRunResult").innerText = "運行結果 : 刪除指令中..."
 	Selections.forEach(element => {
 		console.log(element.id);
-		$.get("/deleteMotorCommand",
+		$.get(Console_ServerURL + "/deleteMotorCommand",
 			{id : element.id},
 			function(data) {
 				document.getElementById("saveCommandRunResult").innerText = "運行結果 : OK !"
@@ -95,12 +140,12 @@ function deleteCommandList()
 function runCommandList()
 {
 	document.getElementById("saveCommandRunResult").innerText = "運行結果 : 正在運行動作列表..."
-	$.get("http://192.168.11.3:8001/runCommandList",
+	$.get(Controller_ServerURL + "/runCommandList",
 			function(data) {
 				document.getElementById("saveCommandRunResult").innerText = "運行結果 : OK !"
 			}
 	);
-	$.get("http://192.168.11.3:8001/updateMotorJob",
+	$.get(Controller_ServerURL + "/updateMotorJob",
 			function(data) {
 				console.log("updateMotorJob OK");
 			}
@@ -139,7 +184,7 @@ function showCommandList()
 			
 	});
 
-	$.get("/queryCommandList",
+	$.get(Console_ServerURL + "/queryCommandList",
 		function(data) {
 			var indexnum = 1
 			var commandList = JSON.parse(data);
@@ -179,7 +224,7 @@ function showPlanList()
 			checkbox:"true",
 			pagination:false
 	});
-	$.get("/queryPlanList",
+	$.get(Console_ServerURL + "/queryPlanList",
 		function(data) {
 			var commandList = JSON.parse(data);
 			commandList.forEach(element => {
@@ -188,7 +233,7 @@ function showPlanList()
 			});
 		}
 	);
-	$.get("http://192.168.11.3:8001/updateMotorJob",
+	$.get(Controller_ServerURL + "/updateMotorJob",
 			function(data) {
 				console.log("updateMotorJob OK");
 			}
@@ -202,7 +247,7 @@ function SetMovePlan()
 	var _Time = document.getElementById("datetimepicker").childNodes[1].value;
 	document.getElementById("savePlanRunResult").innerText = "運行結果 : 上傳中..."
 	
-	$.get("/savePlanRunning",
+	$.get(Console_ServerURL + "/savePlanRunning",
 		{Time : _Time},
 		function(data) {
 			document.getElementById("savePlanRunResult").innerText = "運行結果 : OK !"
@@ -220,7 +265,7 @@ function deleteTimeCommand()
 	document.getElementById("savePlanRunResult").innerText = "運行結果 : 刪除指令中..."
 	Selections.forEach(element => {
 		console.log(element.id);
-		$.get("/deleteTimeCommand",
+		$.get(Console_ServerURL + "/deleteTimeCommand",
 			{id : element.id},
 			function(data) {
 				document.getElementById("savePlanRunResult").innerText = "運行結果 : OK !"
@@ -234,7 +279,7 @@ function deleteTimeCommand()
 //顯示距離與馬達運行時間比例
 function showDistanceOfTimeProportion()
 {
-	$.get("/queryDistanceOfTimeProportion",
+	$.get(Console_ServerURL + "/queryDistanceOfTimeProportion",
 		function(data) {
 			var StepMotor_config_A = data["StepMotor_DistanceOfTimeProport_A"];
 			var StepMotor_config_B = data["StepMotor_DistanceOfTimeProport_B"];
@@ -325,7 +370,7 @@ function UpdateDistanceOfTimeProportion(_SettingMotorNumber)
 			}
 
 	document.getElementById("saveDistanceOfTimeProportionResult").innerText = "運行結果 : 儲存中..."
-	$.get("/UpdateDistanceOfTimeProportion",
+	$.get(Console_ServerURL + "/UpdateDistanceOfTimeProportion",
 		{ SettingMotorNumber: _SettingMotorNumber, value : StepMotroConfig},
 		function(data) {
 			console.log(data);
@@ -387,6 +432,9 @@ $(document).ready(function(){
 		locale: moment.locale('zh-tw')
 	});
 
+	//更新樹梅派IP
+	getRaspberryIP();
+
 	//顯示命令列表
 	showCommandList();
 
@@ -399,4 +447,5 @@ $(document).ready(function(){
 	//顯示所有排程列表
 	showPlanList();
 
+	getJetsonNanoIP();
 });

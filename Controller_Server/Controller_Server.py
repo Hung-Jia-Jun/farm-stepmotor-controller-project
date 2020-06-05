@@ -59,12 +59,13 @@ logger.addHandler(my_handler)
 
 
 class config(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    config_key = db.Column(db.String(255))
-    width = db.Column(db.Integer)
-    frequency = db.Column(db.Integer)
-    count = db.Column(db.Integer)
-    distance = db.Column(db.Integer)
+	id = db.Column(db.Integer, primary_key=True)
+	config_key = db.Column(db.String(255))
+	width = db.Column(db.Integer)
+	frequency = db.Column(db.Integer)
+	count = db.Column(db.Integer)
+	distance = db.Column(db.Integer)
+	value = db.Column(db.String(255))
 
 class motor_position(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -431,14 +432,19 @@ def SetPoint(TargetX,TargetY):
         }
         return parameterEcho
 
+def GetJetsonIP():
+	configIP = config.query.filter_by(
+		config_key='JetsonIP').first()
+	return configIP.value
 #呼叫Jetson Nano拍照
 def TakePic():
-    response = requests.get("http://192.168.11.7:8000/Pic", timeout = 30)
+    JetsonIP = GetJetsonIP()
+    response = requests.get("http://" + JetsonIP + ":8000/Pic", timeout = 30)
     
     filename = response.text
     payload = {'filename': filename}
     #叫Nano上傳
-    uploadResponse = requests.get("http://192.168.11.7:8000/upload", timeout = 30 , params=payload)
+    uploadResponse = requests.get("http://" + JetsonIP + ":8000/upload", timeout = 30 , params=payload)
     logger.info("Schedule take picture result : " + uploadResponse.text)
     return response.text,uploadResponse.text
 
