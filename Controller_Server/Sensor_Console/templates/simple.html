@@ -1,0 +1,212 @@
+<html lang="en"><head>     
+ <style>
+	.loader {
+	border: 8px solid #f3f3f3;
+	border-radius: 50%;
+	border-top: 8px solid #3498db;
+	width: 50px;
+	height: 50px;
+	-webkit-animation: spin 2s linear infinite; /* Safari */
+	animation: spin 2s linear infinite;
+	}
+
+	/* Safari */
+	@-webkit-keyframes spin {
+	0% { -webkit-transform: rotate(0deg); }
+	100% { -webkit-transform: rotate(360deg); }
+	}
+
+	@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+	}
+
+	table {
+    width: 100%;
+	}
+ </style>
+	<meta charset="utf-8">     
+ 	<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>  
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+	<script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.3/moment.min.js"></script>
+						
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+ 
+    <script src="https://cdn.bootcss.com/moment.js/2.18.1/moment-with-locales.min.js"></script>
+    <link href="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css"  rel="stylesheet">
+    <script src="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+
+
+	 <script type="text/javascript" src="/static/Sensor.js"></script>
+ 
+ </head>   
+ <body>   
+ <div class="container">  
+	
+<div style="height: 50px;" class="row"></div>
+<div class="row">
+	<div class="col-md-8">
+		<h4>定時重複運行指令</h4>    
+		
+		
+		<div style="height: 10px;" class="row"></div>
+		<div class="row">
+			<div class="col-md-2">
+				<input type="text" class="form-control" id="MotorPositionX" placeholder="X座標">
+			</div>
+			<div class="col-md-0.5">
+				<label>:</label>
+			</div>
+			<div class="col-md-2">
+				<input type="text" class="form-control" id="MotorPositionY" placeholder="Z座標">
+			</div>
+			<div class="col-md-1">
+				<button onclick="saveMotorCommand();" type="button" class="btn btn-primary">新增指令</button>  
+			</div>
+		</div>
+		<div style="height: 10px;" class="row"></div>
+		<div class="row">
+			<div class="col-md-10 table-responsive">
+				<table class="table table-responsive-md" id="commandTable">
+					<thead>
+						<tr>
+							<th data-checkbox="true"></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+		<div style="height: 30px;" class="row">
+			<div class="col-md-12">
+				<h6 id="saveCommandRunResult">運行結果 :</h6>
+			</div>
+		</div>
+		<div style="height: 10px;" class="row">
+			<div class="col-md-2">
+				<button onclick="showCommandList();" type="button" class="btn btn-primary">更新列表</button>  
+			</div>
+			<div class="col-md-2">
+				<button onclick="deleteCommandList();" type="button" class="btn btn-danger">刪除已選指令</button>  
+			</div>
+			<div class="col-md-2">
+				<button onclick="runCommandList();" type="button" class="btn btn-warning">立即運行重複指令</button>  
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-4">
+		<div class="row">
+			<h4>定時運行排程</h4>    
+		</div>
+		<div style="height: 5px;" class="row"></div>
+		
+		<div class="row">
+			<div class="col-md-0">
+				<button onclick="SetMovePlan();"type="button" class="btn btn-primary">新增排程運行</button>  
+			</div>
+			<div class="col-sm-6">
+				<div class="form-group">
+					<div class="input-group date" id='datetimepicker'>
+						<input type="text" class="form-control">
+						<span class="input-group-addon">
+							<i class="glyphicon glyphicon-calendar"></i>
+						</span>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<div class="row">
+			<div class="col-md-8 table-responsive">
+				<table class="table" id="Schedule_table">
+					<thead>
+						<tr>
+							<th data-checkbox="true"></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+		<div style="height: 30px;" class="row">
+			<div class="col-md-0">
+				<h6 id="savePlanRunResult">運行結果 :</h6>
+			</div>
+		</div>
+		<div style="height: 5px;" class="row"></div>
+		<div class="row">
+			<div class="col-md-0">
+				<button onclick="showPlanList();" type="button" class="btn btn-primary">更新排程列表</button>  
+			</div>
+			<div class="col-md-1">
+				<button onclick="deleteTimeCommand();"type="button" class="btn btn-danger">刪除已選排程</button>  
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<div style="height: 50px;" class="row"></div>
+
+
+	<div style="height: 50px;" class="row"></div>
+	<h4>拍照測試</h4>
+	<h8>Jetson Nano 拍照的圖將會顯示在這裡</h8>
+	
+	<div class="row">
+
+			<div class="col-md-3">
+				<img id="ShowPic" src="https://3.blog.xuite.net/3/a/2/7/238328267/blog_3441985/txt/200984010/0.jpg" width="100%" height="auto" class="img-responsive" alt="Cinque Terre">
+			</div>
+
+			<div class="col-md-3">
+				<div class="row">		
+					<div class="col-md-8">
+						<button onclick="TakePic();" type="button" class="btn btn-warning">Jetson Nano 拍照測試</button>
+					</div>
+				</div>	
+				<div style="height: 20px;" class="row"></div>
+				<div class="row">
+					<div class="col-md-12">
+						<h8 id="PicFilePath">拍照檔名 : </h8>
+						<div id="PicFilePathLoader" style="display:none" class="loader"></div>
+					</div>
+				</div>
+				
+				<div style="height: 20px;" class="row"></div>
+				<div class="row">
+					<div class="col-md-12">
+						<h10 id="PicFileUploadResult">上傳狀態 : </h10>
+						<div id="PicFileUploadResultLoader" style="display:none" class="loader"></div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-md-6">
+				<div class="row">
+					<div class="col-md-4">
+						<h4> Jetson Nano IP </h4>
+					</div>
+					<div class="col-md-6">
+						<input type="text" class="form-control" id="JetsonNanoIP" placeholder="Jetson Nano IP">
+					</div>
+				</div>
+				<div style="height: 20px;" class="row"></div>
+				<div class="row">		
+					<div class="col-md-8">
+						<button onclick = "saveJetsonNanoIP();" type="button" class="btn btn-primary">儲存</button>
+					</div>
+				</div>	
+			</div>
+			
+	</div>
+	<div style="height: 50px;" class="row"></div>
+</div>
+  
+</body></html>

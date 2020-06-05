@@ -77,6 +77,12 @@ class sensor_ph(db.Model):
 		self.Data = Data
 #------------------------------------------------------------------------------------------------------
 
+#簡易版網頁
+@app.route("/simple")
+def simple():
+	return render_template('simple.html')
+
+
 @app.route("/index")
 def index():
 	return render_template('index.html')
