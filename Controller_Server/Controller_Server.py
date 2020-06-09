@@ -13,6 +13,7 @@ from flask_socketio import SocketIO, emit
 import schedule as scheduler
 import base64
 import logging
+import configparser
 from logging.handlers import RotatingFileHandler
 if sys.platform == "linux":
     #光遮斷器
@@ -30,7 +31,13 @@ elif sys.platform == "win32":
     pass
 
 
-
+# config = configparser.ConfigParser()
+# config.read('/home/pii/Config.ini')
+# localPictureFolderPath = config.get('Setting','localPictureFolderPath')
+# FTP = config.get('Setting','FTP')
+# FTPUsername = config.get('Setting','FTPUsername')
+# FTPPassword = config.get('Setting','FTPPassword')
+# remoteFolderPath = config.get('Setting','remoteFolderPath')
 #------------------------------------------------------------------------------------------------------
 app = Flask(__name__)
 CORS(app)
