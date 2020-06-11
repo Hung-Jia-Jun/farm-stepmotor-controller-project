@@ -7,7 +7,8 @@ if sys.platform == "linux":
 	import threading
 	import os
 	import termios
-	sys.path.append("/home/jetson/MVS/Samples/aarch64/Python/MvImport")    
+	sys.path.append("/opt/MVS/Samples/aarch64/Python/MvImport")    
+	sys.path.append("/opt/MVS/lib")   
 	print (sys.path)
 	from MvCameraControl_class import *
 elif sys.platform == "win32":
