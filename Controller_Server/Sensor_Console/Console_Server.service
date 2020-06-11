@@ -1,10 +1,10 @@
 [Unit]
-Description=StartGrab
+Description=Start Console server
 
 [Service]
 Type=simple
 WorkingDirectory=/home/pii/farm-stepmotor-controller-project/Controller_Server/Sensor_Console
-ExecStart=/bin/bash StartConsoleServer.sh
+ExecStart=/bin/bash -c "python3 Console_Server.py"
 
 
 [Install]
