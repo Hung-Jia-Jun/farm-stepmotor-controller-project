@@ -15,6 +15,10 @@ import base64
 import logging
 import configparser
 from logging.handlers import RotatingFileHandler
+import os
+
+
+
 if sys.platform == "linux":
     #光遮斷器
     import Controll_input
@@ -30,19 +34,18 @@ if sys.platform == "linux":
 elif sys.platform == "win32":
     pass
 
+currentPath = os.path.dirname(os.path.abspath(__file__))
+config = configparser.ConfigParser()
+config.read(currentPath + '/Sensor_Console/Config.ini')
+DatabaseIP = config.get('Setting','DatabaseIP')
+DBusername = config.get('Setting','DBusername')
+DBpassword = config.get('Setting','DBpassword')
 
-# config = configparser.ConfigParser()
-# config.read('/home/pii/Config.ini')
-# localPictureFolderPath = config.get('Setting','localPictureFolderPath')
-# FTP = config.get('Setting','FTP')
-# FTPUsername = config.get('Setting','FTPUsername')
-# FTPPassword = config.get('Setting','FTPPassword')
-# remoteFolderPath = config.get('Setting','remoteFolderPath')
 #------------------------------------------------------------------------------------------------------
 app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:snapfarming@192.168.11.3:3306/sensordb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://'+DBusername+':'+DBpassword+'@'+DatabaseIP+':3306/sensordb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 

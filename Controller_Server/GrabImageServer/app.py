@@ -49,7 +49,6 @@ class Camera:
 
 		#拍照結果
 		result = ""
-
 		#依照USB現在的名稱，去自動選擇拍照的機器
 		if "IDS" in str(self.subprocess):
 			GrabImageFilePath = localPictureFolderPath + self.FileName
@@ -61,6 +60,7 @@ class Camera:
 			MVSControll = GrabImageToJpg.MVSControll()
 			if MVSControll == "device not find !":
 				return "device not find !"
+			time.sleep(1)
 			result = MVSControll.StartGrab(localPictureFolderPath + self.FileName)
 			MVSControll.StopCamera()
 		if self.FileName in result:

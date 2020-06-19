@@ -13,16 +13,28 @@ from datetime import datetime
 from flask_socketio import SocketIO, emit
 import base64
 from os.path import dirname, abspath 
+import configparser
 import threading
+import os
 d = dirname(dirname(abspath(__file__)))
 sys.path.append(d)
 
+config = configparser.ConfigParser()
 
+currentPath = os.path.dirname(os.path.abspath(__file__))
+config.read(currentPath + '/Config.ini')
+DatabaseIP = config.get('Setting','DatabaseIP')
+DBusername = config.get('Setting','DBusername')
+DBpassword = config.get('Setting','DBpassword')
+
+FTP_IP = config.get('Setting','FTP')
+FTPUsername = config.get('Setting','FTPUsername')
+FTPPassword = config.get('Setting','FTPPassword')
 #------------------------------------------------------------------------------------------------------
 app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:snapfarming@192.168.11.3:3306/sensordb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://'+DBusername+':'+DBpassword+'@'+DatabaseIP+':3306/sensordb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
@@ -299,9 +311,8 @@ def TakePic_event(msg):
 		response = requests.get("http://"+ JetsonIP +":8000/upload", timeout = 30 , params=payload)
 		
 		#等確定上傳後，去下載剛剛上傳的檔案，並轉成base64
-		FTPURL = "192.168.11.4"
-		ftp = ftplib.FTP(FTPURL)
-		ftp.login("admin", "snapfarming")
+		ftp = ftplib.FTP(FTP_IP)
+		ftp.login(FTPUsername, FTPPassword)
 		last_file = ftp.nlst("/homes/admin/MVSImage")[-1]
 		bufsize=1024
 		fp = open(os.getcwd() + filename,'wb')  
