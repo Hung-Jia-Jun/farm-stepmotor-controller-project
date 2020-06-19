@@ -40,7 +40,7 @@ config.read(currentPath + '/Sensor_Console/Config.ini')
 DatabaseIP = config.get('Setting','DatabaseIP')
 DBusername = config.get('Setting','DBusername')
 DBpassword = config.get('Setting','DBpassword')
-
+TakePicStatus = config.get('Setting','TakePic')
 #------------------------------------------------------------------------------------------------------
 app = Flask(__name__)
 CORS(app)
@@ -428,8 +428,10 @@ def SetPoint(TargetX,TargetY):
         #回原點歸零的那個任務不拍照
         if int(TargetX) > 0 and int(TargetY) > 0:
             time.sleep(6)
-            #到達定點後拍照
-            TakePic()
+            logger.info("TakePic mode : " + TakePicStatus)
+            if TakePicStatus == "Enable":
+                #到達定點後拍照
+                TakePic()
         return str(status_A + status_B)
 
     elif sys.platform == "win32":
