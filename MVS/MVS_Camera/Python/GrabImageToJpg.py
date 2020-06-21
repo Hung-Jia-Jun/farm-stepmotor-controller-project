@@ -92,9 +92,12 @@ class MVSControll:
 			print ("set trigger mode fail! ret[0x%x]" % self.ret)
 			sys.exit()
 
+		self.ret = self.cam.MV_CC_SetEnumValue("ExposureAuto", )
 		#設定曝光
 		self.ret = self.cam.MV_CC_SetFloatValue("ExposureTime", 150000)
 	
+		self.ret = self.cam.MV_CC_SetFloatValue("Gain", 20.03)
+
 		# Get payload size
 		stParam =  MVCC_INTVALUE()
 		memset(byref(stParam), 0, sizeof(MVCC_INTVALUE))

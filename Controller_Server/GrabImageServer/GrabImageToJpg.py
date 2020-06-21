@@ -8,7 +8,7 @@ if sys.platform == "linux":
 	import os
 	import termios
 	sys.path.append("/opt/MVS/Samples/aarch64/Python/MvImport")    
-	sys.path.append("/opt/MVS/lib")   
+	sys.path.append("/opt/MVS/lib ")   
 	print (sys.path)
 	from MvCameraControl_class import *
 elif sys.platform == "win32":
@@ -95,6 +95,24 @@ class MVSControll:
 			print ("set trigger mode fail! ret[0x%x]" % self.ret)
 			sys.exit()
 
+		#設定自動曝光為Continuous
+		self.ret = self.cam.MV_CC_SetEnumValue("ExposureAuto",2)
+
+		#設定曝光
+		self.ret = self.cam.MV_CC_SetFloatValue("ExposureTime", 150000)
+		
+		self.ret = self.cam.MV_CC_SetEnumValue("GainAuto",2)
+
+		self.ret = self.cam.MV_CC_SetFloatValue("Gain", 20.03)
+		
+		self.ret = self.cam.MV_CC_SetBoolValue("GammaEnable",True)
+
+		self.ret = self.cam.MV_CC_SetBoolValue("SharpnessEnable",True)
+
+		self.ret = self.cam.MV_CC_SetBoolValue("HueEnable",True)
+
+	
+
 		# Get payload size
 		stParam =  MVCC_INTVALUE()
 		memset(byref(stParam), 0, sizeof(MVCC_INTVALUE))
@@ -118,7 +136,10 @@ class MVSControll:
 	def StartGrab(self,filename):
 		#Start grab image
 		start_time = time.time()
-		self.ret = self.cam.MV_CC_GetOneFrameTimeout(byref(self.data_buf), self.nPayloadSize, self.stDeviceList, 1000)
+		self.ret = None
+		while self.ret != 0:
+			self.ret = self.cam.MV_CC_GetOneFrameTimeout(byref(self.data_buf), self.nPayloadSize, self.stDeviceList, 1000)
+
 		if self.ret == 0:
 			print ("get one frame: Width[%d], Height[%d], nFrameNum[%d]"  % (self.stDeviceList.nWidth, self.stDeviceList.nHeight, self.stDeviceList.nFrameNum))
 
