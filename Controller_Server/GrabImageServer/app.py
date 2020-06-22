@@ -61,6 +61,9 @@ class Camera:
 			if MVSControll == "device not find !":
 				return "device not find !"
 			time.sleep(1)
+			import pdb;
+			pdb.set_trace()
+
 			result = MVSControll.StartGrab(localPictureFolderPath + self.FileName)
 			MVSControll.StopCamera()
 		if self.FileName in result:
@@ -88,6 +91,9 @@ class FTP:
 		if file in file_list:
 			fileHandle = open(self.localPictureFolderPath + file, "rb")
 		else:
+			import pdb
+			pdb.set_trace()
+
 			logging.warning(file +" Missing")
 			return file +" Missing"
 		

@@ -315,15 +315,15 @@ def TakePic_event(msg):
 		ftp.login(FTPUsername, FTPPassword)
 		last_file = ftp.nlst("/homes/admin/MVSImage")[-1]
 		bufsize=1024
-		fp = open(os.getcwd() + filename,'wb')  
+		fp = open(os.getcwd()+ "/" + filename,'wb')  
 		ftp.retrbinary('RETR ' + last_file, fp.write, bufsize)
 		fp.close()  
 		
-		with open(os.getcwd() + filename, "rb") as image_file:
+		with open(os.getcwd()+ "/" + filename, "rb") as image_file:
 			encoded_string = base64.b64encode(image_file.read())
 
 		#刪除剛剛下載下來的圖片檔
-		os.remove(os.getcwd() + filename)
+		os.remove(os.getcwd()+ "/" + filename)
 		socketio.emit('server_response', {'data': "upload Pic result :" + response.text})
 		socketio.emit('ImageStream', {'data': str(encoded_string, encoding = "utf-8")})
 if __name__ == "__main__":
