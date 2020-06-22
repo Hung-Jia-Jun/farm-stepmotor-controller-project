@@ -54,8 +54,8 @@ log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(line
 
 logFile = "/home/pii/StepMotor.log"
 
-my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=1024*1024, 
-                                 backupCount=2, encoding=None, delay=0)
+my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=10240, 
+                                 backupCount=5, encoding=None, delay=0)
 my_handler.setFormatter(log_formatter)
 my_handler.setLevel(logging.DEBUG)
 
@@ -522,6 +522,7 @@ def pendingJob():
     while True:
         logger.info("run pending")
         updateMotorJob()
+        logger.info("end pending search")
         time.sleep(60)
 
 if __name__ == "__main__":
@@ -550,7 +551,7 @@ if __name__ == "__main__":
     # 執行該子執行緒
     t.start()
 
-    # # 建立一個子執行緒，去定時更新運行排程
+    # # # 建立一個子執行緒，去定時更新運行排程
     # t2 = threading.Thread(target = updateMotorJob)
 
     # # 執行該子執行緒
