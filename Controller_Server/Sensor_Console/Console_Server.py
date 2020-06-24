@@ -30,6 +30,7 @@ DBpassword = config.get('Setting','DBpassword')
 FTP_IP = config.get('Setting','FTP')
 FTPUsername = config.get('Setting','FTPUsername')
 FTPPassword = config.get('Setting','FTPPassword')
+remoteFolderPath = config.get('Setting','remoteFolderPath')
 #------------------------------------------------------------------------------------------------------
 app = Flask(__name__)
 CORS(app)
@@ -313,7 +314,7 @@ def TakePic_event(msg):
 		#等確定上傳後，去下載剛剛上傳的檔案，並轉成base64
 		ftp = ftplib.FTP(FTP_IP)
 		ftp.login(FTPUsername, FTPPassword)
-		last_file = ftp.nlst("/homes/admin/MVSImage")[-1]
+		last_file = ftp.nlst(remoteFolderPath)[-1]
 		bufsize=1024
 		fp = open(os.getcwd()+ "/" + filename,'wb')  
 		ftp.retrbinary('RETR ' + last_file, fp.write, bufsize)
