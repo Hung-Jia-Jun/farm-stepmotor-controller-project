@@ -16,6 +16,8 @@ from os.path import dirname, abspath
 import configparser
 import threading
 import os
+from openpyxl import load_workbook,Workbook
+
 d = dirname(dirname(abspath(__file__)))
 sys.path.append(d)
 
@@ -187,13 +189,45 @@ def getSensorHistory():
 	#使用ID來刪除物件
 	From = request.args.get('From')
 	End = request.args.get('End')
-	Command = schedule_day_of_time.query.filter_by(id=_id).first()
 
-	#刪除指定的DB指令
-	db.session.delete(Command)
-	db.session.commit()
-	return "OK"
+	#去資料庫把符合日期時間的資料抓出來
+	Between_lux = sensor_lux.query.filter(sensor_lux.DateTime.between(From,End))
+	if Between_lux.count() > 0:
+		#處理剛剛讀出來的DB歷史資料
+		processHistoryData(Between_lux,"lux")
 
+		Between_ec = sensor_ec.query.filter(sensor_ec.DateTime.between(From,End))
+		#處理剛剛讀出來的DB歷史資料
+		processHistoryData(Between_ec,"ec")
+
+		Between_ph = sensor_ph.query.filter(sensor_ph.DateTime.between(From,End))
+		#處理剛剛讀出來的DB歷史資料
+		processHistoryData(Between_ph,"ph")
+		return "OK"
+	else:
+		return "null"
+
+def processHistoryData(DBInstance,filename):
+	book = Workbook()
+	sheet = book.active
+	sheet.title = filename
+
+	#從資料首行提取本Table中Data的所有Key當作Excel的標題首欄
+	keys = json.loads(DBInstance[0].Data.replace("'", '"')).keys()
+
+	keys_li = []
+	for key in keys:
+		keys_li.append(key)
+
+	sheet.append(["時間"]+keys_li)
+	for row in DBInstance:
+		Values = json.loads(row.Data.replace("'", '"'))
+		append_List = [row.DateTime]
+		for key in keys_li:
+			append_List.append(Values[key])
+		sheet.append(append_List)
+	
+	book.save(os.path.dirname(os.path.abspath(__file__)) + '/static/'+ filename +'.xlsx')
 #刪除定時運行指令
 @app.route("/deleteTimeCommand")
 def deleteTimeCommand():

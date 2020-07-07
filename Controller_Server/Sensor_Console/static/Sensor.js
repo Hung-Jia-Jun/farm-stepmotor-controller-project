@@ -259,6 +259,15 @@ function GetHistory() {
 	//要下載的歷史資料時間
 	var From = document.getElementById("datetimepicker_from").childNodes[1].value;
 	var End = document.getElementById("datetimepicker_end").childNodes[1].value;
+	$.get(Console_ServerURL + "/getSensorHistory",
+			{
+				From : From,
+				End : End
+			},
+			function(data) {
+				console.log(data);
+			}
+		);
 }
 
 //刪除已選擇的指令
