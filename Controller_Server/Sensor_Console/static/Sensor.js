@@ -254,9 +254,12 @@ function SetMovePlan()
 			showPlanList();
 		}
 	);
-
 }
-
+function GetHistory() {
+	//要下載的歷史資料時間
+	var From = document.getElementById("datetimepicker_from").childNodes[1].value;
+	var End = document.getElementById("datetimepicker_end").childNodes[1].value;
+}
 
 //刪除已選擇的指令
 function deleteTimeCommand()
@@ -431,7 +434,14 @@ $(document).ready(function(){
 		format: 'HH:mm',
 		locale: moment.locale('zh-tw')
 	});
-
+	$('#datetimepicker_from').datetimepicker({
+		format: 'YYYY-MM-DD',
+		locale: moment.locale('zh-tw')
+	});
+	$('#datetimepicker_end').datetimepicker({
+		format: 'YYYY-MM-DD',
+		locale: moment.locale('zh-tw')
+	});
 	//更新樹梅派IP
 	getRaspberryIP();
 

@@ -180,6 +180,20 @@ def queryPlanList():
 			Plan_li.append(json.dumps(schedulePlan))
 	return json.dumps(Plan_li)
 
+
+#刪除定時運行指令
+@app.route("/getSensorHistory")
+def getSensorHistory():
+	#使用ID來刪除物件
+	From = request.args.get('From')
+	End = request.args.get('End')
+	Command = schedule_day_of_time.query.filter_by(id=_id).first()
+
+	#刪除指定的DB指令
+	db.session.delete(Command)
+	db.session.commit()
+	return "OK"
+
 #刪除定時運行指令
 @app.route("/deleteTimeCommand")
 def deleteTimeCommand():

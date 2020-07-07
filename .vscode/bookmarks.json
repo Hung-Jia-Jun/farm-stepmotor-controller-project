@@ -1,10 +1,20 @@
 [
 	{
-		"path": "$ROOTPATH$/Controller_Server/Sensor_Console/templates/index.html",
+		"path": "$ROOTPATH$/Controller_Server/Sensor_Console/Console_Server.py",
 		"bookmarks": [
 			{
-				"line": 430,
-				"column": 26,
+				"line": 189,
+				"column": 0,
+				"label": ""
+			}
+		]
+	},
+	{
+		"path": "$ROOTPATH$/Controller_Server/Sensor_Console/static/Sensor.js",
+		"bookmarks": [
+			{
+				"line": 437,
+				"column": 32,
 				"label": ""
 			}
 		]
