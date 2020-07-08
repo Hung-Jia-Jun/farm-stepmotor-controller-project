@@ -259,12 +259,33 @@ function GetHistory() {
 	//要下載的歷史資料時間
 	var From = document.getElementById("datetimepicker_from").childNodes[1].value;
 	var End = document.getElementById("datetimepicker_end").childNodes[1].value;
+	document.getElementById("ExcelHistoryLoader").style.display="block"
 	$.get(Console_ServerURL + "/getSensorHistory",
 			{
 				From : From,
 				End : End
 			},
 			function(data) {
+				document.getElementById("ExcelHistoryLoader").style.display="none";
+				if (data!="OK")
+				{
+					alert("此日期區間內無資料");
+					return;
+				}
+				var a = document.createElement("a");
+				a.href = "/static/ec.xlsx";
+				a.download = 'ec.xlsx';
+				a.click();
+
+				var a = document.createElement("a");
+				a.href = "/static/lux.xlsx";
+				a.download = 'lux.xlsx';
+				a.click();
+
+				var a = document.createElement("a");
+				a.href = "/static/ph.xlsx";
+				a.download = 'ph.xlsx';
+				a.click();
 				console.log(data);
 			}
 		);
