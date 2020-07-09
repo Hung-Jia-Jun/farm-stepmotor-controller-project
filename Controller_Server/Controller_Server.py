@@ -54,18 +54,21 @@ log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(line
 
 logFile = "/home/pii/StepMotor.log"
 
-my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=10240, 
-                                 backupCount=5, encoding=None, delay=0)
-my_handler.setFormatter(log_formatter)
-my_handler.setLevel(logging.DEBUG)
+try:
+    my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=10240, 
+                                    backupCount=5, encoding=None, delay=0)
+    my_handler.setFormatter(log_formatter)
+    my_handler.setLevel(logging.DEBUG)
 
 
-logger = logging.getLogger('root')
+    logger = logging.getLogger('root')
 
-logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.DEBUG)
 
-logger.addHandler(my_handler)
-
+    logger.addHandler(my_handler)
+except:
+    #windows環境
+    pass
 
 
 class config(db.Model):
@@ -555,7 +558,11 @@ if __name__ == "__main__":
 
 
     db.init_app(app)
-    db.create_all()
+    try:
+        db.create_all()
+    except:
+        EmailSender.SendMail("DB發生問題，無法讀寫內容")
+        
     print (__name__ , "db.create_all")
     #啟動Server後，先鎖定煞車，後放鬆馬達出力
     Controll_2MD4850.InitMotor()

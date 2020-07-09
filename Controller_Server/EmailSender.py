@@ -8,7 +8,7 @@ import os
 def SendMail(Message):
     currentPath = os.path.dirname(os.path.abspath(__file__))
     config = configparser.ConfigParser()
-    config.read(currentPath + '\\Sensor_Console\\Config.ini')
+    config.read(currentPath + '/Sensor_Console/Config.ini')
     GmailUser = config.get('Setting','GmailUser')
     GmailApplicationPassword = config.get('Setting','GmailApplicationPassword')
     NotifycationEmailUser = config.get('Setting','NotifycationEmailUser')
@@ -17,7 +17,7 @@ def SendMail(Message):
     to = NotifycationEmailUser
 
     message = MIMEText(Message, 'plain', 'utf-8')
-    message['Subject'] = 'Sensor fail notifycation'
+    message['Subject'] = 'System notifycation'
     message['From'] = GmailUser
     message['To'] = to
 
@@ -30,3 +30,7 @@ def SendMail(Message):
     # Send msil
     smtp.sendmail(message['From'], message['To'], message.as_string())
     print('Send mails OK!')
+
+
+if __name__ == "__main__":
+    SendMail("test")
