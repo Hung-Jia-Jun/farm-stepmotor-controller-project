@@ -16,7 +16,7 @@ import logging
 import configparser
 from logging.handlers import RotatingFileHandler
 import os
-
+import EmailSender
 
 
 if sys.platform == "linux":
@@ -204,8 +204,16 @@ def ReadLUX():
             db.session.commit()
             return _Data
         except Exception as e:
+            EmailSender.SendMail("三合一感測器發生問題，未擷取到資料")
             print (e)
-            pass
+            _Data = {
+                "大氣溫度" : "0",
+                "濕度" : "0",
+                "光照" : "0",
+                "二氧化碳" : "0",
+                "大氣壓力" : "0",
+            }
+            return _Data
     elif sys.platform == "win32":
         data = {
                     "大氣溫度" : "在windows環境無法顯示此數值",
@@ -238,6 +246,12 @@ def ReadEC():
             return _Data
         except Exception as e:
             print (e)
+            EmailSender.SendMail("EC電導感測器發生問題，未擷取到資料")
+            _Data = {
+                "水溫" : "0",
+                "電導率" : "0",
+            }
+            return _Data
     elif sys.platform == "win32":
         data = {
                 "水溫" : "在windows環境無法顯示此數值",
@@ -266,7 +280,12 @@ def ReadPH():
                 db.session.commit()
                 return _Data
         except Exception as e:
+            EmailSender.SendMail("PH感測器發生問題，未擷取到資料")
             print (e)
+            _Data = {
+                "PH" : "0"
+            }
+            return _Data
     elif sys.platform == "win32":
         data = {
             "PH" : "在windows環境無法顯示此數值"
