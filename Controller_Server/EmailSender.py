@@ -5,7 +5,7 @@ import smtplib
 import configparser
 import os
 
-def SendMail(Message):
+def Send(Message):
     currentPath = os.path.dirname(os.path.abspath(__file__))
     config = configparser.ConfigParser()
     config.read(currentPath + '/Sensor_Console/Config.ini')

@@ -19,7 +19,7 @@ class RS485:
 		while True:
 			if retryCount > retryCountLimit:
 				print ("ReadLUX Fail")
-				return "ReadLUX Fail"
+				return "ReadLUX Fail",  "ReadLUX Fail",  "ReadLUX Fail",  "ReadLUX Fail",  "ReadLUX Fail" 
 			self.ser.flushInput()
 			self.ser.flushOutput()
 			self.ser.write(command)
@@ -74,7 +74,7 @@ class RS485:
 			retryCount +=1
 			if retryCount > retryCountLimit:
 				print ("ReadEC Fail")
-				return "ReadEC Fail"
+				return "ReadEC Fail","ReadEC Fail"
 			while self.ser.inWaiting() > 0:
 				for c in self.ser.read(2):
 					index += 1
