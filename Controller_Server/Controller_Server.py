@@ -570,6 +570,14 @@ def updateMotorJob():
 			#到指定時間後，運行重複運行指令
 			if datetime.now().strftime("%H:%M") == ele.time:
 				StartSchedule_Job()
+			
+			#每日健康檢查2次
+			if datetime.now().strftime("%H:%M") == '08:00':
+				databaseChecker()
+				sensorChecker()
+			if datetime.now().strftime("%H:%M") == '15:00':
+				databaseChecker()
+				sensorChecker()
 	return "OK"
 
 def databaseChecker():
@@ -599,13 +607,6 @@ def pendingJob():
 		logger.info("end pending search")
 		time.sleep(60)
 
-#每秒鐘都去確認是否有Sensor任務要運行
-def Sensor_pendingJob():
-	while True:
-		scheduler.run_pending()
-		time.sleep(1)
-
- 
 if __name__ == "__main__":
 	if sys.platform == "linux":
 		try:
@@ -643,18 +644,8 @@ if __name__ == "__main__":
 	scheduler.every(16).minutes.do(ReadEC_Job)
 	scheduler.every(17).minutes.do(ReadPH_Job)
 	
-	#每日健康檢查2次
-	scheduler.every().day.at('08:00').do(databaseChecker)
-	scheduler.every().day.at('15:00').do(databaseChecker)
 	
-	scheduler.every().day.at('08:00').do(sensorChecker)
-	scheduler.every().day.at('15:00').do(sensorChecker)
 	
-	# 建立一個子執行緒，去定時對機器健康檢查
-	t2 = threading.Thread(target = Sensor_pendingJob)
-
-	# 執行該子執行緒
-	t2.start()
 	app.run(host='0.0.0.0',port=8001)
 
 
