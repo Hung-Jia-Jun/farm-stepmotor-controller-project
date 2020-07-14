@@ -273,17 +273,17 @@ function GetHistory() {
 					return;
 				}
 				var a = document.createElement("a");
-				a.href = "/static/ec.xlsx";
+				a.href = "http://" + RaspberryIP + ":8000" + "/static/ec.xlsx";
 				a.download = 'ec.xlsx';
 				a.click();
 
 				var a = document.createElement("a");
-				a.href = "/static/lux.xlsx";
+				a.href = "http://" + RaspberryIP + ":8000" + "/static/lux.xlsx";
 				a.download = 'lux.xlsx';
 				a.click();
 
 				var a = document.createElement("a");
-				a.href = "/static/ph.xlsx";
+				a.href = "http://" + RaspberryIP + ":8000" + "/static/ph.xlsx";
 				a.download = 'ph.xlsx';
 				a.click();
 				console.log(data);
@@ -438,7 +438,9 @@ function UploadPic(filename)
 
 var socket;
 $(document).ready(function(){
-	socket = io.connect();
+	//更新樹梅派IP
+	getRaspberryIP();
+	socket = io.connect("http://" + RaspberryIP + ":8000" , {path: '/socket.io'});
 	socket.on('server_response', function(msg) {
 		if (msg["data"].match('TakePic :')!=null)
 		{
@@ -472,8 +474,7 @@ $(document).ready(function(){
 		format: 'YYYY-MM-DD',
 		locale: moment.locale('zh-tw')
 	});
-	//更新樹梅派IP
-	getRaspberryIP();
+
 
 	//顯示命令列表
 	showCommandList();
