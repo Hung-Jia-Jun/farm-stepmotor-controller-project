@@ -17,7 +17,7 @@ import configparser
 import threading
 import os
 from openpyxl import load_workbook,Workbook
-
+from flask_cors import cross_origin
 d = dirname(dirname(abspath(__file__)))
 sys.path.append(d)
 
@@ -344,6 +344,7 @@ def GetJetsonIP():
 	return configIP.value
 
 @socketio.on('TakePic_event')
+@cross_origin()
 def TakePic_event(msg):
 	JetsonIP = GetJetsonIP()
 	if msg["data"] == "Take Pic!":
