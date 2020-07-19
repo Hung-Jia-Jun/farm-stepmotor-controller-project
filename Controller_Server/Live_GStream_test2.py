@@ -4,7 +4,8 @@ import sys
 import threading
 import os
 import termios
-
+import numpy as np
+import cv2
 from ctypes import *
 
 sys.path.append("../MvImport")
@@ -19,14 +20,14 @@ def work_thread(cam=0, pData=0, nDataSize=0):
 	while True:
 		ret = cam.MV_CC_GetOneFrameTimeout(pData, nDataSize, stFrameInfo, 1000)
 		# print(pData)   此处获得是3686400字节的c_ubyte_Array 。why？因为我的分辨率1280*960，3通道
-        # np.set_printoptions(threshold=np.inf)
-        temp = np.asarray(pData)   # 将c_ubyte_Array转化成ndarray得到（3686400，）
-        temp = temp.reshape((960, 1280, 3))   #  根据自己分辨率进行转化
-        # print(temp)
-        # print(temp.shape)
-        temp = cv2.cvtColor(temp, cv2.COLOR_BGR2RGB)  # 这一步获取到的颜色不对，因为默认是BRG，要转化成RGB，颜色才正常
-        cv2.namedWindow("result", cv2.WINDOW_AUTOSIZE)
-        cv2.imshow("result", temp)
+		# np.set_printoptions(threshold=np.inf)
+		temp = np.asarray(pData)   # 将c_ubyte_Array转化成ndarray得到（3686400，）
+		temp = temp.reshape((960, 1280, 3))   #  根据自己分辨率进行转化
+		# print(temp)
+		# print(temp.shape)
+		temp = cv2.cvtColor(temp, cv2.COLOR_BGR2RGB)  # 这一步获取到的颜色不对，因为默认是BRG，要转化成RGB，颜色才正常
+		cv2.namedWindow("result", cv2.WINDOW_AUTOSIZE)
+		cv2.imshow("result", temp)
 
 		if ret == 0:
 			print ("get one frame: Width[%d], Height[%d], PixelType[0x%x], nFrameNum[%d]"  % (stFrameInfo.nWidth, stFrameInfo.nHeight, stFrameInfo.enPixelType,stFrameInfo.nFrameNum))
