@@ -18,6 +18,8 @@ def work_thread(cam=0, pData=0, nDataSize=0):
 	stFrameInfo = MV_FRAME_OUT_INFO_EX()
 	memset(byref(stFrameInfo), 0, sizeof(stFrameInfo))
 	while True:
+		import pdb
+		pdb.set_trace()
 		ret = cam.MV_CC_GetOneFrameTimeout(pData, nDataSize, stFrameInfo, 1000)
 		# print(pData)   此处获得是3686400字节的c_ubyte_Array 。why？因为我的分辨率1280*960，3通道
 		# np.set_printoptions(threshold=np.inf)

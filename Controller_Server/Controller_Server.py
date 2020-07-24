@@ -603,6 +603,7 @@ def sensorChecker():
 def pendingJob():
 	while True:
 		logger.info("run pending")
+		scheduler.run_pending()
 		updateMotorJob()
 		logger.info("end pending search")
 		time.sleep(60)
@@ -638,13 +639,14 @@ if __name__ == "__main__":
 	# 執行該子執行緒
 	t.start()
 
-	
 
 	scheduler.every(15).minutes.do(ReadLUX_Job)
 	scheduler.every(16).minutes.do(ReadEC_Job)
 	scheduler.every(17).minutes.do(ReadPH_Job)
 	
-	
+	ReadLUX_Job()
+	ReadEC_Job()
+	ReadPH_Job()
 	
 	app.run(host='0.0.0.0',port=8001)
 
