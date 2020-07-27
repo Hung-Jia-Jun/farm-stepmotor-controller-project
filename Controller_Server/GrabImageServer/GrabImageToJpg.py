@@ -3,6 +3,7 @@
 import sys
 from ctypes import *
 import logging
+import cv2
 if sys.platform == "linux":
 	import threading
 	import os
@@ -184,6 +185,9 @@ class MVSControll:
 				elif sys.platform == "win32":
 					cdll.msvcrt.memcpy(byref(img_buff), stConvertParam.pImageBuffer, stConvertParam.nImageLen)
 				file_open.write(img_buff, )
+				import pdb; 
+				pdb.set_trace()
+				cv2.imencode('.jpg', img)[1].tobytes()
 				print (img_buff)
 			except:
 				raise Exception("save file executed failed1::%s" % e.message)

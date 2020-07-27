@@ -18,5 +18,15 @@
 				"label": ""
 			}
 		]
+	},
+	{
+		"path": "$ROOTPATH$/Controller_Server/GrabImageServer/GrabImageToJpg.py",
+		"bookmarks": [
+			{
+				"line": 189,
+				"column": 42,
+				"label": ""
+			}
+		]
 	}
 ]
