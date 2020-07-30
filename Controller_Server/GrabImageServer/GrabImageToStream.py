@@ -148,7 +148,7 @@ class MVSControll:
 			# 	self.ret = self.cam.MV_CC_GetOneFrameTimeout(byref(self.data_buf), self.nPayloadSize, self.stDeviceList, 1000)
 			
 			if self.ret == 0:
-				print ("get one frame: Width[%d], Height[%d], nFrameNum[%d]"  % (self.stDeviceList.nWidth, self.stDeviceList.nHeight, self.stDeviceList.nFrameNum))
+				# print ("get one frame: Width[%d], Height[%d], nFrameNum[%d]"  % (self.stDeviceList.nWidth, self.stDeviceList.nHeight, self.stDeviceList.nFrameNum))
 
 				stConvertParam = MV_SAVE_IMAGE_PARAM_EX()
 				stConvertParam.nWidth = self.stDeviceList.nWidth
@@ -171,6 +171,8 @@ class MVSControll:
 					print ("save file executed failed0:! ret[0x%x]" % self.ret)
 					del self.data_buf
 					sys.exit()
+
+				
 				try:
 					img_buff = (c_ubyte * stConvertParam.nImageLen)()
 					if sys.platform == "linux":

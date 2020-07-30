@@ -12,6 +12,7 @@ import pdb
 import os
 import logging
 import GrabImageToJpg
+import GrabImageToStream
 import GrabImageToJpg_Pyueye_OpenCV
 import subprocess
 # from multiprocessing import Process, Queue
@@ -59,14 +60,18 @@ class Camera:
 			self.queue.put(GrabImageFilePath)     
 			result = GrabImageToJpg_Pyueye_OpenCV.GetTakePicResponse(self.ResponseQueue)
 		else:
-			#MVS相機拍照
-			MVSControll = GrabImageToJpg.MVSControll()
-			if MVSControll == "device not find !":
-				return "device not find !"
-			time.sleep(1)
+			frame = camera_cv().get_frame()
+			file_open = open(localPictureFolderPath + self.FileName, 'wb+')
+			try:
+				file_open.write(frame, )
+				logging.info("Grab Sussful " + self.FileName)
+				return self.FileName
+			except Exception as e:
+				logging.error("GrabFail")
+				return "GrabFail"
+			finally:
+				file_open.close()
 
-			result = MVSControll.StartGrab(localPictureFolderPath + self.FileName)
-			MVSControll.StopCamera()
 		if self.FileName in result:
 			logging.info("Grab Sussful " + self.FileName)
 			return self.FileName
