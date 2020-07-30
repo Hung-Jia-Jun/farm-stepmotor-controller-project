@@ -9,7 +9,7 @@ import json
 import ftplib
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from datetime import datetime
+from datetime import datetime,timedelta
 from flask_socketio import SocketIO, emit
 import base64
 from os.path import dirname, abspath 
@@ -189,6 +189,8 @@ def getSensorHistory():
 	#使用ID來刪除物件
 	From = request.args.get('From')
 	End = request.args.get('End')
+
+	End = (datetime.strptime(End, "%Y-%m-%d") + timedelta(1)).strftime("%Y-%m-%d")
 
 	#去資料庫把符合日期時間的資料抓出來
 	Between_lux = sensor_lux.query.filter(sensor_lux.DateTime.between(From,End))
