@@ -521,27 +521,36 @@ def TakePic():
 
 def ReadLUX_Job():
 	print ("Start task ReadLUX_Job")
+	logger.info("Start task ReadLUX_Job")
 	try:
 		ReadLUX()
-	except:
+	except Exception as e:
+		logger.error(e)
 		pass
 	print ("End task ReadLUX_Job")
+	logger.info("End task ReadLUX_Job")
 
 def ReadEC_Job():
 	print ("Start task ReadEC_Job")
+	logger.info("Start task ReadEC_Job")
 	try:
 		ReadEC()
-	except:
+	except Exception as e:
+		logger.error(e)
 		pass
 	print ("End task ReadEC_Job")
+	logger.info("End task ReadEC_Job")
 
 def ReadPH_Job():
 	print ("Start task ReadPH_Job")
+	logger.info("Start task ReadPH_Job")
 	try:
 		ReadPH()
-	except:
+	except Exception as e:
+		logger.error(e)
 		pass
 	print ("End task ReadPH_Job")
+	logger.info("End task ReadPH_Job")
 
 #啟用定時運行命令
 def StartSchedule_Job():

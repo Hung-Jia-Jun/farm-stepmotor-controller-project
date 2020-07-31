@@ -153,7 +153,8 @@ _Camera = None
 def StartCamera():
 	global _Camera
 	_Camera = Camera()
-
+	frame = camera_cv().get_frame()
+	
 @app.route('/stream')
 def stream():
     """Video streaming home page."""
