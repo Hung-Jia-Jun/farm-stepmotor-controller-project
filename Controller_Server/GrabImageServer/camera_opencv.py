@@ -29,7 +29,7 @@ class Camera(BaseCamera):
 			img_data = cv2.imdecode(img_data, cv2.IMREAD_COLOR)
 			yield cv2.imencode('.jpg', img_data)[1].tobytes()
 
-		MVSControll.StopCamera()
+		# MVSControll.StopCamera()
 
 if __name__ == "__main__":
 	from GrabImageToStream import MVSControll

@@ -123,7 +123,12 @@ class FTP:
 		fileHandle.close()
 		logging.info("ftp close")
 		try:
-			os.remove(self.localPictureFolderPath + file)
+			JPG_filelist = [ f for f in os.listdir(self.localPictureFolderPath) if f.endswith(".jpg") ]
+			for image in JPG_filelist:
+				try:
+					os.remove(self.localPictureFolderPath + image)
+				except Exception as e:
+					logging.error(e)
 			logging.info("file removed")
 		except Exception as e:
 			logging.error("file remove error", exc_info=True)
