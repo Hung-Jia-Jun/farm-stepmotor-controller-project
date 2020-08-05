@@ -222,6 +222,7 @@ def ReadLUX(checkTask=False):
 			return _Data
 		except:
 			EmailSender.Send("三合一感測器發生問題，未擷取到資料")
+			logger.error("Sensor檢查任務 - 三合一感測器發生問題，未擷取到資料")
 			_Data = {
 				"大氣溫度" : "0",
 				"濕度" : "0",
@@ -255,6 +256,7 @@ def ReadEC(checkTask=False):
 			if checkTask == True:
 				if "Fail" in str(temperature):
 					EmailSender.Send("EC電導感測器發生問題，未擷取到資料")
+					logger.error("Sensor檢查任務 - EC電導感測器發生問題，未擷取到資料")
 					_Data = {
 						"水溫" : "0",
 						"電導率" : "0",
@@ -302,6 +304,7 @@ def ReadPH(checkTask=False):
 				if checkTask == True:
 					if "Fail" in str(PH):
 						EmailSender.Send("PH感測器發生問題，未擷取到資料")
+						logger.error("Sensor檢查任務 - PH感測器發生問題，未擷取到資料")
 						_Data = {
 							"PH" : "0"
 						}
@@ -582,11 +585,17 @@ def updateMotorJob():
 			
 			#每日健康檢查2次
 			if datetime.now().strftime("%H:%M") == '08:00':
-				databaseChecker()
+				logger.info("Sensor檢查任務 - 啟動")
 				sensorChecker()
+				databaseChecker()
+				print ("Sensor檢查任務 - 結束")
+				logger.info("Sensor檢查任務 - 結束")
 			if datetime.now().strftime("%H:%M") == '15:00':
-				databaseChecker()
+				logger.info("Sensor檢查任務 - 啟動")
 				sensorChecker()
+				databaseChecker()
+				print ("Sensor檢查任務 - 結束")
+				logger.info("Sensor檢查任務 - 結束")
 	return "OK"
 
 def databaseChecker():
@@ -602,8 +611,6 @@ def sensorChecker():
 		ReadLUX(checkTask=True)
 		ReadEC(checkTask=True)
 		ReadPH(checkTask=True)
-		print ("Sensor檢查任務 - 成功")
-		logger.error("Sensor檢查任務 - 成功")
 	except:
 		print ("Sensor檢查任務 - 有部分Sensor失敗")
 		logger.error("Sensor檢查任務 - 有部分Sensor失敗")
