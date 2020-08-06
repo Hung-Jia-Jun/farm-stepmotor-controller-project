@@ -33,6 +33,7 @@ FTP_IP = config.get('Setting','FTP')
 FTPUsername = config.get('Setting','FTPUsername')
 FTPPassword = config.get('Setting','FTPPassword')
 remoteFolderPath = config.get('Setting','remoteFolderPath')
+JetsonNanoIP = config.get('Setting','JetsonNanoIP')
 #------------------------------------------------------------------------------------------------------
 app = Flask(__name__)
 CORS(app)
@@ -341,10 +342,12 @@ def UpdateJetsonIP():
 #更新Jetson的IP位置
 @app.route("/GetJetsonIP")
 def GetJetsonIP():
-	configIP = config.query.filter_by(
-		config_key='JetsonIP').first()
-	return configIP.value
-
+	try:
+		configIP = config.query.filter_by(
+			config_key='JetsonIP').first()
+		return configIP.value
+	except:
+		return JetsonNanoIP
 @socketio.on('TakePic_event')
 @cross_origin()
 def TakePic_event(msg):

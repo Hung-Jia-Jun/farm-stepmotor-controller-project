@@ -90,7 +90,11 @@ class FTP:
 
 	def FTPupload(self,file):
 		logging.basicConfig(filename="/home/jetson/MVS/Samples/aarch64/Python/Running.log", filemode="w", format="%(asctime)s %(name)s:%(levelname)s:%(message)s", datefmt="%d-%M-%Y %H:%M:%S", level=logging.DEBUG)
-		ftp = ftplib.FTP(self.FTP)
+		try:
+			ftp = ftplib.FTP(self.FTP)
+		except OSError:
+			logging.error("FTP server disconnect")
+			return "FTP server disconnect"
 		ftp.login(self.FTPUsername, self.FTPPassword)
 		file_list = listdir(self.localPictureFolderPath)
 		logging.warning(str(file_list))
@@ -100,6 +104,7 @@ class FTP:
 
 			logging.warning(file +" Missing")
 			return file +" Missing"
+
 		
 		retry = 0
 		while file not in ftp.nlst(self.remoteFolderPath):
@@ -125,10 +130,17 @@ class FTP:
 		try:
 			JPG_filelist = [ f for f in os.listdir(self.localPictureFolderPath) if f.endswith(".jpg") ]
 			for image in JPG_filelist:
-				try:
-					os.remove(self.localPictureFolderPath + image)
-				except Exception as e:
-					logging.error(e)
+				JPG_Date = image.split(".")[0]
+				Img_Time = time.strptime(JPG_Date, '%Y_%m_%d_%H-%M-%S')
+				now = time.localtime(time.time())
+
+				#刪除大於三天的檔案
+				if (time.mktime(now) - time.mktime(Img_Time))/ 60/ 60/ 24 > 3:
+					try:
+						os.remove(self.localPictureFolderPath + image)
+					except Exception as e:
+						logging.error(e)
+				
 			logging.info("file removed")
 		except Exception as e:
 			logging.error("file remove error", exc_info=True)

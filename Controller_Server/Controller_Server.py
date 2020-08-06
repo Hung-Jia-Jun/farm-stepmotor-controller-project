@@ -41,6 +41,8 @@ DatabaseIP = config.get('Setting','DatabaseIP')
 DBusername = config.get('Setting','DBusername')
 DBpassword = config.get('Setting','DBpassword')
 TakePicStatus = config.get('Setting','TakePic')
+JetsonNanoIP = config.get('Setting','JetsonNanoIP')
+
 #------------------------------------------------------------------------------------------------------
 app = Flask(__name__)
 CORS(app)
@@ -507,9 +509,12 @@ def SetPoint(TargetX,TargetY):
 		return parameterEcho
 
 def GetJetsonIP():
-	configIP = config.query.filter_by(
-		config_key='JetsonIP').first()
-	return configIP.value
+	try:
+		configIP = config.query.filter_by(
+			config_key='JetsonIP').first()
+		return configIP.value
+	except:
+		return JetsonNanoIP
 #呼叫Jetson Nano拍照
 def TakePic():
 	JetsonIP = GetJetsonIP()
@@ -632,8 +637,6 @@ if __name__ == "__main__":
 			pass
 	elif sys.platform == "win32":
 		pass
-
-
 
 	db.init_app(app)
 	try:
