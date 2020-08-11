@@ -4,6 +4,7 @@ import multiprocessing
 from flask import request
 import ftplib
 import os
+from flask import render_template, Response
 from os import listdir
 import time
 import configparser
@@ -11,11 +12,14 @@ import pdb
 import os
 import logging
 import GrabImageToJpg
+import GrabImageToStream
 import GrabImageToJpg_Pyueye_OpenCV
 import subprocess
 # from multiprocessing import Process, Queue
 from queue import Queue
 import threading
+from camera_opencv import Camera as camera_cv 
+
 app = Flask(__name__)
 
 class Camera:
@@ -56,14 +60,18 @@ class Camera:
 			self.queue.put(GrabImageFilePath)     
 			result = GrabImageToJpg_Pyueye_OpenCV.GetTakePicResponse(self.ResponseQueue)
 		else:
-			#MVS相機拍照
-			MVSControll = GrabImageToJpg.MVSControll()
-			if MVSControll == "device not find !":
-				return "device not find !"
-			time.sleep(1)
+			frame = camera_cv().get_frame()
+			file_open = open(localPictureFolderPath + self.FileName, 'wb+')
+			try:
+				file_open.write(frame, )
+				logging.info("Grab Sussful " + self.FileName)
+				return self.FileName
+			except Exception as e:
+				logging.error("GrabFail")
+				return "GrabFail"
+			finally:
+				file_open.close()
 
-			result = MVSControll.StartGrab(localPictureFolderPath + self.FileName)
-			MVSControll.StopCamera()
 		if self.FileName in result:
 			logging.info("Grab Sussful " + self.FileName)
 			return self.FileName
@@ -82,7 +90,11 @@ class FTP:
 
 	def FTPupload(self,file):
 		logging.basicConfig(filename="/home/jetson/MVS/Samples/aarch64/Python/Running.log", filemode="w", format="%(asctime)s %(name)s:%(levelname)s:%(message)s", datefmt="%d-%M-%Y %H:%M:%S", level=logging.DEBUG)
-		ftp = ftplib.FTP(self.FTP)
+		try:
+			ftp = ftplib.FTP(self.FTP)
+		except OSError:
+			logging.error("FTP server disconnect")
+			return "FTP server disconnect"
 		ftp.login(self.FTPUsername, self.FTPPassword)
 		file_list = listdir(self.localPictureFolderPath)
 		logging.warning(str(file_list))
@@ -92,6 +104,7 @@ class FTP:
 
 			logging.warning(file +" Missing")
 			return file +" Missing"
+
 		
 		retry = 0
 		while file not in ftp.nlst(self.remoteFolderPath):
@@ -115,7 +128,19 @@ class FTP:
 		fileHandle.close()
 		logging.info("ftp close")
 		try:
-			os.remove(self.localPictureFolderPath + file)
+			JPG_filelist = [ f for f in os.listdir(self.localPictureFolderPath) if f.endswith(".jpg") ]
+			for image in JPG_filelist:
+				JPG_Date = image.split(".")[0]
+				Img_Time = time.strptime(JPG_Date, '%Y_%m_%d_%H-%M-%S')
+				now = time.localtime(time.time())
+
+				#刪除大於三天的檔案
+				if (time.mktime(now) - time.mktime(Img_Time))/ 60/ 60/ 24 > 3:
+					try:
+						os.remove(self.localPictureFolderPath + image)
+					except Exception as e:
+						logging.error(e)
+				
 			logging.info("file removed")
 		except Exception as e:
 			logging.error("file remove error", exc_info=True)
@@ -145,6 +170,27 @@ _Camera = None
 def StartCamera():
 	global _Camera
 	_Camera = Camera()
+	frame = camera_cv().get_frame()
+	
+@app.route('/stream')
+def stream():
+    """Video streaming home page."""
+    return render_template('stream.html')
+
+
+def gen(camera):
+    """Video streaming generator function."""
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
+@app.route('/video_feed')
+def video_feed():
+    """Video streaming route. Put this in the src attribute of an img tag."""
+    return Response(gen(camera_cv()),mimetype='multipart/x-mixed-replace; boundary=frame')
+
 
 if __name__ == "__main__":
 	app.debug = True

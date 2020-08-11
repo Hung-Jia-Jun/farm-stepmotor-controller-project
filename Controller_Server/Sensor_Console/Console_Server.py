@@ -9,7 +9,7 @@ import json
 import ftplib
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from datetime import datetime
+from datetime import datetime,timedelta
 from flask_socketio import SocketIO, emit
 import base64
 from os.path import dirname, abspath 
@@ -33,6 +33,7 @@ FTP_IP = config.get('Setting','FTP')
 FTPUsername = config.get('Setting','FTPUsername')
 FTPPassword = config.get('Setting','FTPPassword')
 remoteFolderPath = config.get('Setting','remoteFolderPath')
+JetsonNanoIP = config.get('Setting','JetsonNanoIP')
 #------------------------------------------------------------------------------------------------------
 app = Flask(__name__)
 CORS(app)
@@ -190,6 +191,8 @@ def getSensorHistory():
 	From = request.args.get('From')
 	End = request.args.get('End')
 
+	End = (datetime.strptime(End, "%Y-%m-%d") + timedelta(1)).strftime("%Y-%m-%d")
+
 	#去資料庫把符合日期時間的資料抓出來
 	Between_lux = sensor_lux.query.filter(sensor_lux.DateTime.between(From,End))
 	if Between_lux.count() > 0:
@@ -339,10 +342,12 @@ def UpdateJetsonIP():
 #更新Jetson的IP位置
 @app.route("/GetJetsonIP")
 def GetJetsonIP():
-	configIP = config.query.filter_by(
-		config_key='JetsonIP').first()
-	return configIP.value
-
+	try:
+		configIP = config.query.filter_by(
+			config_key='JetsonIP').first()
+		return configIP.value
+	except:
+		return JetsonNanoIP
 @socketio.on('TakePic_event')
 @cross_origin()
 def TakePic_event(msg):

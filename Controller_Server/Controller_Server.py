@@ -41,6 +41,8 @@ DatabaseIP = config.get('Setting','DatabaseIP')
 DBusername = config.get('Setting','DBusername')
 DBpassword = config.get('Setting','DBpassword')
 TakePicStatus = config.get('Setting','TakePic')
+JetsonNanoIP = config.get('Setting','JetsonNanoIP')
+
 #------------------------------------------------------------------------------------------------------
 app = Flask(__name__)
 CORS(app)
@@ -222,6 +224,7 @@ def ReadLUX(checkTask=False):
 			return _Data
 		except:
 			EmailSender.Send("三合一感測器發生問題，未擷取到資料")
+			logger.error("Sensor檢查任務 - 三合一感測器發生問題，未擷取到資料")
 			_Data = {
 				"大氣溫度" : "0",
 				"濕度" : "0",
@@ -255,6 +258,7 @@ def ReadEC(checkTask=False):
 			if checkTask == True:
 				if "Fail" in str(temperature):
 					EmailSender.Send("EC電導感測器發生問題，未擷取到資料")
+					logger.error("Sensor檢查任務 - EC電導感測器發生問題，未擷取到資料")
 					_Data = {
 						"水溫" : "0",
 						"電導率" : "0",
@@ -302,6 +306,7 @@ def ReadPH(checkTask=False):
 				if checkTask == True:
 					if "Fail" in str(PH):
 						EmailSender.Send("PH感測器發生問題，未擷取到資料")
+						logger.error("Sensor檢查任務 - PH感測器發生問題，未擷取到資料")
 						_Data = {
 							"PH" : "0"
 						}
@@ -504,9 +509,12 @@ def SetPoint(TargetX,TargetY):
 		return parameterEcho
 
 def GetJetsonIP():
-	configIP = config.query.filter_by(
-		config_key='JetsonIP').first()
-	return configIP.value
+	try:
+		configIP = config.query.filter_by(
+			config_key='JetsonIP').first()
+		return configIP.value
+	except:
+		return JetsonNanoIP
 #呼叫Jetson Nano拍照
 def TakePic():
 	JetsonIP = GetJetsonIP()
@@ -521,27 +529,36 @@ def TakePic():
 
 def ReadLUX_Job():
 	print ("Start task ReadLUX_Job")
+	logger.info("Start task ReadLUX_Job")
 	try:
 		ReadLUX()
-	except:
+	except Exception as e:
+		logger.error(e)
 		pass
 	print ("End task ReadLUX_Job")
+	logger.info("End task ReadLUX_Job")
 
 def ReadEC_Job():
 	print ("Start task ReadEC_Job")
+	logger.info("Start task ReadEC_Job")
 	try:
 		ReadEC()
-	except:
+	except Exception as e:
+		logger.error(e)
 		pass
 	print ("End task ReadEC_Job")
+	logger.info("End task ReadEC_Job")
 
 def ReadPH_Job():
 	print ("Start task ReadPH_Job")
+	logger.info("Start task ReadPH_Job")
 	try:
 		ReadPH()
-	except:
+	except Exception as e:
+		logger.error(e)
 		pass
 	print ("End task ReadPH_Job")
+	logger.info("End task ReadPH_Job")
 
 #啟用定時運行命令
 def StartSchedule_Job():
@@ -573,11 +590,17 @@ def updateMotorJob():
 			
 			#每日健康檢查2次
 			if datetime.now().strftime("%H:%M") == '08:00':
-				databaseChecker()
+				logger.info("Sensor檢查任務 - 啟動")
 				sensorChecker()
+				databaseChecker()
+				print ("Sensor檢查任務 - 結束")
+				logger.info("Sensor檢查任務 - 結束")
 			if datetime.now().strftime("%H:%M") == '15:00':
-				databaseChecker()
+				logger.info("Sensor檢查任務 - 啟動")
 				sensorChecker()
+				databaseChecker()
+				print ("Sensor檢查任務 - 結束")
+				logger.info("Sensor檢查任務 - 結束")
 	return "OK"
 
 def databaseChecker():
@@ -593,8 +616,6 @@ def sensorChecker():
 		ReadLUX(checkTask=True)
 		ReadEC(checkTask=True)
 		ReadPH(checkTask=True)
-		print ("Sensor檢查任務 - 成功")
-		logger.error("Sensor檢查任務 - 成功")
 	except:
 		print ("Sensor檢查任務 - 有部分Sensor失敗")
 		logger.error("Sensor檢查任務 - 有部分Sensor失敗")
@@ -616,8 +637,6 @@ if __name__ == "__main__":
 			pass
 	elif sys.platform == "win32":
 		pass
-
-
 
 	db.init_app(app)
 	try:
