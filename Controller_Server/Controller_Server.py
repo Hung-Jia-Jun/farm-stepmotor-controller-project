@@ -200,20 +200,6 @@ def ReadLUX(checkTask=False):
 			}
 
 			print (_Data)
-			#確認Sensor存活狀態的任務
-			if checkTask == True:
-				if "Fail" in str(AtomTemperature):
-					EmailSender.Send("三合一感測器發生問題，未擷取到資料")
-					_Data = {
-						"大氣溫度" : "0",
-						"濕度" : "0",
-						"光照" : "0",
-						"二氧化碳" : "0",
-						"大氣壓力" : "0",
-					}
-					return _Data
-				else:
-					return _Data
 			LuxData = sensor_lux(
 				DateTime = str(datetime.now()) ,
 				Data = str(_Data)
@@ -223,7 +209,10 @@ def ReadLUX(checkTask=False):
 			db.session.commit()
 			return _Data
 		except:
-			EmailSender.Send("三合一感測器發生問題，未擷取到資料")
+			#確認Sensor存活狀態的任務
+			if checkTask == True:
+				EmailSender.Send("三合一感測器發生問題，未擷取到資料")
+				logger.error("Sensor檢查任務 - 三合一感測器已發Mail通知")
 			logger.error("Sensor檢查任務 - 三合一感測器發生問題，未擷取到資料")
 			_Data = {
 				"大氣溫度" : "0",
@@ -258,6 +247,7 @@ def ReadEC(checkTask=False):
 			if checkTask == True:
 				if "Fail" in str(temperature):
 					EmailSender.Send("EC電導感測器發生問題，未擷取到資料")
+					logger.error("Sensor檢查任務 - EC電導感測器已發Mail通知")
 					logger.error("Sensor檢查任務 - EC電導感測器發生問題，未擷取到資料")
 					_Data = {
 						"水溫" : "0",
@@ -278,7 +268,10 @@ def ReadEC(checkTask=False):
 			db.session.commit()
 			return _Data
 		except:
-			EmailSender.Send("EC電導感測器發生問題，未擷取到資料")
+			#確認Sensor存活狀態的任務
+			if checkTask == True:
+				EmailSender.Send("EC電導感測器發生問題，未擷取到資料")
+				logger.error("Sensor檢查任務 - EC電導感測器已發Mail通知")
 			_Data = {
 				"水溫" : "0",
 				"電導率" : "0",
@@ -306,6 +299,7 @@ def ReadPH(checkTask=False):
 				if checkTask == True:
 					if "Fail" in str(PH):
 						EmailSender.Send("PH感測器發生問題，未擷取到資料")
+						logger.error("Sensor檢查任務 - PH感測器已發Mail通知")
 						logger.error("Sensor檢查任務 - PH感測器發生問題，未擷取到資料")
 						_Data = {
 							"PH" : "0"
@@ -325,7 +319,10 @@ def ReadPH(checkTask=False):
 				db.session.commit()
 				return _Data
 		except:
-			EmailSender.Send("PH感測器發生問題，未擷取到資料")
+			#確認Sensor存活狀態的任務
+			if checkTask == True:
+				EmailSender.Send("PH感測器發生問題，未擷取到資料")
+				logger.error("Sensor檢查任務 - PH感測器已發Mail通知")
 			print (e)
 			_Data = {
 				"PH" : "0"
