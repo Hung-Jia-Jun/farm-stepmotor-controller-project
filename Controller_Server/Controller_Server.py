@@ -575,30 +575,39 @@ def runCommandList():
 @app.route("/updateMotorJob")
 #更新步進馬達的移動任務
 def updateMotorJob():
-	#依照ID排序
-	day_schedule = schedule_day_of_time.query.order_by(schedule_day_of_time.id.asc()).all()
+	nowTime = datetime.now().strftime("%H:%M")
+	logger.info("任務排程檢查時間 : " + nowTime)
+	print ("任務排程檢查時間 : " + nowTime)
+	#每日健康檢查2次
+	if nowTime == '08:00':
+		logger.info("Sensor檢查任務 - 啟動")
+		sensorChecker()
+		databaseChecker()
+		print ("Sensor檢查任務 - 結束")
+		logger.info("Sensor檢查任務 - 結束")
+	if nowTime == '15:00':
+		logger.info("Sensor檢查任務 - 啟動")
+		sensorChecker()
+		databaseChecker()
+		print ("Sensor檢查任務 - 結束")
+		logger.info("Sensor檢查任務 - 結束")
 
-	Plan_li = []
-	for ele in day_schedule:
-		if ele != None:
-			#到指定時間後，運行重複運行指令
-			if datetime.now().strftime("%H:%M") == ele.time:
-				StartSchedule_Job()
+	try:
+		#依照ID排序
+		day_schedule = schedule_day_of_time.query.order_by(schedule_day_of_time.id.asc()).all()
+
+		Plan_li = []
+		for ele in day_schedule:
+			if ele != None:
+				#到指定時間後，運行重複運行指令
+				if nowTime == ele.time:
+					StartSchedule_Job()
+		return "OK"
+	except:
+		print ("DB錯誤，無法運行馬達排程任務")
+		logger.error("DB錯誤，無法運行馬達排程任務")
+		return "OK"
 			
-			#每日健康檢查2次
-			if datetime.now().strftime("%H:%M") == '08:00':
-				logger.info("Sensor檢查任務 - 啟動")
-				sensorChecker()
-				databaseChecker()
-				print ("Sensor檢查任務 - 結束")
-				logger.info("Sensor檢查任務 - 結束")
-			if datetime.now().strftime("%H:%M") == '15:00':
-				logger.info("Sensor檢查任務 - 啟動")
-				sensorChecker()
-				databaseChecker()
-				print ("Sensor檢查任務 - 結束")
-				logger.info("Sensor檢查任務 - 結束")
-	return "OK"
 
 def databaseChecker():
 	try:
