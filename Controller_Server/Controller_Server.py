@@ -57,8 +57,8 @@ log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(line
 logFile = "/home/pii/StepMotor.log"
 
 try:
-	my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=10240, 
-									backupCount=5, encoding=None, delay=0)
+	my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=10*1024*1024, 
+									backupCount=1, encoding=None, delay=0)
 	my_handler.setFormatter(log_formatter)
 	my_handler.setLevel(logging.DEBUG)
 
@@ -532,8 +532,8 @@ def ReadLUX_Job():
 	logger.info("Start task ReadLUX_Job")
 	try:
 		ReadLUX()
-	except Exception as e:
-		logger.error(e)
+	except:
+		logger.error("Error read job")
 		pass
 	print ("End task ReadLUX_Job")
 	logger.info("End task ReadLUX_Job")
@@ -543,8 +543,8 @@ def ReadEC_Job():
 	logger.info("Start task ReadEC_Job")
 	try:
 		ReadEC()
-	except Exception as e:
-		logger.error(e)
+	except:
+		logger.error("Error read job")
 		pass
 	print ("End task ReadEC_Job")
 	logger.info("End task ReadEC_Job")
@@ -554,8 +554,8 @@ def ReadPH_Job():
 	logger.info("Start task ReadPH_Job")
 	try:
 		ReadPH()
-	except Exception as e:
-		logger.error(e)
+	except:
+		logger.error("Error read job")
 		pass
 	print ("End task ReadPH_Job")
 	logger.info("End task ReadPH_Job")
@@ -578,30 +578,33 @@ def runCommandList():
 @app.route("/updateMotorJob")
 #更新步進馬達的移動任務
 def updateMotorJob():
-	#依照ID排序
-	day_schedule = schedule_day_of_time.query.order_by(schedule_day_of_time.id.asc()).all()
+	#每日健康檢查2次
+	if datetime.now().strftime("%H:%M") == '08:00':
+		logger.info("Sensor檢查任務 - 啟動")
+		sensorChecker()
+		databaseChecker()
+		print ("Sensor檢查任務 - 結束")
+		logger.info("Sensor檢查任務 - 結束")
+	if datetime.now().strftime("%H:%M") == '15:00':
+		logger.info("Sensor檢查任務 - 啟動")
+		sensorChecker()
+		databaseChecker()
+		print ("Sensor檢查任務 - 結束")
+		logger.info("Sensor檢查任務 - 結束")
 
-	Plan_li = []
-	for ele in day_schedule:
-		if ele != None:
-			#到指定時間後，運行重複運行指令
-			if datetime.now().strftime("%H:%M") == ele.time:
-				StartSchedule_Job()
-			
-			#每日健康檢查2次
-			if datetime.now().strftime("%H:%M") == '08:00':
-				logger.info("Sensor檢查任務 - 啟動")
-				sensorChecker()
-				databaseChecker()
-				print ("Sensor檢查任務 - 結束")
-				logger.info("Sensor檢查任務 - 結束")
-			if datetime.now().strftime("%H:%M") == '15:00':
-				logger.info("Sensor檢查任務 - 啟動")
-				sensorChecker()
-				databaseChecker()
-				print ("Sensor檢查任務 - 結束")
-				logger.info("Sensor檢查任務 - 結束")
-	return "OK"
+	try:
+		#依照ID排序
+		day_schedule = schedule_day_of_time.query.order_by(schedule_day_of_time.id.asc()).all()
+
+		Plan_li = []
+		for ele in day_schedule:
+			if ele != None:
+				#到指定時間後，運行重複運行指令
+				if datetime.now().strftime("%H:%M") == ele.time:
+					StartSchedule_Job()
+		return "OK"
+	except:
+		return "only sussful running health test if on current time"
 
 def databaseChecker():
 	try:
