@@ -561,13 +561,13 @@ def updateMotorJob():
 	logger.info("任務排程檢查時間 : " + nowTime)
 	print ("任務排程檢查時間 : " + nowTime)
 	#每日健康檢查2次
-	if nowTime == '08:00':
+	if nowTime == '08:05':
 		logger.info("Sensor檢查任務 - 啟動")
 		sensorChecker()
 		databaseChecker()
 		print ("Sensor檢查任務 - 結束")
 		logger.info("Sensor檢查任務 - 結束")
-	if nowTime == '15:00':
+	if nowTime == '15:05':
 		logger.info("Sensor檢查任務 - 啟動")
 		sensorChecker()
 		databaseChecker()
