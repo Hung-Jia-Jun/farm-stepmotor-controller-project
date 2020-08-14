@@ -140,7 +140,7 @@ class FTP:
 						os.remove(self.localPictureFolderPath + image)
 					except Exception as e:
 						logging.error(e)
-				
+			os.remove(self.localPictureFolderPath + file)
 			logging.info("file removed")
 		except Exception as e:
 			logging.error("file remove error", exc_info=True)
