@@ -58,7 +58,7 @@ logFile = "/home/pii/StepMotor.log"
 
 try:
 	my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=10*1024*1024, 
-									backupCount=1, encoding=None, delay=0)
+									backupCount=5, encoding=None, delay=0)
 	my_handler.setFormatter(log_formatter)
 	my_handler.setLevel(logging.DEBUG)
 
