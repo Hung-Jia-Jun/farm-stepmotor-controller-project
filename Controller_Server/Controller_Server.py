@@ -200,20 +200,6 @@ def ReadLUX(checkTask=False):
 			}
 
 			print (_Data)
-			#確認Sensor存活狀態的任務
-			if checkTask == True:
-				if "Fail" in str(AtomTemperature):
-					EmailSender.Send("三合一感測器發生問題，未擷取到資料")
-					_Data = {
-						"大氣溫度" : "0",
-						"濕度" : "0",
-						"光照" : "0",
-						"二氧化碳" : "0",
-						"大氣壓力" : "0",
-					}
-					return _Data
-				else:
-					return _Data
 			LuxData = sensor_lux(
 				DateTime = str(datetime.now()) ,
 				Data = str(_Data)
@@ -223,7 +209,10 @@ def ReadLUX(checkTask=False):
 			db.session.commit()
 			return _Data
 		except:
-			EmailSender.Send("三合一感測器發生問題，未擷取到資料")
+			#確認Sensor存活狀態的任務
+			if checkTask == True:
+				EmailSender.Send("三合一感測器發生問題，未擷取到資料")
+				logger.error("Sensor檢查任務 - 三合一感測器已發Mail通知")
 			logger.error("Sensor檢查任務 - 三合一感測器發生問題，未擷取到資料")
 			_Data = {
 				"大氣溫度" : "0",
@@ -258,6 +247,7 @@ def ReadEC(checkTask=False):
 			if checkTask == True:
 				if "Fail" in str(temperature):
 					EmailSender.Send("EC電導感測器發生問題，未擷取到資料")
+					logger.error("Sensor檢查任務 - EC電導感測器已發Mail通知")
 					logger.error("Sensor檢查任務 - EC電導感測器發生問題，未擷取到資料")
 					_Data = {
 						"水溫" : "0",
@@ -278,7 +268,10 @@ def ReadEC(checkTask=False):
 			db.session.commit()
 			return _Data
 		except:
-			EmailSender.Send("EC電導感測器發生問題，未擷取到資料")
+			#確認Sensor存活狀態的任務
+			if checkTask == True:
+				EmailSender.Send("EC電導感測器發生問題，未擷取到資料")
+				logger.error("Sensor檢查任務 - EC電導感測器已發Mail通知")
 			_Data = {
 				"水溫" : "0",
 				"電導率" : "0",
@@ -306,6 +299,7 @@ def ReadPH(checkTask=False):
 				if checkTask == True:
 					if "Fail" in str(PH):
 						EmailSender.Send("PH感測器發生問題，未擷取到資料")
+						logger.error("Sensor檢查任務 - PH感測器已發Mail通知")
 						logger.error("Sensor檢查任務 - PH感測器發生問題，未擷取到資料")
 						_Data = {
 							"PH" : "0"
@@ -325,7 +319,10 @@ def ReadPH(checkTask=False):
 				db.session.commit()
 				return _Data
 		except:
-			EmailSender.Send("PH感測器發生問題，未擷取到資料")
+			#確認Sensor存活狀態的任務
+			if checkTask == True:
+				EmailSender.Send("PH感測器發生問題，未擷取到資料")
+				logger.error("Sensor檢查任務 - PH感測器已發Mail通知")
 			print (e)
 			_Data = {
 				"PH" : "0"
@@ -578,14 +575,17 @@ def runCommandList():
 @app.route("/updateMotorJob")
 #更新步進馬達的移動任務
 def updateMotorJob():
+	nowTime = datetime.now().strftime("%H:%M")
+	logger.info("任務排程檢查時間 : " + nowTime)
+	print ("任務排程檢查時間 : " + nowTime)
 	#每日健康檢查2次
-	if datetime.now().strftime("%H:%M") == '08:00':
+	if nowTime == '08:00':
 		logger.info("Sensor檢查任務 - 啟動")
 		sensorChecker()
 		databaseChecker()
 		print ("Sensor檢查任務 - 結束")
 		logger.info("Sensor檢查任務 - 結束")
-	if datetime.now().strftime("%H:%M") == '15:00':
+	if nowTime == '15:00':
 		logger.info("Sensor檢查任務 - 啟動")
 		sensorChecker()
 		databaseChecker()
@@ -600,11 +600,14 @@ def updateMotorJob():
 		for ele in day_schedule:
 			if ele != None:
 				#到指定時間後，運行重複運行指令
-				if datetime.now().strftime("%H:%M") == ele.time:
+				if nowTime == ele.time:
 					StartSchedule_Job()
 		return "OK"
 	except:
-		return "only sussful running health test if on current time"
+		print ("DB錯誤，無法運行馬達排程任務")
+		logger.error("DB錯誤，無法運行馬達排程任務")
+		return "OK"
+			
 
 def databaseChecker():
 	try:
