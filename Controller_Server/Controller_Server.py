@@ -222,15 +222,6 @@ def ReadLUX(checkTask=False):
 				"大氣壓力" : "0",
 			}
 			return _Data
-	elif sys.platform == "win32":
-		data = {
-					"大氣溫度" : "在windows環境無法顯示此數值",
-					"濕度" :  "在windows環境無法顯示此數值",
-					"光照" :  "在windows環境無法顯示此數值",
-					"二氧化碳" :  "在windows環境無法顯示此數值",
-					"大氣壓力" :  "在windows環境無法顯示此數值",
-				}
-		return data
 
 def ReadEC(checkTask=False):
 	if sys.platform == "linux":
@@ -277,12 +268,6 @@ def ReadEC(checkTask=False):
 				"電導率" : "0",
 			}
 			return _Data
-	elif sys.platform == "win32":
-		data = {
-				"水溫" : "在windows環境無法顯示此數值",
-				"電導率" :  "在windows環境無法顯示此數值",
-			}
-		return data
 
 def ReadPH(checkTask=False):
 	if sys.platform == "linux":
@@ -328,11 +313,6 @@ def ReadPH(checkTask=False):
 				"PH" : "0"
 			}
 			return _Data
-	elif sys.platform == "win32":
-		data = {
-			"PH" : "在windows環境無法顯示此數值"
-		}
-		return data
 
 #讀取光遮斷器數值
 @app.route("/LightControllerStatus")
