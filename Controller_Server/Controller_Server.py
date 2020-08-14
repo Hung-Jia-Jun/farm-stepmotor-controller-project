@@ -188,6 +188,12 @@ def ReadLUX(checkTask=False):
 		try:
 			time.sleep(5)
 			AtomTemperature , humidity , lux , C02 , AtmosphericPressure = RS485.ReadLUX()
+			if "Fail" in str(AtomTemperature):
+				#確認Sensor存活狀態的任務
+				if checkTask == True:
+					EmailSender.Send("三合一感測器發生問題，未擷取到資料")
+					logger.error("Sensor檢查任務 - 三合一感測器已發Mail通知")
+
 			RS485.Clear()
 			_Data = {
 				"大氣溫度" : str(AtomTemperature),
