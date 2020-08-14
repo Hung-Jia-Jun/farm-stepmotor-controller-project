@@ -134,8 +134,6 @@ def BrushlessDC_Motor():
 	if sys.platform == "linux":
 		status = Controll_ZM6405E.Run_BrushlessDC_Motor_ByInputSetNumber(TimeMinSec,direction)
 		return str(status)
-	elif sys.platform == "win32":
-		return "在windows環境無法顯示此數值"
 
 
 
@@ -352,8 +350,6 @@ def LightControllerStatus():
 			status["ZeroSensor2"] = True
 
 		return json.dumps(status)
-	elif sys.platform == "win32":
-		return "在windows環境無法顯示此數值"
 
 #將兩顆步進馬達設定到指定的位置
 def SetPoint(TargetX,TargetY):
