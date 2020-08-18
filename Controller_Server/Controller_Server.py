@@ -208,9 +208,13 @@ def ReadLUX(checkTask=False):
 				DateTime = str(datetime.now()) ,
 				Data = str(_Data)
 			)
+			try:
+				db.session.add(LuxData)
+				db.session.commit()
+			except:
+				print ("DB發生問題，無法讀寫內容")
+				logger.error("DB發生問題，無法讀寫內容")
 
-			db.session.add(LuxData)
-			db.session.commit()
 			return _Data
 		except:
 			#確認Sensor存活狀態的任務
@@ -259,8 +263,13 @@ def ReadEC(checkTask=False):
 				Data = str(_Data)
 			)
 
-			db.session.add(ECData)
-			db.session.commit()
+			try:
+				db.session.add(ECData)
+				db.session.commit()
+			except:
+				print ("DB發生問題，無法讀寫內容")
+				logger.error("DB發生問題，無法讀寫內容")
+				
 			return _Data
 		except:
 			#確認Sensor存活狀態的任務
@@ -304,8 +313,12 @@ def ReadPH(checkTask=False):
 					Data = str(_Data)
 				)
 
-				db.session.add(PHData)
-				db.session.commit()
+				try:
+					db.session.add(PHData)
+					db.session.commit()
+				except:
+					print ("DB發生問題，無法讀寫內容")
+					logger.error("DB發生問題，無法讀寫內容")
 				return _Data
 		except:
 			#確認Sensor存活狀態的任務
