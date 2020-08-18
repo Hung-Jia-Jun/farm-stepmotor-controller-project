@@ -106,6 +106,8 @@ class MVSControll:
 
 		self.ret = self.cam.MV_CC_SetEnumValue("GainAuto",2)
 
+		self.ret = self.cam.MV_CC_SetEnumValue("BalanceWhiteAuto",0)
+
 		self.ret = self.cam.MV_CC_SetEnumValue("GammaSelector",2)
 		
 		self.ret = self.cam.MV_CC_SetFloatValue("Gain", 20.03)

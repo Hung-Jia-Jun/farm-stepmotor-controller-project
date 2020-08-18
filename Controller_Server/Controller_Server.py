@@ -611,7 +611,7 @@ def databaseChecker():
 		print ("DB發生問題，無法讀寫內容")
 		logger.error("DB發生問題，無法讀寫內容")
 		EmailSender.Send("DB發生問題，無法讀寫內容")
-
+		logger.info("DB檢查任務 - 已發DB錯誤的Mail通知")
 def sensorChecker():
 	try:
 		ReadLUX(checkTask=True)
