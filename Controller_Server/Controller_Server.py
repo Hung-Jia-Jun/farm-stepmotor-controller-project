@@ -57,7 +57,7 @@ log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(line
 logFile = "/home/pii/StepMotor.log"
 
 try:
-	my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=10*1024*1024, 
+	my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=500*1024*1024, 
 									backupCount=5, encoding=None, delay=0)
 	my_handler.setFormatter(log_formatter)
 	my_handler.setLevel(logging.DEBUG)
@@ -649,7 +649,7 @@ if __name__ == "__main__":
 		
 	#檢查Sensor
 	sensorChecker()
-	
+
 	print (__name__ , "db.create_all")
 	#啟動Server後，先鎖定煞車，後放鬆馬達出力
 	Controll_2MD4850.InitMotor()
