@@ -647,7 +647,9 @@ if __name__ == "__main__":
 		logger.error("DB發生問題，無法讀寫內容")
 		EmailSender.Send("DB發生問題，無法讀寫內容")
 		
-		
+	#檢查Sensor
+	sensorChecker()
+	
 	print (__name__ , "db.create_all")
 	#啟動Server後，先鎖定煞車，後放鬆馬達出力
 	Controll_2MD4850.InitMotor()
