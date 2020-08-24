@@ -162,10 +162,10 @@ class StepMotorControll:
        
         #依照次數與脈衝寬度與頻率控制步進馬達
         for i in range(int(Pulse_Count)):
-            logger.debug(str(i) + ".   PUL = " + str(PUL) + str(" : GPIO.HIGH"))
+            # logger.debug(str(i) + ".   PUL = " + str(PUL) + str(" : GPIO.HIGH"))
             GPIO.output(PUL, GPIO.HIGH)
             time.sleep(HighDutyTime)
-            logger.debug("PUL = " + str(PUL) + str(" : GPIO.LOW"))
+            # logger.debug("PUL = " + str(PUL) + str(" : GPIO.LOW"))
             GPIO.output(PUL, GPIO.LOW)
             time.sleep(LowDutyTime)
             
