@@ -368,7 +368,8 @@ def TakePic_event(msg):
 		#等確定上傳後，去下載剛剛上傳的檔案，並轉成base64
 		ftp = ftplib.FTP(FTP_IP)
 		ftp.login(FTPUsername, FTPPassword)
-		last_file = ftp.nlst(remoteFolderPath)[-1]
+		last_file = sorted(ftp.nlst(remoteFolderPath))[-1]
+		print (last_file)
 		bufsize=1024
 		fp = open(os.getcwd()+ "/" + filename,'wb')  
 		ftp.retrbinary('RETR ' + last_file, fp.write, bufsize)
