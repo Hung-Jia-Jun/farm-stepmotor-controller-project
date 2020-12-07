@@ -27,3 +27,9 @@
 
 # Web Console page
 ![](https://i.imgur.com/ECX5wnx.png)
+
+# Enterprise cooperation case
+https://farmingonline.com.tw/
+
+# Video introduction
+https://www.facebook.com/watch/?v=1832738763438053
