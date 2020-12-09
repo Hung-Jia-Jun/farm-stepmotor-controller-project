@@ -183,6 +183,23 @@ function showCommandList()
 			pagination:false
 			
 	});
+	var rows = []
+	for (var i = 0; i < 10; i++) {
+		rows.push({
+		  Id: i,
+		  PositionX: 'test' + (i),
+		  PositionY: '$' + (i),
+		  _data:({
+			"toggle":"collapse",
+			"parent": "#commandTable",
+			"target": "#GPIO_Status",
+			"href":"#GPIO_Status",
+			})
+
+		})
+	  }
+	$('#commandTable').bootstrapTable('append', rows);
+	
 
 	$.get(Console_ServerURL + "/queryCommandList",
 		function(data) {
@@ -216,6 +233,8 @@ function showPlanList()
 			align:'center'
 		}, 
 	];
+	
+
 	$('#Schedule_table').bootstrapTable('destroy')
 	$('#Schedule_table').bootstrapTable({  
 			toolbar:"#toolbar",  
@@ -224,6 +243,16 @@ function showPlanList()
 			checkbox:"true",
 			pagination:false
 	});
+
+	var rows = []
+	for (var i = 0; i < 10; i++) {
+		rows.push({
+		  Id: i,
+		  Time: 'testTime:' + (i),
+		})
+	  }
+	$('#Schedule_table').bootstrapTable('append', rows);
+
 	$.get(Console_ServerURL + "/queryPlanList",
 		function(data) {
 			var commandList = JSON.parse(data);
