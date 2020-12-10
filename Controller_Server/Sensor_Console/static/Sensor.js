@@ -180,22 +180,18 @@ function showCommandList()
 			columns: columns, 
 			uniqueId:'Id',
 			checkbox:"true",
-			pagination:false
-			
+			pagination:false,
+			onClickRow: function (row, $element, field) {
+				//顯示GPIO功能列表
+				showGPIOList();
+			}
 	});
 	var rows = []
 	for (var i = 0; i < 10; i++) {
 		rows.push({
-		  Id: i,
-		  PositionX: 'test' + (i),
-		  PositionY: '$' + (i),
-		  _data:({
-			"toggle":"collapse",
-			"parent": "#commandTable",
-			"target": "#GPIO_Status",
-			"href":"#GPIO_Status",
-			})
-
+			Id: i,
+			PositionX: 'test' + (i),
+			PositionY: '$' + (i),
 		})
 	  }
 	$('#commandTable').bootstrapTable('append', rows);
@@ -216,8 +212,50 @@ function showCommandList()
 		}
 	);
 	
+	
 }
+function showGPIOList() 
+{
+	//$("#delayTime").val("00:01:00");
+	//$("#runTime").val("00:01:00");
 
+	
+	
+	var columns = [
+		{
+			field: 'Id',
+			title: 'Id',
+			align: 'center'
+		},
+		{
+			field: 'Pin',
+			title: 'Pin',
+			align: 'center'
+		}
+	];
+	$('#GPIO_Pin').bootstrapTable('destroy')
+	$('#GPIO_Pin').bootstrapTable({
+		toolbar: "#toolbar",
+		columns: columns,
+		uniqueId: 'Id',
+		checkbox: "false",
+	});
+
+	var rows = []
+	for (var i = 0; i < 9; i++) {
+		rows.push({
+			Id : i,
+			Pin: i,
+		})
+	}
+	$('#GPIO_Pin').bootstrapTable('append', rows);
+	$('#GPIO_Pin').bootstrapTable('uncheckAll');
+	$('#GPIO_Pin')
+	var GPIO_List = document.getElementById("GPIO_Pin").getElementsByTagName("tr");
+	GPIO_List.forEach(element => {
+		element.removeAttribute("class");
+	});
+}
 //顯示定時運行指令
 function showPlanList()
 {	
@@ -504,6 +542,8 @@ $(document).ready(function(){
 		locale: moment.locale('zh-tw')
 	});
 
+	//註冊按鈕點擊function
+	document.getElementById("refreshGPIO").addEventListener("click",showGPIOList());
 
 	//顯示命令列表
 	showCommandList();
