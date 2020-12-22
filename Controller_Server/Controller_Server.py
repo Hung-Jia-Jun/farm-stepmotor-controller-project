@@ -18,6 +18,8 @@ from logging.handlers import RotatingFileHandler
 import os
 import EmailSender
 
+#GPIO 控制
+import Controll_GPIO
 
 if sys.platform == "linux":
 	#光遮斷器
@@ -31,6 +33,8 @@ if sys.platform == "linux":
 
 	#步進馬達
 	import Controll_2MD4850
+
+
 elif sys.platform == "win32":
 	pass
 
@@ -92,6 +96,7 @@ class schedule(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	PositionX = db.Column(db.Integer)
 	PositionY = db.Column(db.Integer)
+	GPIO_uid = db.Column(db.Integer, db.ForeignKey('GPIO.id'), nullable=True)
 
 class schedule_day_of_time(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -120,6 +125,14 @@ class sensor_ph(db.Model):
 	def __init__(self, DateTime, Data):
 		self.DateTime = DateTime
 		self.Data = Data
+
+class GPIO(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	update_time = db.Column(db.DateTime)
+	GPIO_Open = db.Column(db.String(255))
+	#延遲時間
+	delayTime = db.Column(db.Float)
+	TakePic = db.Column(db.Boolean, unique=False, default=False)
 #------------------------------------------------------------------------------------------------------
 
 
@@ -500,6 +513,14 @@ def SetPoint(TargetX,TargetY):
 		}
 		return parameterEcho
 
+#啟動資料庫記錄的GPIO
+def ActiveGPIO(PinOpenLi,durationTime):
+	#GPIO 控制
+	Controll = Controll_GPIO.Controll()
+	#啟動GPIO,並且一段時間後停止
+	Controll.OpenGPIO(PinOpenLi,durationTime)
+	return "OK"
+
 def GetJetsonIP():
 	try:
 		configIP = config.query.filter_by(
@@ -558,6 +579,16 @@ def StartSchedule_Job():
 	scheduleLi = schedule.query.order_by(schedule.id.asc()).all()
 	for ele in scheduleLi:
 		logger.info("Start Schedule Job: (" +str(ele.PositionX) + "," +str(ele.PositionY) + ")")
+		#找到這次要開啟的GPIO列表
+		GPIOCommand = GPIO.query.filter_by(id = ele.GPIO_uid).first()
+		
+		#切分準備要開啟的GPIO列表
+		GPIO_OpenLi = GPIOCommand.split(",")
+		ActiveGPIO(GPIO_OpenLi)
+
+		#延遲一段時間後才開始移動
+		time.sleep(GPIOCommand.delayTime)
+		#GPIO運行結束後，才會進行移動任務
 		SetPoint(ele.PositionX,ele.PositionY)
 
 #立即運行剛剛設定的指令

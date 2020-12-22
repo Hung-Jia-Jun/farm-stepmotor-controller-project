@@ -249,7 +249,9 @@ function showGPIOList(id)
 		var GPIO_Detail = JSON.parse(data);
 		GPIO_OpenList = GPIO_Detail.GPIO_Open.split(',');
 		var rows = []
-		for (var i = 0; i < 9; i++) {
+		
+		//共八個GPIO
+		for (var i = 0; i < 8; i++) {
 			rows.push({
 				Id: i,
 				Pin: i,

@@ -1,10 +1,35 @@
 [
 	{
-		"path": "$ROOTPATH$/Controller_Server/Sensor_Console/static/Sensor.js",
+		"path": "$ROOTPATH$/Controller_Server/Sensor_Console/Console_Server.py",
 		"bookmarks": [
 			{
-				"line": 292,
-				"column": 16,
+				"line": 65,
+				"column": 0,
+				"label": ""
+			}
+		]
+	},
+	{
+		"path": "$ROOTPATH$/Controller_Server/Controller_Server.py",
+		"bookmarks": [
+			{
+				"line": 516,
+				"column": 1,
+				"label": ""
+			},
+			{
+				"line": 577,
+				"column": 1,
+				"label": ""
+			}
+		]
+	},
+	{
+		"path": "$ROOTPATH$/Controller_Server/Controll_GPIO.py",
+		"bookmarks": [
+			{
+				"line": 29,
+				"column": 10,
 				"label": ""
 			}
 		]
