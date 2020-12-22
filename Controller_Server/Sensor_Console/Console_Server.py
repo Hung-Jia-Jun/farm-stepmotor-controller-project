@@ -38,10 +38,10 @@ JetsonNanoIP = config.get('Setting','JetsonNanoIP')
 app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://'+DBusername+':'+DBpassword+'@'+DatabaseIP+':3306/sensordb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://'+DBusername+':'+DBpassword+'@'+DatabaseIP+':3306/sensordb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
-
+db.init_app(app)
 
 
 
@@ -63,7 +63,7 @@ class schedule(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	PositionX = db.Column(db.Integer)
 	PositionY = db.Column(db.Integer)
-
+	GPIO_uid = db.Column(db.Integer, db.ForeignKey('GPIO.id'), nullable=True)
 class schedule_day_of_time(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	time = db.Column(db.String)
@@ -91,6 +91,14 @@ class sensor_ph(db.Model):
 	def __init__(self, DateTime, Data):
 		self.DateTime = DateTime
 		self.Data = Data
+
+class GPIO(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	update_time = db.Column(db.DateTime)
+	GPIO_Open = db.Column(db.String(255))
+	#延遲時間
+	delayTime = db.Column(db.Float)
+	TakePic = db.Column(db.Boolean, unique=False, default=False)
 #------------------------------------------------------------------------------------------------------
 
 #簡易版網頁
@@ -143,14 +151,70 @@ def saveMotorCommand():
 
 	#座標位置 Y
 	_PositionY = request.args.get('PositionY')
+	
+	#因為一定要綁定一個 GPIO設定檔，所以要先創建一個空的
+	GPIOCommand = GPIO(
+			GPIO_Open = "",
+			TakePic = True,
+			delayTime = 0,
+			update_time = datetime.now()
+		)
+		
+	db.session.add(GPIOCommand)
+	db.session.commit()
 
 	scheduleCommand = schedule(PositionX = int(_PositionX),
 								PositionY = int(_PositionY),
+								GPIO_uid = GPIOCommand.id,
 								)
 	 
 	db.session.add(scheduleCommand)
 	db.session.commit()
 	return "OK"
+#--------------------運行排程時的GPIO設定跟此次任務是否要拍照----------------------------------------------------------------------
+#新增GPIO指令
+@app.route("/saveGPIOAndTakePic")
+def saveGPIOAndTakePic():
+	#此次座標移動指令的ID
+	_positionId = request.args.get('positionId')
+	#新增GPIO指令
+	_GPIO_Open = request.args.get('GPIO_Open')
+	_TakePic = request.args.get('TakePic')
+	_delayTime = request.args.get('delayTime')
+	#js 過來的 true 要全小寫,python 的True要首字大寫
+	if _TakePic == "true":
+		_TakePic = True
+	elif _TakePic == "false":
+		_TakePic = False
+
+	positionTask = schedule.query.filter_by(id=_positionId).first()
+	GPIOCommand = GPIO.query.filter_by(id = positionTask.GPIO_uid).first()
+	GPIOCommand.GPIO_Open = _GPIO_Open
+	GPIOCommand.TakePic = bool(_TakePic)
+	GPIOCommand.delayTime = int(_delayTime)
+	GPIOCommand.update_time = datetime.now()
+	 
+	db.session.add(GPIOCommand)
+	db.session.commit()
+	return "OK"
+
+#讀取這次移動任務的GPIO指令
+@app.route("/queryGPIOAndTakePic")
+def queryGPIOAndTakePic():
+	#從移動位置的ID去查資料表，找到關於這個移動位置所需要的GPIO詳細移動資訊
+	_positionId = request.args.get('positionId')
+	GPIO_schedule = schedule.query.filter_by(id=_positionId).first()
+	Command = GPIO.query.filter_by(id=GPIO_schedule.GPIO_uid).first()
+	GPIO_command = {
+				'id':Command.id,
+				'GPIO_Open' : Command.GPIO_Open,
+				'TakePic' : Command.TakePic,
+				'delayTime':Command.delayTime,
+			}
+	return json.dumps(GPIO_command)
+#--------------------運行排程時的GPIO設定跟此次任務是否要拍照----------------------------------------------------------------------
+
+
 
 #--------------------定時運行排程----------------------------------------------------------------------
 #新增定時運行排程

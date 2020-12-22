@@ -9,7 +9,9 @@
 	-webkit-animation: spin 2s linear infinite; /* Safari */
 	animation: spin 2s linear infinite;
 	}
-
+	#table-row, #table-col, #table-wrapper {
+		height: 80%;
+	}
 	/* Safari */
 	@-webkit-keyframes spin {
 	0% { -webkit-transform: rotate(0deg); }
@@ -124,16 +126,32 @@
 			</div>
 		</div>
 		<div style="height: 10px;" class="row"></div>
-		<div class="row">
-			<div class="col-md-6 table-responsive">
+		<div class="row" style="height:120%">
+			<div class="col-md-6 table-responsive" style="height:150%">
 				<table class="table table-responsive-md" id="commandTable">
 					<thead>
 						<tr>
 							<th data-checkbox="true"></th>
 						</tr>
 					</thead>
-				
 				</table>
+				<div style="height: 30px;" class="row"></div>
+				<div style="height: 30px;" class="row">
+					<div class="col-md-12">
+						<h6 id="saveCommandRunResult">運行結果 :</h6>
+					</div>
+				</div>
+				<div style="height: 10px;" class="row">
+					<div class="col-md-3">
+						<button onclick="showCommandList();" type="button" class="btn btn-primary">更新列表</button>  
+					</div>
+					<div class="col-md-4">
+						<button onclick="deleteCommandList();" type="button" class="btn btn-danger">刪除已選指令</button>  
+					</div>
+					<div class="col-md-2">
+						<button onclick="runCommandList();" type="button" class="btn btn-warning">立即運行重複指令</button>  
+					</div>
+				</div>
 			</div>
 			<div class="col-md-6">
 				<div class="row">
@@ -148,35 +166,20 @@
 					</div>
 				</div>
 				<div class="row">
-					<div style="height: 10px;" class="row"></div>
+					<div style="height: 15px;" class="row"></div>
 					<div class="row">
 						<div class="col-md-12">
-							<h12 class="col-md-5">延遲起始時間：</h12>
-							<input type="number" class="form-control col-md-2" id="delayTime_mm" placeholder="分">
-							<div class="col-md-1">
-								<h10>:</h10>
-							</div>
-							<input type="number" class="form-control col-md-2" id="delayTime_ss" placeholder="秒">
+							<h12 class="col-md-push-1 col-md-5">延遲起始時間：</h12>
+							<input type="number" class="col-md-push-1 form-control col-md-3" id="delayTime_ss" placeholder="秒">
 						</div>
 					</div>
 					<div style="height: 10px;" class="row"></div>
-					<div class="row">
-						<div class="col-md-12">
-							<h12 class="col-md-5">執行時間：</h12>
-							<input type="number" class="form-control col-md-2" id="runningTime_mm" placeholder="分">
-							<div class="col-md-1">
-								<h10>:</h10>
-							</div>
-							<input type="number" class="form-control col-md-2" id="runningTime_ss" placeholder="秒">
-						</div>
-					</div>
-
 				</div>
 				<div style="height: 10px;" class="row"></div>
 				<div class="row">
 					<div class="row">
 						<div class="col-md-12">
-							<input class="form-check-input col-md-1 col-md-push-1" type="checkbox" value="" id="defaultCheck1">
+							<input class="form-check-input col-md-1 col-md-push-1" type="checkbox" value="" id="TakePic">
 							<h12 class="col-md-11 col-md-push-1">此次運行是否要拍照</h12>
 						</div>
 						<div class="col-md-5">
@@ -186,30 +189,19 @@
 				<div style="height: 10px;" class="row"></div>
 				<div class="row">
 					<div class="col-md-5">
-						<button id = "refreshGPIO" type="button" class="btn btn-primary">儲存GPIO設定</button>  
+						<button id = "saveGPIOSetting" type="button" class="btn btn-primary">儲存GPIO設定</button>  
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<h12 id="GPIO_RunningStatus">運行結果：</h12>
 					</div>
 				</div>
 				<div style="height: 10px;" class="row"></div>
 			</div>
 		</div>
 			
-		<div style="height: 30px;" class="row"></div>
-		<div style="height: 30px;" class="row">
-			<div class="col-md-12">
-				<h6 id="saveCommandRunResult">運行結果 :</h6>
-			</div>
-		</div>
-		<div style="height: 10px;" class="row">
-			<div class="col-md-2">
-				<button onclick="showCommandList();" type="button" class="btn btn-primary">更新列表</button>  
-			</div>
-			<div class="col-md-2">
-				<button onclick="deleteCommandList();" type="button" class="btn btn-danger">刪除已選指令</button>  
-			</div>
-			<div class="col-md-2">
-				<button onclick="runCommandList();" type="button" class="btn btn-warning">立即運行重複指令</button>  
-			</div>
-		</div>
+		
 	</div>
 
 	<div class="col-md-4">

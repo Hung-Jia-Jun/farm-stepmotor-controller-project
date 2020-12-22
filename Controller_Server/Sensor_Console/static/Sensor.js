@@ -183,18 +183,20 @@ function showCommandList()
 			pagination:false,
 			onClickRow: function (row, $element, field) {
 				//顯示GPIO功能列表
-				showGPIOList();
+				showGPIOList(row.id);
 			}
 	});
-	var rows = []
-	for (var i = 0; i < 10; i++) {
-		rows.push({
-			Id: i,
-			PositionX: 'test' + (i),
-			PositionY: '$' + (i),
-		})
-	  }
-	$('#commandTable').bootstrapTable('append', rows);
+
+	//dummy data
+	// var rows = []
+	// for (var i = 0; i < 10; i++) {
+	// 	rows.push({
+	// 		Id: i,
+	// 		PositionX: 'test' + (i),
+	// 		PositionY: '$' + (i),
+	// 	})
+	//   }
+	// $('#commandTable').bootstrapTable('append', rows);
 	
 
 	$.get(Console_ServerURL + "/queryCommandList",
@@ -214,13 +216,12 @@ function showCommandList()
 	
 	
 }
-function showGPIOList() 
-{
-	//$("#delayTime").val("00:01:00");
-	//$("#runTime").val("00:01:00");
 
-	
-	
+var nowSelectPositionID;
+function showGPIOList(id) 
+{
+	//儲存現在正在被選擇的點位ID
+	nowSelectPositionID = id;
 	var columns = [
 		{
 			field: 'Id',
@@ -241,20 +242,63 @@ function showGPIOList()
 		checkbox: "false",
 	});
 
-	var rows = []
-	for (var i = 0; i < 9; i++) {
-		rows.push({
-			Id : i,
-			Pin: i,
-		})
-	}
-	$('#GPIO_Pin').bootstrapTable('append', rows);
-	$('#GPIO_Pin').bootstrapTable('uncheckAll');
-	$('#GPIO_Pin')
-	var GPIO_List = document.getElementById("GPIO_Pin").getElementsByTagName("tr");
-	GPIO_List.forEach(element => {
-		element.removeAttribute("class");
+	
+	$.get(Console_ServerURL + "/queryGPIOAndTakePic",
+	{ positionId: id },
+	function (data) {
+		var GPIO_Detail = JSON.parse(data);
+		GPIO_OpenList = GPIO_Detail.GPIO_Open.split(',');
+		var rows = []
+		for (var i = 0; i < 9; i++) {
+			rows.push({
+				Id: i,
+				Pin: i,
+				checked: true,
+			})
+		}
+		$('#GPIO_Pin').bootstrapTable('append', rows);
+		$('#GPIO_Pin').bootstrapTable('uncheckAll');
+		var GPIO_List = document.getElementById("GPIO_Pin").getElementsByTagName("tr");
+		GPIO_List.forEach(element => {
+			element.removeAttribute("class");
+		});
+		//如果這個GPIO被選中，那就讓他在介面上面顯示為true
+		GPIO_OpenList.forEach(element => {
+			if (element != "")
+			{
+				$('#GPIO_Pin').bootstrapTable('check', parseInt(element));
+			}
+		});
+		document.getElementById("TakePic").checked = GPIO_Detail.TakePic;
+		document.getElementById("delayTime_ss").value = GPIO_Detail.delayTime;
+		}
+	);
+}
+
+//儲存GPIO設定
+function saveGPIOList()
+{
+	var Selections = $('#GPIO_Pin').bootstrapTable('getSelections');
+	document.getElementById("GPIO_RunningStatus").innerText = "運行結果 : 上傳GPIO設定中...";
+	var Pin_Open = "";
+	Selections.forEach(element => {
+		console.log(element.Pin);
+		Pin_Open += (element.Pin).toString() + ",";
 	});
+	_delayTime = document.getElementById("delayTime_ss").value;
+	var _TakePic = document.getElementById("TakePic").checked;
+	$.get(Console_ServerURL + "/saveGPIOAndTakePic",
+		{
+			GPIO_Open: Pin_Open,
+			TakePic: _TakePic,
+			delayTime: _delayTime,
+			positionId: nowSelectPositionID.toString()
+		},
+		function (data) {
+			document.getElementById("GPIO_RunningStatus").innerText = "運行結果 : OK !"
+			showPlanList();
+		}
+	);
 }
 //顯示定時運行指令
 function showPlanList()
@@ -281,15 +325,16 @@ function showPlanList()
 			checkbox:"true",
 			pagination:false
 	});
-
-	var rows = []
-	for (var i = 0; i < 10; i++) {
-		rows.push({
-		  Id: i,
-		  Time: 'testTime:' + (i),
-		})
-	  }
-	$('#Schedule_table').bootstrapTable('append', rows);
+	
+	//dummy data
+	// var rows = []
+	// for (var i = 0; i < 10; i++) {
+	// 	rows.push({
+	// 	  Id: i,
+	// 	  Time: 'testTime:' + (i),
+	// 	})
+	//   }
+	// $('#Schedule_table').bootstrapTable('append', rows);
 
 	$.get(Console_ServerURL + "/queryPlanList",
 		function(data) {
@@ -543,7 +588,7 @@ $(document).ready(function(){
 	});
 
 	//註冊按鈕點擊function
-	document.getElementById("refreshGPIO").addEventListener("click",showGPIOList());
+	document.getElementById("saveGPIOSetting").addEventListener("click",saveGPIOList);
 
 	//顯示命令列表
 	showCommandList();
