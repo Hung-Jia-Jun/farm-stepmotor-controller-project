@@ -492,7 +492,35 @@ function TestRunStep()
 		}
 	);
 }
+function saveContinueAnywayEvent()
+{
+	//取得現在這顆按鈕的狀態
+	ContinueAnyway_status = document.getElementById("isContinueAnyway").checked;
+	document.getElementById("saveCommandRunResult").innerText = "運行結果 : 上傳中..."
+	$.get(Console_ServerURL + "/saveContinueAnywayStatus",
+		{status : ContinueAnyway_status},
+		function(data) {
+			document.getElementById("saveCommandRunResult").innerText = "運行結果 : OK !"
+		}
+	);
+}
 
+//取得是否要強制執行的status
+function getContinueAnywayStatus()
+{
+	$.get(Console_ServerURL + "/queryContinueAnywayStatus",
+		function(data) {
+			if (data == "false")
+			{
+				$('#isContinueAnyway').bootstrapToggle('off');
+			}
+			else
+			{
+				$('#isContinueAnyway').bootstrapToggle('on');
+			}
+		}
+	);
+}
 //儲存距離與馬達運行時間比例的修改結果
 function UpdateDistanceOfTimeProportion(_SettingMotorNumber)
 {
@@ -591,7 +619,7 @@ $(document).ready(function(){
 
 	//註冊按鈕點擊function
 	document.getElementById("saveGPIOSetting").addEventListener("click",saveGPIOList);
-
+	
 	//顯示命令列表
 	showCommandList();
 
@@ -603,6 +631,9 @@ $(document).ready(function(){
 
 	//顯示所有排程列表
 	showPlanList();
-
+	
+	//取得要不要強制執行的status,並改變checkbox的狀態
+	getContinueAnywayStatus();
+	
 	getJetsonNanoIP();
 });

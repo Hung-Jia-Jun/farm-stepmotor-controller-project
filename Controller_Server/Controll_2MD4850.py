@@ -4,7 +4,7 @@ import pdb
 import Controll_input
 import logging
 from logging.handlers import RotatingFileHandler
-
+from datetime import datetime
 # logging.basicConfig(filename="/home/pii/StepMotor.log", filemode="w", format="%(asctime)s %(name)s:%(levelname)s:%(message)s", datefmt="%d-%M-%Y %H:%M:%S", level=logging.DEBUG)
     
 
@@ -80,6 +80,10 @@ class StepMotorControll:
     def SetPointToMove(self,nowPosition,TargetPosition,Pulse_Count,Distance):
         #算出目前座標點與目標點差距多少
         diffPosition = TargetPosition - nowPosition
+
+        #儲存預計要移動的目標座標，等要Run的時候，就可以下判斷
+        #判斷移動2分鐘後還是沒有碰到限位開關的時候要發信
+        self.TargetPosition = TargetPosition
 
         MoveClockwise = 0
         if diffPosition > 0:
@@ -159,7 +163,13 @@ class StepMotorControll:
         logger.debug("Pulse_Count : " + str(Pulse_Count))
         logger.debug("HighDutyTime : " + str(HighDutyTime))
         logger.debug("LowDutyTime : " + str(LowDutyTime))
-       
+
+        #馬達啟動時間
+        startTime = None
+        endTime = None
+        #歸零復位模式，如果兩分鐘沒有成功復位，那就停止此次任務
+        if self.TargetPosition < 0:
+            startTime = datetime.now()
         #依照次數與脈衝寬度與頻率控制步進馬達
         for i in range(int(Pulse_Count)):
             # logger.debug(str(i) + ".   PUL = " + str(PUL) + str(" : GPIO.HIGH"))
@@ -195,6 +205,17 @@ class StepMotorControll:
                             #Enable = GPIO.LOW (低電壓為啟動) 高電壓為ENA disable 
                             GPIO.output(ENA, GPIO.HIGH)
                             return "X axis zero point sensor trigger"
+                        else:
+                            #歸零復位模式，如果兩分鐘沒有成功復位，那就停止此次任務
+                            if self.TargetPosition < 0:
+                                endTime = datetime.now()
+                                #取時間差，當>2分鐘的時候，就發信警告
+                                diffTime = endTime - startTime
+                                if diffTime.seconds > 120:
+                                    startTime = None
+                                    endTime = None
+                                    logger.warning("Running X axis back to zero point task ,  but over 2 min still not trigger")
+                                    return  "Running X axis back to zero point task ,  but over 2 min still not trigger"
                     if self.MotorNumber == "B":
                         #零點開關偵測
                         if Controll_input.ReturnSensorStatus(ZeroSensor2):
@@ -208,12 +229,24 @@ class StepMotorControll:
                             GPIO.output(ENA, GPIO.HIGH)
                             
                             return "Y axis zero point sensor trigger"
+                        else:
+                            #歸零復位模式，如果兩分鐘沒有成功復位，那就停止此次任務
+                            if self.TargetPosition < 0:
+                                endTime = datetime.now()
+                                #取時間差，當>2分鐘的時候，就發信警告
+                                diffTime = endTime - startTime
+                                if diffTime.seconds > 120:
+                                    startTime = None
+                                    endTime = None
+                                    logger.warning("Running Y axis back to zero point task ,  but over 2 min still not trigger")
+                                    return  "Running Y axis back to zero point task ,  but over 2 min still not trigger"
                     
 
 
 
         logger.info("Disable ENA = "+str(ENA)+"  GPIO.HIGH")
-        #Enable開關要關閉，不然長時間運行馬達會過熱
+        #Enable開關要關閉
+        # ，不然長時間運行馬達會過熱
         #Enable = GPIO.LOW (低電壓為啟動)
         GPIO.output(ENA, GPIO.HIGH)
         logger.info("---------------------------------------------------------")

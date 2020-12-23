@@ -382,7 +382,6 @@ def LightControllerStatus():
 			status["ZeroSensor2"] = True
 
 		return json.dumps(status)
-
 #將兩顆步進馬達設定到指定的位置
 def SetPoint(TargetX,TargetY):
 	#讀取資料庫設定檔
@@ -453,7 +452,12 @@ def SetPoint(TargetX,TargetY):
 		if "axis zero point sensor trigger" in status_A:
 			MotroCurrentPostion_A.value = 0
 
-
+		#在倒退運行的時候，連續運行2分鐘，但都沒碰到限位開關
+		#那就發mail通知
+		if "Running X axis back to zero point task ,  but over 2 min still not trigger" in status_A:
+			EmailSender.Send("歸零任務發生問題，請檢查X軸馬達位置")
+			#回到原點這件事發生錯誤
+			return "An error occurred when returning to the origin"
 
 		#-------------------------步進馬達 B ----------------------------------
 		#Z軸要放開煞車
@@ -491,7 +495,13 @@ def SetPoint(TargetX,TargetY):
 		#碰到零點感測器就表示已經回0了
 		if "axis zero point sensor trigger" in status_B:
 			MotroCurrentPostion_B.value = 0
-		
+
+		#在倒退運行的時候，連續運行2分鐘，但都沒碰到限位開關
+		#那就發mail通知
+		if "Running Y axis back to zero point task ,  but over 2 min still not trigger" in status_A:
+			EmailSender.Send("歸零任務發生問題，請檢查Y軸馬達位置")
+			return "An error occurred when returning to the origin"
+
 		db.session.commit()
 
 		#回原點歸零的那個任務不拍照
@@ -588,8 +598,19 @@ def StartSchedule_Job():
 
 		#延遲一段時間後才開始移動
 		time.sleep(GPIOCommand.delayTime)
+
+		
 		#GPIO運行結束後，才會進行移動任務
-		SetPoint(ele.PositionX,ele.PositionY)
+		result = SetPoint(ele.PositionX,ele.PositionY)
+		#當偵測到回原點這件事情發生錯誤
+		#就略過之後所有的任務
+		if result == "An error occurred when returning to the origin":
+			isContinueAnyway = config.query.filter_by(config_key='continueAnyway').first().value
+			
+			#不要強制執行的話為 0
+			#這樣這個任務就會停下來了
+			if isContinueAnyway == 0:
+				return "An error occurred when returning to the origin"
 
 #立即運行剛剛設定的指令
 @app.route("/runCommandList")

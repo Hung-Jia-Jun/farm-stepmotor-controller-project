@@ -128,7 +128,6 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
-bookmarks.json
 # Pyre type checker
 .pyre/
 
@@ -142,3 +141,4 @@ bookmarks.json
 
 # Cython debug symbols
 cython_debug/
+.vscode/bookmarks.json

@@ -246,7 +246,36 @@ def queryPlanList():
 			}
 			Plan_li.append(json.dumps(schedulePlan))
 	return json.dumps(Plan_li)
+#--------------------定時運行排程----------------------------------------------------------------------
 
+@app.route("/saveContinueAnywayStatus")
+def saveContinueAnywayStatus():
+	#儲存要不要強制執行任務的值
+	_status = request.args.get('status')
+	ContinueAnywayStatus = config.query.filter_by(
+		config_key='continueAnyway').first()
+	_status = _status.lower()
+	if _status == "false":
+		_status = False
+	elif _status == "true":
+		_status = True
+	ContinueAnywayStatus.value = _status
+	db.session.commit()
+	return "OK"
+
+
+@app.route("/queryContinueAnywayStatus")
+def queryContinueAnywayStatus():
+	#取得要不要強制執行任務的值
+	ContinueAnywayStatus = config.query.filter_by(
+		config_key='continueAnyway').first()
+	_status = ContinueAnywayStatus.value
+	#為了做js的 true false 轉換
+	if _status == '0':
+		_status = "false"
+	elif _status == '1':
+		_status = "true"
+	return _status
 
 #刪除定時運行指令
 @app.route("/getSensorHistory")
@@ -307,9 +336,6 @@ def deleteTimeCommand():
 	db.session.delete(Command)
 	db.session.commit()
 	return "OK"
-
-#--------------------定時運行排程----------------------------------------------------------------------
-
 
 #取得現在的馬達距離比例
 @app.route("/queryDistanceOfTimeProportion")

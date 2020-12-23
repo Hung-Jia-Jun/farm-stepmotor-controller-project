@@ -50,7 +50,8 @@
 
 
 	 <script type="text/javascript" src="/static/Sensor.js"></script>
- 
+	<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
  </head>   
  <body>   
  <div class="container">  
@@ -135,13 +136,18 @@
 						</tr>
 					</thead>
 				</table>
-				<div style="height: 30px;" class="row"></div>
+				<div class="row">
+					<div class="col-md-5">
+						<input onchange="saveContinueAnywayEvent();" id="isContinueAnyway" type="checkbox" checked data-toggle="toggle" data-on="強制執行任務" data-off="不強制執行任務" data-onstyle="success" data-offstyle="danger"  data-width="150" data-height="35">
+					</div>
+				</div>
 				<div style="height: 30px;" class="row">
 					<div class="col-md-12">
 						<h6 id="saveCommandRunResult">運行結果 :</h6>
 					</div>
 				</div>
-				<div style="height: 10px;" class="row">
+				
+				<div style="height: 40px;" class="row">
 					<div class="col-md-3">
 						<button onclick="showCommandList();" type="button" class="btn btn-primary">更新列表</button>  
 					</div>
