@@ -26,6 +26,7 @@ class Controll:
 		self.GPIO_5 = int(config.get('GPIO Mapping','GPIO_5'))
 		self.GPIO_6 = int(config.get('GPIO Mapping','GPIO_6'))
 		self.GPIO_7 = int(config.get('GPIO Mapping','GPIO_7'))
+		self.GPIO_8 = int(config.get('GPIO Mapping','GPIO_8'))
 
 		#共八個GPIO
 		self.GPIONumber = {
@@ -37,6 +38,7 @@ class Controll:
 			"GPIO_5" :self.GPIO_5,
 			"GPIO_6" :self.GPIO_6,
 			"GPIO_7" :self.GPIO_7,
+			"GPIO_8" :self.GPIO_8,
 		}
 
 		log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(lineno)d) %(message)s')
@@ -70,6 +72,8 @@ class Controll:
 		#先開要開GPIO	
 		#依照Mapping 關係去找到要啟動的Pin
 		for GPIO_Pin in GPIO_Pins:
+			if GPIO_Pin == "":
+				continue
 			Pin = self.GPIONumber["GPIO_"+str(GPIO_Pin)]
 			if sys.platform == "linux":
 				GPIO.output(Pin, GPIO.HIGH)

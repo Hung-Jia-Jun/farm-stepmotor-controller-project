@@ -251,7 +251,7 @@ function showGPIOList(id)
 		var rows = []
 		
 		//共八個GPIO
-		for (var i = 0; i < 8; i++) {
+		for (var i = 0; i < 9; i++) {
 			rows.push({
 				Id: i,
 				Pin: i,
