@@ -101,6 +101,7 @@ class schedule(db.Model):
 class schedule_day_of_time(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	time = db.Column(db.String)
+	takePic = db.Column(db.Boolean, unique=False, default=False)
 
 class sensor_lux(db.Model):
 	DateTime = db.Column(db.String(255), primary_key=True)
@@ -132,7 +133,6 @@ class GPIO(db.Model):
 	GPIO_Open = db.Column(db.String(255))
 	#延遲時間
 	delayTime = db.Column(db.Float)
-	TakePic = db.Column(db.Boolean, unique=False, default=False)
 #------------------------------------------------------------------------------------------------------
 
 

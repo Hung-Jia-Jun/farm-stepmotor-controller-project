@@ -67,6 +67,7 @@ class schedule(db.Model):
 class schedule_day_of_time(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	time = db.Column(db.String)
+	takePic = db.Column(db.Boolean, unique=False, default=False)
 
 class sensor_lux(db.Model):
 	DateTime = db.Column(db.String(255), primary_key=True)
@@ -98,7 +99,6 @@ class GPIO(db.Model):
 	GPIO_Open = db.Column(db.String(255))
 	#延遲時間
 	delayTime = db.Column(db.Float)
-	TakePic = db.Column(db.Boolean, unique=False, default=False)
 #------------------------------------------------------------------------------------------------------
 
 #簡易版網頁
@@ -155,7 +155,6 @@ def saveMotorCommand():
 	#因為一定要綁定一個 GPIO設定檔，所以要先創建一個空的
 	GPIOCommand = GPIO(
 			GPIO_Open = "",
-			TakePic = True,
 			delayTime = 0,
 			update_time = datetime.now()
 		)
@@ -171,26 +170,20 @@ def saveMotorCommand():
 	db.session.add(scheduleCommand)
 	db.session.commit()
 	return "OK"
-#--------------------運行排程時的GPIO設定跟此次任務是否要拍照----------------------------------------------------------------------
+
 #新增GPIO指令
-@app.route("/saveGPIOAndTakePic")
-def saveGPIOAndTakePic():
+@app.route("/saveGPIO")
+def saveGPIO():
 	#此次座標移動指令的ID
 	_positionId = request.args.get('positionId')
 	#新增GPIO指令
 	_GPIO_Open = request.args.get('GPIO_Open')
-	_TakePic = request.args.get('TakePic')
+	
 	_delayTime = request.args.get('delayTime')
-	#js 過來的 true 要全小寫,python 的True要首字大寫
-	if _TakePic == "true":
-		_TakePic = True
-	elif _TakePic == "false":
-		_TakePic = False
 
 	positionTask = schedule.query.filter_by(id=_positionId).first()
 	GPIOCommand = GPIO.query.filter_by(id = positionTask.GPIO_uid).first()
 	GPIOCommand.GPIO_Open = _GPIO_Open
-	GPIOCommand.TakePic = bool(_TakePic)
 	GPIOCommand.delayTime = int(_delayTime)
 	GPIOCommand.update_time = datetime.now()
 	 
@@ -208,7 +201,6 @@ def queryGPIOAndTakePic():
 	GPIO_command = {
 				'id':Command.id,
 				'GPIO_Open' : Command.GPIO_Open,
-				'TakePic' : Command.TakePic,
 				'delayTime':Command.delayTime,
 			}
 	return json.dumps(GPIO_command)
@@ -222,11 +214,16 @@ def queryGPIOAndTakePic():
 def savePlanRunning():
 	#座標位置 X
 	Time = request.args.get('Time')
+	_TakePic = request.args.get('TakePic')
 
-	#座標位置 Y
-	_PositionY = request.args.get('PositionY')
+	#js 過來的 true 要全小寫,python 的True要首字大寫
+	if _TakePic == "true":
+		_TakePic = True
+	elif _TakePic == "false":
+		_TakePic = False
 
-	schedule_day_of_time_Command = schedule_day_of_time(time = Time)
+	schedule_day_of_time_Command = schedule_day_of_time(time = Time,
+														takePic = bool(_TakePic))
 	 
 	db.session.add(schedule_day_of_time_Command)
 	db.session.commit()
@@ -243,6 +240,7 @@ def queryPlanList():
 			schedulePlan = {
 				'id' : ele.id,
 				'Time' : ele.time,
+				'takePic':ele.takePic,
 			}
 			Plan_li.append(json.dumps(schedulePlan))
 	return json.dumps(Plan_li)

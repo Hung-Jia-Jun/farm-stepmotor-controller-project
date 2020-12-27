@@ -288,11 +288,9 @@ function saveGPIOList()
 		Pin_Open += (element.Pin).toString() + ",";
 	});
 	_delayTime = document.getElementById("delayTime_ss").value;
-	var _TakePic = document.getElementById("TakePic").checked;
-	$.get(Console_ServerURL + "/saveGPIOAndTakePic",
+	$.get(Console_ServerURL + "/saveGPIO",
 		{
 			GPIO_Open: Pin_Open,
-			TakePic: _TakePic,
 			delayTime: _delayTime,
 			positionId: nowSelectPositionID.toString()
 		},
@@ -360,9 +358,9 @@ function SetMovePlan()
 {
 	var _Time = document.getElementById("datetimepicker").childNodes[1].value;
 	document.getElementById("savePlanRunResult").innerText = "運行結果 : 上傳中..."
-	
+	var _TakePic = document.getElementById("TakePic").checked;
 	$.get(Console_ServerURL + "/savePlanRunning",
-		{Time : _Time},
+		{Time : _Time,TakePic : _TakePic},
 		function(data) {
 			document.getElementById("savePlanRunResult").innerText = "運行結果 : OK !"
 			showPlanList();
