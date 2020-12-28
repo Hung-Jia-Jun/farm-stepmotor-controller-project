@@ -101,7 +101,6 @@ class schedule(db.Model):
 class schedule_day_of_time(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	time = db.Column(db.String)
-	takePic = db.Column(db.Boolean, unique=False, default=False)
 
 class sensor_lux(db.Model):
 	DateTime = db.Column(db.String(255), primary_key=True)
@@ -133,6 +132,7 @@ class GPIO(db.Model):
 	GPIO_Open = db.Column(db.String(255))
 	#延遲時間
 	delayTime = db.Column(db.Float)
+	TakePic = db.Column(db.Boolean, unique=False, default=False)
 #------------------------------------------------------------------------------------------------------
 
 
@@ -524,11 +524,11 @@ def SetPoint(TargetX,TargetY):
 		return parameterEcho
 
 #啟動資料庫記錄的GPIO
-def ActiveGPIO(PinOpenLi):
+def ActiveGPIO(PinOpenLi,durationTime):
 	#GPIO 控制
 	Controll = Controll_GPIO.Controll()
 	#啟動GPIO,並且一段時間後停止
-	Controll.OpenGPIO(PinOpenLi)
+	Controll.OpenGPIO(PinOpenLi,durationTime)
 	return "OK"
 
 def GetJetsonIP():
@@ -593,7 +593,7 @@ def StartSchedule_Job():
 		GPIOCommand = GPIO.query.filter_by(id = ele.GPIO_uid).first()
 		
 		#切分準備要開啟的GPIO列表
-		GPIO_OpenLi = GPIOCommand.GPIO_Open.split(",")
+		GPIO_OpenLi = GPIOCommand.split(",")
 		ActiveGPIO(GPIO_OpenLi)
 
 		#延遲一段時間後才開始移動
@@ -700,7 +700,7 @@ if __name__ == "__main__":
 		EmailSender.Send("DB發生問題，無法讀寫內容")
 		
 	#檢查Sensor
-	# sensorChecker()
+	sensorChecker()
 
 	print (__name__ , "db.create_all")
 	#啟動Server後，先鎖定煞車，後放鬆馬達出力

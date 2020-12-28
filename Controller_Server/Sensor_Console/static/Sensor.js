@@ -276,6 +276,42 @@ function showGPIOList(id)
 		}
 	);
 }
+function showTakePic(id)
+{
+	planList.forEach(element => {
+		command = JSON.parse(element);
+		if (command["id"] == id)
+		{
+			document.getElementById("TakePic").checked = command["takePic"]
+		}
+	});
+}
+
+// 儲存定時運行排程是否要拍照的狀態
+function saveTakePicSchedule() 
+{
+	var Selections = $('#Schedule_table').bootstrapTable('getSelections');
+	_takePic = document.getElementById("TakePic").checked;
+	document.getElementById("savePlanRunResult").innerText = "運行結果 : 上傳排程拍照設定中...";
+	Selections.forEach(element => {
+		_id = element.id;
+		$.get(Console_ServerURL + "/updatePlanRunningTakePicStatus",
+			{
+				id : _id,
+				takePic : _takePic,
+			},
+			function (data) {
+				document.getElementById("savePlanRunResult").innerText = "運行結果 : OK !"
+				//每次更新完是否要拍照的狀態之後都要更新剛剛下載下來的定時排程列表
+				$.get(Console_ServerURL + "/queryPlanList",
+					function(data) {
+							planList = JSON.parse(data);
+						}
+					);
+			}
+		);
+	});
+}
 
 //儲存GPIO設定
 function saveGPIOList()
@@ -300,6 +336,8 @@ function saveGPIOList()
 		}
 	);
 }
+
+var planList;
 //顯示定時運行指令
 function showPlanList()
 {	
@@ -323,7 +361,11 @@ function showPlanList()
 			columns: columns, 
 			uniqueId:'Id',
 			checkbox:"true",
-			pagination:false
+			pagination:false,
+			onClickRow: function (row, $element, field) {
+				//顯示GPIO功能列表
+				showTakePic(row.id);
+			}
 	});
 	
 	//dummy data
@@ -335,11 +377,10 @@ function showPlanList()
 	// 	})
 	//   }
 	// $('#Schedule_table').bootstrapTable('append', rows);
-
 	$.get(Console_ServerURL + "/queryPlanList",
 		function(data) {
-			var commandList = JSON.parse(data);
-			commandList.forEach(element => {
+			planList = JSON.parse(data);
+			planList.forEach(element => {
 				command = JSON.parse(element);
 				$('#Schedule_table').bootstrapTable('append', command);
 			});

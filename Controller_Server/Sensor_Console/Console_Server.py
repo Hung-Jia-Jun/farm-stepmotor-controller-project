@@ -209,6 +209,23 @@ def queryGPIOAndTakePic():
 
 
 #--------------------定時運行排程----------------------------------------------------------------------
+#更新這次排程是否要拍照的功能
+@app.route("/updatePlanRunningTakePicStatus")
+def updatePlanRunningTakePicStatus():
+	#使用ID來刪除物件
+	_id = request.args.get('id')
+	_takePic = request.args.get('takePic')
+	#js 過來的 true 要全小寫,python 的True要首字大寫
+	if _takePic == "true":
+		_takePic = True
+	elif _takePic == "false":
+		_takePic = False
+
+	Command = schedule_day_of_time.query.filter_by(id=_id).first()
+	#儲存是否要拍照的標記
+	Command.takePic = _takePic
+	db.session.commit()
+	return "OK"
 #新增定時運行排程
 @app.route("/savePlanRunning")
 def savePlanRunning():
