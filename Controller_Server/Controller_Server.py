@@ -383,7 +383,7 @@ def LightControllerStatus():
 
 		return json.dumps(status)
 #將兩顆步進馬達設定到指定的位置
-def SetPoint(TargetX,TargetY):
+def SetPoint(TargetX,TargetY,takePic = False):
 	#讀取資料庫設定檔
 	StepMotor_config_A = config.query.filter_by(
 		config_key='StepMotor_DistanceOfTimeProportion_A').first()
@@ -508,9 +508,13 @@ def SetPoint(TargetX,TargetY):
 		if int(TargetX) > 0 and int(TargetY) > 0:
 			time.sleep(6)
 			logger.info("TakePic mode : " + TakePicStatus)
+			#Global 的拍照任務，當Global的拍照任務都設定為Disable
+			#那不管哪個Schedule都要略過
+			#所以只有Global 與每個Schedule任務都為 True的時候才會拍照
 			if TakePicStatus == "Enable":
-				#到達定點後拍照
-				TakePic()
+				if takePic == True:
+					#到達定點後拍照
+					TakePic()
 		return str(status_A + status_B)
 
 	elif sys.platform == "win32":
@@ -584,11 +588,11 @@ def ReadPH_Job():
 	logger.info("End task ReadPH_Job")
 
 #啟用定時運行命令
-def StartSchedule_Job():
+def StartSchedule_Job(takePic):
 	#依照ID排序，將所有命令取出來
 	scheduleLi = schedule.query.order_by(schedule.id.asc()).all()
 	for ele in scheduleLi:
-		logger.info("Start Schedule Job: (" +str(ele.PositionX) + "," +str(ele.PositionY) + ")")
+		logger.info("Start Schedule Job: (" +str(ele.PositionX) + "," +str(ele.PositionY) + ")" + "takePic : " + str(takePic))
 		#找到這次要開啟的GPIO列表
 		GPIOCommand = GPIO.query.filter_by(id = ele.GPIO_uid).first()
 		
@@ -601,7 +605,8 @@ def StartSchedule_Job():
 
 		
 		#GPIO運行結束後，才會進行移動任務
-		result = SetPoint(ele.PositionX,ele.PositionY)
+		#並且依照此次是否要拍照的任務決定要不要拍照
+		result = SetPoint(ele.PositionX,ele.PositionY,takePic = takePic)
 		#當偵測到回原點這件事情發生錯誤
 		#就略過之後所有的任務
 		if result == "An error occurred when returning to the origin":
@@ -648,7 +653,7 @@ def updateMotorJob():
 			if ele != None:
 				#到指定時間後，運行重複運行指令
 				if nowTime == ele.time:
-					StartSchedule_Job()
+					StartSchedule_Job(takePic = day_schedule.takePic)
 		return "OK"
 	except:
 		print ("DB錯誤，無法運行馬達排程任務")
