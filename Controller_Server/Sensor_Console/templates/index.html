@@ -184,19 +184,23 @@
 				<div style="height: 10px;" class="row"></div>
 				<div class="row">
 					<div class="row">
+						<div class="col-md-12">
+							<input class="form-check-input col-md-1 col-md-push-1" type="checkbox" value="" id="TakePic">
+							<h12 class="col-md-11 col-md-push-1">此次運行是否要拍照</h12>
+						</div>
 						<div class="col-md-5">
 					</div>
 					</div>
 				</div>
 				<div style="height: 10px;" class="row"></div>
 				<div class="row">
-					<div class="col-md-12">
-						<h12 id="GPIO_RunningStatus">運行結果：</h12>
+					<div class="col-md-5">
+						<button id = "saveGPIOSetting" type="button" class="btn btn-primary">儲存GPIO設定</button>  
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-md-5">
-						<button id = "saveGPIOSetting" type="button" class="btn btn-primary">儲存GPIO設定</button>  
+					<div class="col-md-12">
+						<h12 id="GPIO_RunningStatus">運行結果：</h12>
 					</div>
 				</div>
 				<div style="height: 10px;" class="row"></div>
@@ -239,20 +243,9 @@
 				</table>
 			</div>
 		</div>
-		<div style="height: 30px;" class="row"></div>
 		<div style="height: 30px;" class="row">
-			<div class="col-md-1">
-				<input onchange="saveTakePicSchedule();" class="form-check-input col-md-0" type="checkbox" value="" id="TakePic">
-			</div>
-			<div class="col-md-6">	
-				<h12>此次運行是否要拍照</h12>
-			</div>
-
-		</div>
-
-		<div style="height: 30px;" class="row">
-			<div class="col-md-6">
-				<h6 class="col-md-0 col-md-push-1" id="savePlanRunResult">運行結果 :</h6>
+			<div class="col-md-0">
+				<h6 id="savePlanRunResult">運行結果 :</h6>
 			</div>
 		</div>
 		<div style="height: 5px;" class="row"></div>

@@ -276,42 +276,6 @@ function showGPIOList(id)
 		}
 	);
 }
-function showTakePic(id)
-{
-	planList.forEach(element => {
-		command = JSON.parse(element);
-		if (command["id"] == id)
-		{
-			document.getElementById("TakePic").checked = command["takePic"]
-		}
-	});
-}
-
-// 儲存定時運行排程是否要拍照的狀態
-function saveTakePicSchedule() 
-{
-	var Selections = $('#Schedule_table').bootstrapTable('getSelections');
-	_takePic = document.getElementById("TakePic").checked;
-	document.getElementById("savePlanRunResult").innerText = "運行結果 : 上傳排程拍照設定中...";
-	Selections.forEach(element => {
-		_id = element.id;
-		$.get(Console_ServerURL + "/updatePlanRunningTakePicStatus",
-			{
-				id : _id,
-				takePic : _takePic,
-			},
-			function (data) {
-				document.getElementById("savePlanRunResult").innerText = "運行結果 : OK !"
-				//每次更新完是否要拍照的狀態之後都要更新剛剛下載下來的定時排程列表
-				$.get(Console_ServerURL + "/queryPlanList",
-					function(data) {
-							planList = JSON.parse(data);
-						}
-					);
-			}
-		);
-	});
-}
 
 //儲存GPIO設定
 function saveGPIOList()
@@ -324,9 +288,11 @@ function saveGPIOList()
 		Pin_Open += (element.Pin).toString() + ",";
 	});
 	_delayTime = document.getElementById("delayTime_ss").value;
-	$.get(Console_ServerURL + "/saveGPIO",
+	var _TakePic = document.getElementById("TakePic").checked;
+	$.get(Console_ServerURL + "/saveGPIOAndTakePic",
 		{
 			GPIO_Open: Pin_Open,
+			TakePic: _TakePic,
 			delayTime: _delayTime,
 			positionId: nowSelectPositionID.toString()
 		},
@@ -336,8 +302,6 @@ function saveGPIOList()
 		}
 	);
 }
-
-var planList;
 //顯示定時運行指令
 function showPlanList()
 {	
@@ -361,11 +325,7 @@ function showPlanList()
 			columns: columns, 
 			uniqueId:'Id',
 			checkbox:"true",
-			pagination:false,
-			onClickRow: function (row, $element, field) {
-				//顯示GPIO功能列表
-				showTakePic(row.id);
-			}
+			pagination:false
 	});
 	
 	//dummy data
@@ -377,10 +337,11 @@ function showPlanList()
 	// 	})
 	//   }
 	// $('#Schedule_table').bootstrapTable('append', rows);
+
 	$.get(Console_ServerURL + "/queryPlanList",
 		function(data) {
-			planList = JSON.parse(data);
-			planList.forEach(element => {
+			var commandList = JSON.parse(data);
+			commandList.forEach(element => {
 				command = JSON.parse(element);
 				$('#Schedule_table').bootstrapTable('append', command);
 			});
@@ -399,9 +360,9 @@ function SetMovePlan()
 {
 	var _Time = document.getElementById("datetimepicker").childNodes[1].value;
 	document.getElementById("savePlanRunResult").innerText = "運行結果 : 上傳中..."
-	var _TakePic = document.getElementById("TakePic").checked;
+	
 	$.get(Console_ServerURL + "/savePlanRunning",
-		{Time : _Time,TakePic : _TakePic},
+		{Time : _Time},
 		function(data) {
 			document.getElementById("savePlanRunResult").innerText = "運行結果 : OK !"
 			showPlanList();

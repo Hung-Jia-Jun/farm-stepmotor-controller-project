@@ -101,6 +101,7 @@ class schedule(db.Model):
 class schedule_day_of_time(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	time = db.Column(db.String)
+	takePic = db.Column(db.Boolean, unique=False, default=False)
 
 class sensor_lux(db.Model):
 	DateTime = db.Column(db.String(255), primary_key=True)
@@ -132,7 +133,6 @@ class GPIO(db.Model):
 	GPIO_Open = db.Column(db.String(255))
 	#延遲時間
 	delayTime = db.Column(db.Float)
-	TakePic = db.Column(db.Boolean, unique=False, default=False)
 #------------------------------------------------------------------------------------------------------
 
 
@@ -528,11 +528,11 @@ def SetPoint(TargetX,TargetY,takePic = False):
 		return parameterEcho
 
 #啟動資料庫記錄的GPIO
-def ActiveGPIO(PinOpenLi,durationTime):
+def ActiveGPIO(PinOpenLi):
 	#GPIO 控制
 	Controll = Controll_GPIO.Controll()
 	#啟動GPIO,並且一段時間後停止
-	Controll.OpenGPIO(PinOpenLi,durationTime)
+	Controll.OpenGPIO(PinOpenLi)
 	return "OK"
 
 def GetJetsonIP():
@@ -589,34 +589,38 @@ def ReadPH_Job():
 
 #啟用定時運行命令
 def StartSchedule_Job(takePic):
-	#依照ID排序，將所有命令取出來
-	scheduleLi = schedule.query.order_by(schedule.id.asc()).all()
-	for ele in scheduleLi:
-		logger.info("Start Schedule Job: (" +str(ele.PositionX) + "," +str(ele.PositionY) + ")" + "takePic : " + str(takePic))
-		#找到這次要開啟的GPIO列表
-		GPIOCommand = GPIO.query.filter_by(id = ele.GPIO_uid).first()
-		
-		#切分準備要開啟的GPIO列表
-		GPIO_OpenLi = GPIOCommand.split(",")
-		ActiveGPIO(GPIO_OpenLi)
-
-		#延遲一段時間後才開始移動
-		time.sleep(GPIOCommand.delayTime)
-
-		
-		#GPIO運行結束後，才會進行移動任務
-		#並且依照此次是否要拍照的任務決定要不要拍照
-		result = SetPoint(ele.PositionX,ele.PositionY,takePic = takePic)
-		#當偵測到回原點這件事情發生錯誤
-		#就略過之後所有的任務
-		if result == "An error occurred when returning to the origin":
-			isContinueAnyway = config.query.filter_by(config_key='continueAnyway').first().value
+	try:
+		#依照ID排序，將所有命令取出來
+		scheduleLi = schedule.query.order_by(schedule.id.asc()).all()
+		for ele in scheduleLi:
+			logger.info("Start Schedule Job: (" +str(ele.PositionX) + "," +str(ele.PositionY) + ")" + "takePic : " + str(takePic))
+			#找到這次要開啟的GPIO列表
+			GPIOCommand = GPIO.query.filter_by(id = ele.GPIO_uid).first()
 			
-			#不要強制執行的話為 0
-			#這樣這個任務就會停下來了
-			if isContinueAnyway == 0:
-				return "An error occurred when returning to the origin"
+			#切分準備要開啟的GPIO列表
+			GPIO_OpenLi =  GPIOCommand.GPIO_Open.split(",")
+			ActiveGPIO(GPIO_OpenLi)
 
+			#延遲一段時間後才開始移動
+			time.sleep(GPIOCommand.delayTime)
+
+			
+			#GPIO運行結束後，才會進行移動任務
+			#並且依照此次是否要拍照的任務決定要不要拍照
+			result = SetPoint(ele.PositionX,ele.PositionY,takePic = takePic)
+			#當偵測到回原點這件事情發生錯誤
+			#就略過之後所有的任務
+			if result == "An error occurred when returning to the origin":
+				isContinueAnyway = config.query.filter_by(config_key='continueAnyway').first().value
+				
+				#不要強制執行的話為 0
+				#這樣這個任務就會停下來了
+				if isContinueAnyway == 0:
+					return "An error occurred when returning to the origin"
+	except Exception as e:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+		print(exc_type, fname, exc_tb.tb_lineno)
 #立即運行剛剛設定的指令
 @app.route("/runCommandList")
 def runCommandList():
@@ -645,6 +649,7 @@ def updateMotorJob():
 		logger.info("Sensor檢查任務 - 結束")
 
 	try:
+
 		#依照ID排序
 		day_schedule = schedule_day_of_time.query.order_by(schedule_day_of_time.id.asc()).all()
 
@@ -653,9 +658,12 @@ def updateMotorJob():
 			if ele != None:
 				#到指定時間後，運行重複運行指令
 				if nowTime == ele.time:
-					StartSchedule_Job(takePic = day_schedule.takePic)
+					StartSchedule_Job(takePic = ele.takePic)
 		return "OK"
-	except:
+	except Exception as e:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+		print(exc_type, fname, exc_tb.tb_lineno)
 		print ("DB錯誤，無法運行馬達排程任務")
 		logger.error("DB錯誤，無法運行馬達排程任務")
 		return "OK"

@@ -68,7 +68,7 @@ class Controll:
 				GPIO.setup(Pin, GPIO.OUT)
 	#傳入List 去個別GPIO開關處理
 	def OpenGPIO(self,GPIO_Pins):
-		self.logger.info("Enable Pin "+ ','.join([str(Pin) for Pin in GPIO_Pins])+"  GPIO.HEIGHT")
+		self.logger.info("Enable Pin "+ ','.join([str(Pin) for Pin in GPIO_Pins])+"  GPIO.HIGH")
 		#先開要開GPIO	
 		#依照Mapping 關係去找到要啟動的Pin
 		for GPIO_Pin in GPIO_Pins:
@@ -80,7 +80,7 @@ class Controll:
 			self.logger.info("Pin "+str(Pin)+"  GPIO.HIGH")
 		
 		#列出所有可被操作的GPIO,待會要做相減diff操作
-		GPIO_Pins_Total = [0,1,2,3,4,5,6,7]
+		GPIO_Pins_Total = ['0','1','2','3','4','5','6','7']
 		#diff後取得要關閉的GPIO,所有GPIO減去現在要開啟的GPIO=預計要關閉的GPIO
 		OffGPIO = list(set(GPIO_Pins_Total) - set(GPIO_Pins))
 		self.logger.info("Disable Pin "+ ','.join([str(Pin) for Pin in OffGPIO])+"  GPIO.LOW")
