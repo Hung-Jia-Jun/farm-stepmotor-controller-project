@@ -624,7 +624,7 @@ def StartSchedule_Job(takePic):
 #立即運行剛剛設定的指令
 @app.route("/runCommandList")
 def runCommandList():
-	StartSchedule_Job()
+	StartSchedule_Job(takePic = False)
 	return "OK"
 
 #立即運行剛剛設定的指令
@@ -700,6 +700,7 @@ if __name__ == "__main__":
 		try:
 			RS485 = Read_RS485_Sensor_Lib.RS485()
 		except:
+			logger.info("RS485 reader dongle error")
 			pass
 	elif sys.platform == "win32":
 		pass
