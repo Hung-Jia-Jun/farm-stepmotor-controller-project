@@ -81,10 +81,6 @@ class StepMotorControll:
         #算出目前座標點與目標點差距多少
         diffPosition = TargetPosition - nowPosition
 
-        #儲存預計要移動的目標座標，等要Run的時候，就可以下判斷
-        #判斷移動2分鐘後還是沒有碰到限位開關的時候要發信
-        self.TargetPosition = TargetPosition
-
         MoveClockwise = 0
         if diffPosition > 0:
             #正轉
@@ -168,8 +164,7 @@ class StepMotorControll:
         startTime = None
         endTime = None
         #歸零復位模式，如果兩分鐘沒有成功復位，那就停止此次任務
-        if self.TargetPosition < 0:
-            startTime = datetime.now()
+        startTime = datetime.now()
         #依照次數與脈衝寬度與頻率控制步進馬達
         for i in range(int(Pulse_Count)):
             # logger.debug(str(i) + ".   PUL = " + str(PUL) + str(" : GPIO.HIGH"))
@@ -207,15 +202,14 @@ class StepMotorControll:
                             return "X axis zero point sensor trigger"
                         else:
                             #歸零復位模式，如果兩分鐘沒有成功復位，那就停止此次任務
-                            if self.TargetPosition < 0:
-                                endTime = datetime.now()
-                                #取時間差，當>2分鐘的時候，就發信警告
-                                diffTime = endTime - startTime
-                                if diffTime.seconds > 120:
-                                    startTime = None
-                                    endTime = None
-                                    logger.warning("Running X axis back to zero point task ,  but over 2 min still not trigger")
-                                    return  "Running X axis back to zero point task ,  but over 2 min still not trigger"
+                            endTime = datetime.now()
+                            #取時間差，當>2分鐘的時候，就發信警告
+                            diffTime = endTime - startTime
+                            if diffTime.seconds > 120:
+                                startTime = None
+                                endTime = None
+                                logger.warning("Running X axis back to zero point task ,  but over 2 min still not trigger")
+                                return  "Running X axis back to zero point task ,  but over 2 min still not trigger"
                     if self.MotorNumber == "B":
                         #零點開關偵測
                         if Controll_input.ReturnSensorStatus(ZeroSensor2):
@@ -231,15 +225,14 @@ class StepMotorControll:
                             return "Y axis zero point sensor trigger"
                         else:
                             #歸零復位模式，如果兩分鐘沒有成功復位，那就停止此次任務
-                            if self.TargetPosition < 0:
-                                endTime = datetime.now()
-                                #取時間差，當>2分鐘的時候，就發信警告
-                                diffTime = endTime - startTime
-                                if diffTime.seconds > 120:
-                                    startTime = None
-                                    endTime = None
-                                    logger.warning("Running Y axis back to zero point task ,  but over 2 min still not trigger")
-                                    return  "Running Y axis back to zero point task ,  but over 2 min still not trigger"
+                            endTime = datetime.now()
+                            #取時間差，當>2分鐘的時候，就發信警告
+                            diffTime = endTime - startTime
+                            if diffTime.seconds > 120:
+                                startTime = None
+                                endTime = None
+                                logger.warning("Running Y axis back to zero point task ,  but over 2 min still not trigger")
+                                return  "Running Y axis back to zero point task ,  but over 2 min still not trigger"
                     
 
 

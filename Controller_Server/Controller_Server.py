@@ -50,7 +50,7 @@ JetsonNanoIP = config.get('Setting','JetsonNanoIP')
 #------------------------------------------------------------------------------------------------------
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins='*')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://'+DBusername+':'+DBpassword+'@'+DatabaseIP+':3306/sensordb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
@@ -397,7 +397,7 @@ def SetPoint(TargetX,TargetY,takePic = False):
 	#取得現在步進馬達的座標多少
 	MotroCurrentPostion_A = motor_position.query.filter_by(number='A').first()
 	MotroCurrentPostion_B = motor_position.query.filter_by(number='B').first()
-
+	
 	#算出與目標點差距有幾個脈波
 	Direction_X , Pulse_X_Count = Step_A.SetPointToMove(nowPosition = MotroCurrentPostion_A.value,
 														TargetPosition = TargetX,

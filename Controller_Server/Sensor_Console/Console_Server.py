@@ -37,7 +37,7 @@ JetsonNanoIP = config.get('Setting','JetsonNanoIP')
 #------------------------------------------------------------------------------------------------------
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins='*')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://'+DBusername+':'+DBpassword+'@'+DatabaseIP+':3306/sensordb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
