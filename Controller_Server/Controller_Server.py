@@ -397,7 +397,6 @@ def SetPoint(TargetX,TargetY,takePic = False):
 	#取得現在步進馬達的座標多少
 	MotroCurrentPostion_A = motor_position.query.filter_by(number='A').first()
 	MotroCurrentPostion_B = motor_position.query.filter_by(number='B').first()
-	
 	#算出與目標點差距有幾個脈波
 	Direction_X , Pulse_X_Count = Step_A.SetPointToMove(nowPosition = MotroCurrentPostion_A.value,
 														TargetPosition = TargetX,
@@ -419,6 +418,8 @@ def SetPoint(TargetX,TargetY,takePic = False):
 	if sys.platform == "linux":
 		#Z軸垂直制動器煞車開關
 		_EnableBrake = False
+		import pdb
+		pdb.set_trace()
 		status_A = Step_A.Run(  Pulse_Width = StepMotor_config_A.width,
 								Pulse_Count = Pulse_X_Count,
 								PulseFrequency = StepMotor_config_A.frequency,
@@ -696,14 +697,14 @@ def pendingJob():
 		time.sleep(60)
 
 if __name__ == "__main__":
-	if sys.platform == "linux":
-		try:
-			RS485 = Read_RS485_Sensor_Lib.RS485()
-		except:
-			logger.info("RS485 reader dongle error")
-			pass
-	elif sys.platform == "win32":
-		pass
+	# if sys.platform == "linux":
+	# 	try:
+	# 		RS485 = Read_RS485_Sensor_Lib.RS485()
+	# 	except:
+	# 		logger.info("RS485 reader dongle error")
+	# 		pass
+	# elif sys.platform == "win32":
+	# 	pass
 
 	db.init_app(app)
 	try:
@@ -714,7 +715,7 @@ if __name__ == "__main__":
 		EmailSender.Send("DB發生問題，無法讀寫內容")
 		
 	#檢查Sensor
-	sensorChecker()
+	# sensorChecker()
 
 	print (__name__ , "db.create_all")
 	#啟動Server後，先鎖定煞車，後放鬆馬達出力
@@ -728,13 +729,13 @@ if __name__ == "__main__":
 	t.start()
 
 
-	scheduler.every(15).minutes.do(ReadLUX_Job)
-	scheduler.every(16).minutes.do(ReadEC_Job)
-	scheduler.every(17).minutes.do(ReadPH_Job)
+	# scheduler.every(15).minutes.do(ReadLUX_Job)
+	# scheduler.every(16).minutes.do(ReadEC_Job)
+	# scheduler.every(17).minutes.do(ReadPH_Job)
 	
-	ReadLUX_Job()
-	ReadEC_Job()
-	ReadPH_Job()
+	# ReadLUX_Job()
+	# ReadEC_Job()
+	# ReadPH_Job()
 	
 	app.run(host='0.0.0.0',port=8001)
 

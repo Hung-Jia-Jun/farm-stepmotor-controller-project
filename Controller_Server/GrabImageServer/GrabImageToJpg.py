@@ -185,8 +185,6 @@ class MVSControll:
 				elif sys.platform == "win32":
 					cdll.msvcrt.memcpy(byref(img_buff), stConvertParam.pImageBuffer, stConvertParam.nImageLen)
 				file_open.write(img_buff, )
-				import pdb; 
-				pdb.set_trace()
 				cv2.imencode('.jpg', img)[1].tobytes()
 				print (img_buff)
 			except:
