@@ -418,8 +418,6 @@ def SetPoint(TargetX,TargetY,takePic = False):
 	if sys.platform == "linux":
 		#Z軸垂直制動器煞車開關
 		_EnableBrake = False
-		import pdb
-		pdb.set_trace()
 		status_A = Step_A.Run(  Pulse_Width = StepMotor_config_A.width,
 								Pulse_Count = Pulse_X_Count,
 								PulseFrequency = StepMotor_config_A.frequency,
@@ -457,6 +455,9 @@ def SetPoint(TargetX,TargetY,takePic = False):
 		#那就發mail通知
 		if "Running X axis back to zero point task ,  but over 2 min still not trigger" in status_A:
 			EmailSender.Send("歸零任務發生問題，請檢查X軸馬達位置")
+			#但因為現在機器以為A馬達在-999的位置，這樣下次嘗試歸零的時候就無法進入判斷回圈
+			#所以就先設定0吧
+			MotroCurrentPostion_A.value = 0
 			#回到原點這件事發生錯誤
 			return "An error occurred when returning to the origin"
 
@@ -468,7 +469,6 @@ def SetPoint(TargetX,TargetY,takePic = False):
 								PulseFrequency = StepMotor_config_B.frequency,
 								DR_Type = Direction_Y,
 								EnableBrake = _EnableBrake)
-
 		#正常操作下，不應該碰到限位開關，如果碰到了，就要回到原點
 		if "limit sensor trigger" in status_B:
 			#X,Y軸都要回原點
@@ -499,8 +499,12 @@ def SetPoint(TargetX,TargetY,takePic = False):
 
 		#在倒退運行的時候，連續運行2分鐘，但都沒碰到限位開關
 		#那就發mail通知
-		if "Running Y axis back to zero point task ,  but over 2 min still not trigger" in status_A:
+		if "Running Y axis back to zero point task ,  but over 2 min still not trigger" in status_B:
+			print("歸零任務發生問題，請檢查Y軸馬達位置")
 			EmailSender.Send("歸零任務發生問題，請檢查Y軸馬達位置")
+			#但因為現在機器以為B馬達在-999的位置，這樣下次嘗試歸零的時候就無法進入判斷回圈
+			#所以就先設定0吧
+			MotroCurrentPostion_B.value = 0
 			return "An error occurred when returning to the origin"
 
 		db.session.commit()
@@ -616,7 +620,7 @@ def StartSchedule_Job(takePic):
 				
 				#不要強制執行的話為 0
 				#這樣這個任務就會停下來了
-				if isContinueAnyway == 0:
+				if isContinueAnyway == '0':
 					return "An error occurred when returning to the origin"
 	except Exception as e:
 		exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -697,14 +701,14 @@ def pendingJob():
 		time.sleep(60)
 
 if __name__ == "__main__":
-	# if sys.platform == "linux":
-	# 	try:
-	# 		RS485 = Read_RS485_Sensor_Lib.RS485()
-	# 	except:
-	# 		logger.info("RS485 reader dongle error")
-	# 		pass
-	# elif sys.platform == "win32":
-	# 	pass
+	if sys.platform == "linux":
+		try:
+			RS485 = Read_RS485_Sensor_Lib.RS485()
+		except:
+			logger.info("RS485 reader dongle error")
+			pass
+	elif sys.platform == "win32":
+		pass
 
 	db.init_app(app)
 	try:
@@ -715,7 +719,7 @@ if __name__ == "__main__":
 		EmailSender.Send("DB發生問題，無法讀寫內容")
 		
 	#檢查Sensor
-	# sensorChecker()
+	sensorChecker()
 
 	print (__name__ , "db.create_all")
 	#啟動Server後，先鎖定煞車，後放鬆馬達出力
@@ -729,13 +733,13 @@ if __name__ == "__main__":
 	t.start()
 
 
-	# scheduler.every(15).minutes.do(ReadLUX_Job)
-	# scheduler.every(16).minutes.do(ReadEC_Job)
-	# scheduler.every(17).minutes.do(ReadPH_Job)
+	scheduler.every(15).minutes.do(ReadLUX_Job)
+	scheduler.every(16).minutes.do(ReadEC_Job)
+	scheduler.every(17).minutes.do(ReadPH_Job)
 	
-	# ReadLUX_Job()
-	# ReadEC_Job()
-	# ReadPH_Job()
+	ReadLUX_Job()
+	ReadEC_Job()
+	ReadPH_Job()
 	
 	app.run(host='0.0.0.0',port=8001)
 

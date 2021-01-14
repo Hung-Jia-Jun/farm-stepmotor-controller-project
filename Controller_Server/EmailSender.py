@@ -29,7 +29,7 @@ def Send(Message):
 
     # Send msil
     smtp.sendmail(message['From'], message['To'], message.as_string())
-    print('Send mails OK!')
+    print('Send mails:'+Message)
 
 
 if __name__ == "__main__":
