@@ -33,3 +33,15 @@ https://farmingonline.com.tw/
 
 # Video introduction
 https://www.facebook.com/watch/?v=1832738763438053
+
+## farmbot - running test
+https://youtu.be/szen8yASovc
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/szen8yASovc/0.jpg)](https://www.youtube.com/watch?v=szen8yASovc)
+
+## farmbot - point test
+https://youtu.be/EpDVKpUvn_c
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/EpDVKpUvn_c/0.jpg)](https://www.youtube.com/watch?v=EpDVKpUvn_c)
+
+## farmbot - motor test
+https://youtu.be/epGk56HlGOY
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/epGk56HlGOY/0.jpg)](https://www.youtube.com/watch?v=epGk56HlGOY)
