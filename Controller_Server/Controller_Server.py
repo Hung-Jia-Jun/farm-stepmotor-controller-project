@@ -176,12 +176,23 @@ def Stepping_Motor():
 		EnableBrake = True
 
 	if sys.platform == "linux":
+		#取得現在步進馬達的座標多少
+		MotroCurrentPostion_A = motor_position.query.filter_by(number='A').first()
+		MotroCurrentPostion_B = motor_position.query.filter_by(number='B').first()
+		
 		Step = Controll_2MD4850.StepMotorControll(StepMotorNumber)
 		status = Step.Run(Pulse_Width,
 							Pulse_Count,
 							PulseFrequency,
 							direction,
 							EnableBrake)
+		#碰到零點感測器就表示已經回0了 (X軸)
+		if "X axis zero point sensor trigger" in status:
+			MotroCurrentPostion_A.value = 0
+		#碰到零點感測器就表示已經回0了 (Y軸)
+		if "Y axis zero point sensor trigger" in status:
+			MotroCurrentPostion_B.value = 0
+		db.session.commit()
 		return str(status)
 	elif sys.platform == "win32":
 		parameterEcho = {
