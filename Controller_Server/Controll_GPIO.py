@@ -80,7 +80,7 @@ class Controll:
 			self.logger.info("Pin "+str(Pin)+"  GPIO.HIGH")
 		
 		#列出所有可被操作的GPIO,待會要做相減diff操作
-		GPIO_Pins_Total = ['0','1','2','3','4','5','6','7']
+		GPIO_Pins_Total = ['0','1','2','3','4','5','6','7','8']
 		#diff後取得要關閉的GPIO,所有GPIO減去現在要開啟的GPIO=預計要關閉的GPIO
 		OffGPIO = list(set(GPIO_Pins_Total) - set(GPIO_Pins))
 		self.logger.info("Disable Pin "+ ','.join([str(Pin) for Pin in OffGPIO])+"  GPIO.LOW")
