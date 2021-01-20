@@ -551,6 +551,17 @@ def ActiveGPIO(PinOpenLi):
 	Controll.OpenGPIO(PinOpenLi)
 	return "OK"
 
+#啟動資料庫記錄的GPIO
+@app.route("/ActiveGPIOByRequests")
+def ActiveGPIOByRequests():
+	PinOpenLi = request.args.get('PinOpenLi')
+	PinOpenLi = PinOpenLi.split(",")
+	#GPIO 控制
+	Controll = Controll_GPIO.Controll()
+	#啟動GPIO,並且一段時間後停止
+	Controll.OpenGPIO(PinOpenLi)
+	return "OK"
+
 def GetJetsonIP():
 	try:
 		configIP = config.query.filter_by(
