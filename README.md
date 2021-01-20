@@ -45,3 +45,6 @@ https://www.facebook.com/watch/?v=1832738763438053
 ## farmbot - motor test
 ### https://youtu.be/epGk56HlGOY
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/epGk56HlGOY/0.jpg)](https://www.youtube.com/watch?v=epGk56HlGOY)
+
+### https://youtu.be/srnN_ancCbI
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/srnN_ancCbI/0.jpg)](https://www.youtube.com/watch?v=srnN_ancCbI)
