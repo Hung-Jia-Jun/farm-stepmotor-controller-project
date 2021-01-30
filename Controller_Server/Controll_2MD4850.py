@@ -5,9 +5,17 @@ import Controll_input
 import logging
 from logging.handlers import RotatingFileHandler
 from datetime import datetime
-# logging.basicConfig(filename="/home/pii/StepMotor.log", filemode="w", format="%(asctime)s %(name)s:%(levelname)s:%(message)s", datefmt="%d-%M-%Y %H:%M:%S", level=logging.DEBUG)
-	
+import configparser
+import os
 
+# logging.basicConfig(filename="/home/pii/StepMotor.log", filemode="w", format="%(asctime)s %(name)s:%(levelname)s:%(message)s", datefmt="%d-%M-%Y %H:%M:%S", level=logging.DEBUG)
+currentPath = os.path.dirname(os.path.abspath(__file__))
+config = configparser.ConfigParser()
+config.read(currentPath + '/Sensor_Console/Config.ini')
+
+#如果在這個設定的時間內沒有回到原點，那就發信通知
+TaskerErrorResponseSecond = config.get('Setting','TaskerErrorResponseSecond')
+TaskerErrorResponseSecond = int(TaskerErrorResponseSecond)
 log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(lineno)d) %(message)s')
 
 logFile = "/home/pii/StepMotor.log"
@@ -215,7 +223,7 @@ class StepMotorControll:
 									endTime = datetime.now()
 									#取時間差，當>2分鐘的時候，就發信警告
 									diffTime = endTime - startTime
-									if diffTime.seconds > 60:
+									if diffTime.seconds > TaskerErrorResponseSecond:
 										startTime = None
 										endTime = None
 										logger.warning("Running X axis back to zero point task ,  but over 2 min still not trigger")
@@ -243,7 +251,7 @@ class StepMotorControll:
 									endTime = datetime.now()
 									#取時間差，當>2分鐘的時候，就發信警告
 									diffTime = endTime - startTime
-									if diffTime.seconds > 60:
+									if diffTime.seconds > TaskerErrorResponseSecond:
 										startTime = None
 										endTime = None
 										logger.warning("Running Y axis back to zero point task ,  but over 2 min still not trigger")

@@ -189,9 +189,11 @@ def Stepping_Motor():
 		#碰到零點感測器就表示已經回0了 (X軸)
 		if "X axis zero point sensor trigger" in status:
 			MotroCurrentPostion_A.value = 0
+			db.session.commit()
 		#碰到零點感測器就表示已經回0了 (Y軸)
 		if "Y axis zero point sensor trigger" in status:
 			MotroCurrentPostion_B.value = 0
+			db.session.commit()
 		db.session.commit()
 		return str(status)
 	elif sys.platform == "win32":
@@ -408,6 +410,12 @@ def SetPoint(TargetX,TargetY,takePic = False):
 	#取得現在步進馬達的座標多少
 	MotroCurrentPostion_A = motor_position.query.filter_by(number='A').first()
 	MotroCurrentPostion_B = motor_position.query.filter_by(number='B').first()
+	if MotroCurrentPostion_A.value < 0 and TargetX > 0:
+		MotroCurrentPostion_A.value = 0
+		db.session.commit()
+	if MotroCurrentPostion_B.value < 0 and TargetY > 0:
+		MotroCurrentPostion_B.value = 0
+		db.session.commit()
 	#算出與目標點差距有幾個脈波
 	Direction_X , Pulse_X_Count = Step_A.SetPointToMove(nowPosition = MotroCurrentPostion_A.value,
 														TargetPosition = TargetX,
@@ -451,16 +459,18 @@ def SetPoint(TargetX,TargetY,takePic = False):
 			#碰到零點感測器就表示已經回0了 (X軸)
 			if "axis zero point sensor trigger" in status_A:
 				MotroCurrentPostion_A.value = 0
+				db.session.commit()
 			#碰到零點感測器就表示已經回0了 (Y軸)
 			if "axis zero point sensor trigger" in status_B:
 				MotroCurrentPostion_B.value = 0
-				
+				db.session.commit()
 			#回到原點後，略過此次任務
 			return "Pass this mission"
 
 		#碰到零點感測器就表示已經回0了
 		if "axis zero point sensor trigger" in status_A:
 			MotroCurrentPostion_A.value = 0
+			db.session.commit()
 
 		#在倒退運行的時候，連續運行2分鐘，但都沒碰到限位開關
 		#那就發mail通知
@@ -469,6 +479,7 @@ def SetPoint(TargetX,TargetY,takePic = False):
 			#但因為現在機器以為A馬達在-999的位置，這樣下次嘗試歸零的時候就無法進入判斷回圈
 			#所以就先設定0吧
 			MotroCurrentPostion_A.value = 0
+			db.session.commit()
 			#回到原點這件事發生錯誤
 			return "An error occurred when returning to the origin"
 
@@ -497,9 +508,11 @@ def SetPoint(TargetX,TargetY,takePic = False):
 			#碰到零點感測器就表示已經回0了 (X軸)
 			if "axis zero point sensor trigger" in status_A:
 				MotroCurrentPostion_A.value = 0
+				db.session.commit()
 			#碰到零點感測器就表示已經回0了 (Y軸)
 			if "axis zero point sensor trigger" in status_B:
 				MotroCurrentPostion_B.value = 0
+				db.session.commit()
 
 			#回到原點後，略過此次任務
 			return "Pass this mission"
@@ -507,6 +520,7 @@ def SetPoint(TargetX,TargetY,takePic = False):
 		#碰到零點感測器就表示已經回0了
 		if "axis zero point sensor trigger" in status_B:
 			MotroCurrentPostion_B.value = 0
+			db.session.commit()
 
 		#在倒退運行的時候，連續運行2分鐘，但都沒碰到限位開關
 		#那就發mail通知
@@ -516,6 +530,7 @@ def SetPoint(TargetX,TargetY,takePic = False):
 			#但因為現在機器以為B馬達在-999的位置，這樣下次嘗試歸零的時候就無法進入判斷回圈
 			#所以就先設定0吧
 			MotroCurrentPostion_B.value = 0
+			db.session.commit()
 			return "An error occurred when returning to the origin"
 
 		db.session.commit()
@@ -643,6 +658,8 @@ def StartSchedule_Job(takePic):
 				#不要強制執行的話為 0
 				#這樣這個任務就會停下來了
 				if isContinueAnyway == '0':
+					#關閉所有GPIO，防止出錯了還在灑水
+					ActiveGPIO([])
 					return "An error occurred when returning to the origin"
 	except Exception as e:
 		exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -654,6 +671,12 @@ def runCommandList():
 	StartSchedule_Job(takePic = False)
 	return "OK"
 
+#立即運行剛剛設定的指令
+@app.route("/forceRestart")
+#更新步進馬達的移動任務
+def forceRestart():
+	os.popen("sudo -S %s"%('systemctl restart Controller_Server'), 'w').write('888')
+	return 'OK'
 #立即運行剛剛設定的指令
 @app.route("/updateMotorJob")
 #更新步進馬達的移動任務
