@@ -7,6 +7,7 @@
 6. Using FTP to Auto upload picture to NAS 
 7. Raspberry controll step motor
 
+![](https://i.imgur.com/kfXOwjLl.jpg)
 # Architecture diagram
 ![](https://i.imgur.com/z71rRYA.png)
 # Jetson Nano 
